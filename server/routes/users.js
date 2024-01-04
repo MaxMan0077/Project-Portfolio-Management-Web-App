@@ -1,30 +1,32 @@
 const express = require('express');
+const multer = require('multer');
 const router = express.Router();
-const db = require('../database');
+const db = require('../database'); // Adjust this path as needed
+
+// Configure multer (file upload handling)
+const upload = multer({ dest: 'uploads/' }); // Files will be saved in the 'uploads' directory
 
 // POST route to add a new user
-router.post('/users', (req, res) => {
-    // Destructure the user data from the request body
-    const { name_first, name_second, office, department, user_type, photo, username, password } = req.body;
+router.post('/', upload.single('photo'), (req, res) => { // 'photo' is the field name for the uploaded file
+    console.log("Request body: ", req.body); // Log the text fields
+    console.log("Uploaded file: ", req.file); // Log the file information
 
-    // SQL query to insert a new user into the 'users' table
+    const { name_first, name_second, office, department, user_type, username, password } = req.body;
+    const photo = req.file ? req.file.path : ''; // Use the file path if a file was uploaded
+
     const query = `
-        INSERT INTO users (name_first, name_second, office, department, user_type, photo, username, password)
+        INSERT INTO user (name_first, name_second, office, department, user_type, photo, username, password)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
-    // Execute the query with the user data
     db.query(query, [name_first, name_second, office, department, user_type, photo, username, password], (err, result) => {
         if (err) {
-            // If an error occurs, log it and send a 500 status code
             console.error('Error adding new user:', err);
             res.status(500).send('Error adding new user');
         } else {
-            // If successful, send back a 201 status code with the new user's ID and a success message
             res.status(201).json({ iduser: result.insertId, message: 'New user added successfully' });
         }
     });
 });
 
-// Export the router to be used in other parts of the application
 module.exports = router;
