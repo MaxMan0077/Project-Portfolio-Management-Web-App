@@ -1,32 +1,67 @@
 const express = require('express');
 const multer = require('multer');
+const bcryptjs = require('bcryptjs');
 const router = express.Router();
 const db = require('../database'); // Adjust this path as needed
 
-// Configure multer (file upload handling)
-const upload = multer({ dest: 'uploads/' }); // Files will be saved in the 'uploads' directory
+// Configure multer for file upload handling
+const upload = multer({ dest: 'uploads/' });
 
 // POST route to add a new user
-router.post('/', upload.single('photo'), (req, res) => { // 'photo' is the field name for the uploaded file
-    console.log("Request body: ", req.body); // Log the text fields
-    console.log("Uploaded file: ", req.file); // Log the file information
+router.post('/register', upload.single('photo'), async (req, res) => {
+    console.log("Register Request body: ", req.body);
+    console.log("Uploaded file: ", req.file);
 
     const { name_first, name_second, office, department, user_type, username, password } = req.body;
-    const photo = req.file ? req.file.path : ''; // Use the file path if a file was uploaded
+    const photo = req.file ? req.file.path : '';
 
-    const query = `
-        INSERT INTO user (name_first, name_second, office, department, user_type, photo, username, password)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-    `;
+    try {
+        // Hash the password
+        const salt = await bcryptjs.genSalt(10);
+        const hashedPassword = await bcryptjs.hash(password, salt);
 
-    db.query(query, [name_first, name_second, office, department, user_type, photo, username, password], (err, result) => {
-        if (err) {
-            console.error('Error adding new user:', err);
-            res.status(500).send('Error adding new user');
+        // Insert the user with the hashed password
+        const query = `
+            INSERT INTO user (name_first, name_second, office, department, user_type, photo, username, password)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+        `;
+        await db.promise().query(query, [name_first, name_second, office, department, user_type, photo, username, hashedPassword]);
+
+        res.status(201).json({ message: 'New user added successfully' });
+    } catch (err) {
+        console.error('Error adding new user:', err);
+        res.status(500).send('Error adding new user');
+    }
+});
+
+// POST route for user login
+router.post('/login', async (req, res) => {
+    const { username, password } = req.body;
+    console.log("Login Request body: ", req.body);
+
+    try {
+        const sql = 'SELECT * FROM user WHERE username = ?';
+        const [users] = await db.promise().query(sql, [username]);
+        console.log("Users found: ", users);
+
+        if (users.length > 0) {
+            const user = users[0];
+            console.log("User found: ", user);
+            const passwordMatch = await bcryptjs.compare(password, user.password);
+            console.log("Password match: ", passwordMatch);
+
+            if (passwordMatch) {
+                res.status(200).json({ message: "Login successful" });
+            } else {
+                res.status(401).json({ message: "Invalid credentials" });
+            }
         } else {
-            res.status(201).json({ iduser: result.insertId, message: 'New user added successfully' });
+            res.status(404).json({ message: "User not found" });
         }
-    });
+    } catch (err) {
+        console.error("Error during login: ", err);
+        res.status(500).json({ message: "Server error" });
+    }
 });
 
 module.exports = router;

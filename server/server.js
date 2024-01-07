@@ -12,11 +12,13 @@ app.use(express.json());
 const mainRoutes = require('./routes/main');
 const projectRoutes = require('./routes/projects');
 const userRoutes = require('./routes/users');
+const resourceRoutes = require('./routes/resources');
 
 // Route middlewares
 app.use('/api/main', mainRoutes);
 app.use('/api/projects', projectRoutes);
 app.use('/api/users', userRoutes);
+app.use('/api/resources', resourceRoutes);
 
 // Default route for the server
 app.get('/', (req, res) => {

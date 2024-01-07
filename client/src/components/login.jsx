@@ -20,19 +20,22 @@ export default function Login() {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            // Replace URL with your server's login endpoint
-            const response = await axios.post('http://localhost:5000/api/login', credentials);
-            if (response.data.success) {
+            const response = await axios.post('http://localhost:5000/api/users/login', credentials);
+            
+            // Check the response from the server
+            if (response.status === 200) {
+                console.log("Login successful");
                 navigate('/dashboard'); // Navigate on successful login
             } else {
-                // Handle login failure (e.g., show an error message)
+                console.log("Login failed: ", response.data.message);
+                // Optionally, handle login failure (e.g., show an error message)
             }
         } catch (error) {
             console.error('Login error:', error);
-            // Handle server error (e.g., show an error message)
+            // Optionally, handle server error (e.g., show an error message)
         }
     };
-    
+
     return(
         <div className="relative w-full h-screen bg-zinc-900/90">
             <img className="absolute w-full h-full object-cover mix-blend-overlay" src={loginImg} alt="/" />
@@ -41,11 +44,11 @@ export default function Login() {
                     <h2 className="text-4xl font-bold text-center py-4">MyProjects</h2>
                     <div className="flex flex-col mb-4 relative">
                         <label>Username</label>
-                        <input className="border relative bg-gray-100 p-2" type="text" />
+                        <input className="border relative bg-gray-100 p-2" type="text" name="username" value={credentials.username} onChange={handleChange}/>
                     </div>
                     <div className="flex flex-col relative">
                         <label>Password</label>
-                        <input className="border relative bg-gray-100 p-2" type="password" />
+                        <input className="border relative bg-gray-100 p-2" type="password" name="password" value={credentials.password} onChange={handleChange}/>
                     </div>
                     <button className="w-full py-3 mt-8 bg-indigo-600 hover:bg-indigo-500 relative">Login</button>
                     <p className=" flex items-center mt-2 relative"><input className="mr-2" type="checkbox" />Remember Me</p>
