@@ -1,15 +1,35 @@
 const express = require('express');
+const db = require('../database');
 const router = express.Router();
 
-// Define routes for projects here
-router.get('/', (req, res) => {
-    // Logic to handle GET request for all projects
-});
+router.post('/add', async (req, res) => {
+    // Extract project data from the request
+    const {
+        name,
+        program,
+        location,
+        complexity,
+        project_manager,
+        business_owner,
+        description,
+        status,
+        budget_approved
+    } = req.body;
 
-router.post('/', (req, res) => {
-    // Logic to handle POST request to add a new project
-});
+    // Your SQL INSERT query to add a project to the database
+    const query = `
+        INSERT INTO project (name, program, location, complexity, project_manager, business_owner, description, status, budget_approved)
+        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+    `;
 
-// More project-related routes (PUT, DELETE, etc.)
+    // Execute the query
+    try {
+        const [result] = await db.promise().query(query, [name, program, location, complexity, project_manager, business_owner, description, status, budget_approved]);
+        res.status(201).json({ projectId: result.insertId, message: 'Project created successfully' });
+    } catch (err) {
+        console.error('Error adding new project:', err);
+        res.status(500).send('Error adding new project');
+    }
+});
 
 module.exports = router;

@@ -8,6 +8,8 @@ const upload = multer({ dest: 'uploads/' });
 
 router.post('/add', upload.single('photo'), async (req, res) => {
     // Extract resource data from the request
+    console.log('req.body:', req.body);
+    console.log('req.file:', req.file);
     const {
         resourceFirstName: name_first,
         resourceSecondName: name_second,

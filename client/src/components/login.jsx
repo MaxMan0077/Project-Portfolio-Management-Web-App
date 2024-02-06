@@ -6,8 +6,8 @@ import loginImg from "../assets/home_img_2.jpg";
 export default function Login() {
     const navigate = useNavigate();
     const [credentials, setCredentials] = useState({ username: '', password: '' });
+    const [isFadingOut, setIsFadingOut] = useState(false);
 
-    // Function to update state from input
     const handleChange = (e) => {
         const { name, value } = e.target;
         setCredentials(prevState => ({
@@ -16,31 +16,31 @@ export default function Login() {
         }));
     };
 
-    // Function to handle login
+    const fadeToDashboard = () => {
+        setIsFadingOut(true); // Start the fade-out effect
+        setTimeout(() => navigate('/dashboard'), 300); // Set the duration of the fade effect
+    }
+
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
             const response = await axios.post('http://localhost:5000/api/users/login', credentials);
-            
-            // Check the response from the server
             if (response.status === 200) {
                 console.log("Login successful");
-                navigate('/dashboard'); // Navigate on successful login
+                fadeToDashboard(); // Use fade function to navigate
             } else {
                 console.log("Login failed: ", response.data.message);
-                // Optionally, handle login failure (e.g., show an error message)
             }
         } catch (error) {
             console.error('Login error:', error);
-            // Optionally, handle server error (e.g., show an error message)
         }
     };
 
     return(
-        <div className="relative w-full h-screen bg-zinc-900/90">
+        <div className={`relative w-full h-screen bg-zinc-900/90 transition-opacity duration-500 ${isFadingOut ? 'opacity-0' : 'opacity-100'}`}>
             <img className="absolute w-full h-full object-cover mix-blend-overlay" src={loginImg} alt="/" />
             <div className="flex justify-center items-center h-full">
-                <form onSubmit={handleLogin} className="max-w-[400px] w-full mx-auto bg-white p-8">
+                <form onSubmit={handleLogin} className={`max-w-[400px] w-full mx-auto bg-white p-8 transition-opacity duration-500 ${isFadingOut ? 'opacity-0' : 'opacity-100'}`}>
                     <h2 className="text-4xl font-bold text-center py-4">MyProjects</h2>
                     <div className="flex flex-col mb-4 relative">
                         <label>Username</label>
