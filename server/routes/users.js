@@ -2,7 +2,7 @@ const express = require('express');
 const multer = require('multer');
 const bcryptjs = require('bcryptjs');
 const router = express.Router();
-const db = require('../database'); // Adjust this path as needed
+const db = require('../database');
 
 // Configure multer for file upload handling
 const upload = multer({ dest: 'uploads/' });
@@ -63,5 +63,62 @@ router.post('/login', async (req, res) => {
         res.status(500).json({ message: "Server error" });
     }
 });
+
+// GET route to fetch all users
+router.get('/getall', async (req, res) => {
+    try {
+        // Include iduser in the SELECT statement
+        const sql = 'SELECT iduser, name_first, name_second, office, department, user_type FROM user';
+        const [users] = await db.promise().query(sql);
+        res.json(users);
+    } catch (err) {
+        console.error("Error fetching users: ", err);
+        res.status(500).json({ message: "Error fetching users" });
+    }
+});
+
+
+// PUT route to update an existing user
+router.put('/update/:iduser', async (req, res) => {
+    const { iduser } = req.params;
+    const { name_first, name_second, office, department, user_type, photo } = req.body;
+
+    if (!iduser) {
+        return res.status(400).send('User ID is required');
+    }
+
+    try {
+        const query = `
+            UPDATE user
+            SET
+                name_first = ?,
+                name_second = ?,
+                office = ?,
+                department = ?,
+                user_type = ?,
+                photo = ?
+            WHERE iduser = ?
+        `;
+        await db.promise().query(query, [name_first, name_second, office, department, user_type, photo, iduser]);
+        res.json({ message: 'User updated successfully' });
+    } catch (err) {
+        console.error('Error updating user:', err);
+        res.status(500).send('Error updating user');
+    }
+});
+
+// DELETE route to delete a user
+router.delete('/delete/:iduser', async (req, res) => {
+    const { iduser } = req.params;
+    try {
+        const query = `DELETE FROM user WHERE iduser = ?`;
+        await db.promise().query(query, [iduser]);
+        res.json({ message: 'User deleted successfully' });
+    } catch (err) {
+        console.error('Error deleting user:', err);
+        res.status(500).send('Error deleting user');
+    }
+});
+
 
 module.exports = router;

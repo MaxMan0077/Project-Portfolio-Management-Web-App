@@ -3,6 +3,8 @@ import Login from './components/login'
 import Dashboard from './components/dashboard';
 import UserCreate from './components/UserCreate';
 import CreateProject from './components/createProject';
+import UserOverview from './components/userOverview';
+
 
 function App() {
   return (
@@ -10,6 +12,7 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/user-overview" element={<UserOverview />} />
         <Route path="/create-user" element={<UserCreate />} />
         <Route path="/create-project" element={<CreateProject />} />
       </Routes>
