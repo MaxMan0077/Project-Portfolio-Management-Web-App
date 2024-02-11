@@ -2,14 +2,22 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import UserModal from './userModal';
+import ResourceModal from './resourceModal';
 
 export default function UserOverview() {
     const navigate = useNavigate();
     const [searchTerm, setSearchTerm] = useState('');
     const [users, setUsers] = useState([]);
+    const [resources, setResources] = useState([]);
     const [isSearchingUsers, setIsSearchingUsers] = useState(true);
+    const [selectedResource, setSelectedResource] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
+    const [notification, setNotification] = useState({ show: false, message: '', fadingOut: false });
+
+    const [selectedItem, setSelectedItem] = useState(null);
+    const [isResourceModalOpen, setIsResourceModalOpen] = useState(false);
+
 
     const fetchUsers = async () => {
         try {
@@ -21,9 +29,21 @@ export default function UserOverview() {
         }
     };
 
+    const fetchResources = async () => {
+        try {
+            const response = await axios.get('http://localhost:5000/api/resources/getall');
+            console.log('Resource Data: ', response.data);
+            setResources(response.data);
+        } catch (error) {
+            console.error('Failed to fetch resources:', error);
+        }
+    };
+    
     useEffect(() => {
         if (isSearchingUsers) {
             fetchUsers();
+        } else {
+            fetchResources();
         }
     }, [isSearchingUsers]);
 
@@ -32,6 +52,23 @@ export default function UserOverview() {
         return fullName.includes(searchTerm.toLowerCase());
     });
 
+    const filteredResources = resources.filter(resource => {
+        const resourceName = `${resource.name_first} ${resource.name_second}`.toLowerCase();
+        return resourceName.includes(searchTerm.toLowerCase());
+    });
+
+    const showNotification = (message) => {
+        setNotification({ show: true, message, fadingOut: false }); // Immediately show the notification without fading out
+        setTimeout(() => {
+            // Start fading out after 2.5 seconds
+            setNotification((prev) => ({ ...prev, fadingOut: true }));
+            // Completely hide the notification after another 0.5 seconds, allowing the fade-out transition to complete
+            setTimeout(() => {
+                setNotification({ show: false, message: '', fadingOut: false });
+            }, 500); // This timeout matches the CSS transition duration
+        }, 2500); // Adjust this duration to control how long the notification stays fully visible
+    };
+    
     const handleSearchChange = (e) => {
         setSearchTerm(e.target.value);
     };
@@ -53,38 +90,67 @@ export default function UserOverview() {
             const response = await axios.put(`http://localhost:5000/api/users/update/${updatedUserData.iduser}`, updatedUserData);
             console.log(response.data);
             setIsModalOpen(false); // Close the modal
-            
-            // Refresh the user list to reflect the changes.
-            fetchUsers(); // Assuming fetchUsers is a function that gets the updated list of users from the server
+            fetchUsers(); // Refresh the user list
+            showNotification("User saved successfully!"); // Show success notification
         } catch (error) {
-            console.error('Error updating user:', error);
+            console.error('Error saving user:', error);
+            showNotification("Failed to save user."); // Show error notification
         }
     };
+    
     
     const handleDeleteUser = async (userId) => {
         try {
             const response = await axios.delete(`http://localhost:5000/api/users/delete/${userId}`);
             console.log(response.data);
             setIsModalOpen(false); // Close the modal
-            
-            // Refresh the user list to reflect the deletion
-            fetchUsers(); // Re-fetch the user list after deletion
+
+            fetchUsers(); // Refresh the user list
+            showNotification("User deleted successfully!");
         } catch (error) {
             console.error('Error deleting user:', error);
+            showNotification("Failed to delete user."); // Show error notification
         }
-    };    
+    };
+
+
+    const handleSaveResource = async (resourceData) => {
+        try {
+            const response = await axios.put(`http://localhost:5000/api/resources/update/${resourceData.idresource}`, resourceData);
+            console.log("Resource saved successfully", response.data);
+            setIsResourceModalOpen(false); // Close the modal
+            fetchResources(); // Refresh the resource list
+            showNotification("Resource saved successfully!");
+        } catch (error) {
+            console.error('Failed to save resource:', error);
+            showNotification("Failed to save resource.");
+        }
+    };
+    
+    const handleDeleteResource = async (resourceId) => {
+        try {
+            const response = await axios.delete(`http://localhost:5000/api/resources/delete/${resourceId}`);
+            console.log("Resource deleted successfully", response.data);
+            fetchResources(); // Refresh the resource list
+            setIsResourceModalOpen(false); // Close the modal if open
+            showNotification("Resource deleted successfully!");
+        } catch (error) {
+            console.error('Failed to delete resource:', error);
+            showNotification("Failed to delete resource.");
+        }
+    };
+      
 
     const openModal = (user) => {
         console.log('Selected user with ID:', user.iduser);
         setSelectedUser(user);
         setIsModalOpen(true);
     };
-    // Dummy resources data
-    const [resources, setResources] = useState([
-        { name: 'Resource One', department: 'Finance', office: 'London', role: 'Analyst', type: 'External' },
-        { name: 'Resource Two', department: 'IT', office: 'New York', role: 'Developer', type: 'Internal' },
-        // Add more resource objects as needed
-    ]);
+
+    const openResourceModal = (resource) => {
+        setSelectedResource(resource);
+        setIsResourceModalOpen(true);
+    };
 
     return (
         <div className="container mx-auto p-8">
@@ -161,9 +227,11 @@ export default function UserOverview() {
                             </tr>
                         </thead>
                         <tbody>
-                            {resources.map((resource, index) => (
-                                <tr key={index} className={`${index % 2 === 0 ? 'bg-white' : 'bg-gray-100'}`}>
-                                    <td className="px-5 py-5 border-b border-gray-200 text-sm">{resource.name}</td>
+                            {filteredResources.map((resource, index) => (
+                                <tr key={index} onClick={() => openResourceModal(resource)} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-100'} hover:bg-gray-200`}>
+                                    <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                                        {`${resource.name_first} ${resource.name_second}`}
+                                    </td>
                                     <td className="px-5 py-5 border-b border-gray-200 text-sm">{resource.department}</td>
                                     <td className="px-5 py-5 border-b border-gray-200 text-sm">{resource.office}</td>
                                     <td className="px-5 py-5 border-b border-gray-200 text-sm">{resource.role}</td>
@@ -174,9 +242,15 @@ export default function UserOverview() {
                     </table>
                 </div>
             )}
+            {notification.show ? (
+                <div className="fixed inset-0 bg-transparent flex justify-center items-center z-50">
+                    <div className={`transition-opacity duration-1000 ease-in-out ${notification.show ? 'opacity-100' : 'opacity-0 pointer-events-none'} p-4 max-w-sm mx-auto bg-blue-500 text-white text-center rounded-lg shadow-lg`}>
+                        {notification.message}
+                    </div>
+                </div>
+            ) : null}
             {isModalOpen && <UserModal user={selectedUser} onClose={() => setIsModalOpen(false)} onSave={handleSaveUser} onDelete={handleDeleteUser} />}
-            {/* Implement filters, search results, and rows with alternating colors here */}
-            {/* This placeholder section should be replaced with actual search logic and rendering */}
+            {isResourceModalOpen && <ResourceModal resource={selectedResource} onClose={() => setIsResourceModalOpen(false)} onSave={handleSaveResource} onDelete={handleDeleteResource} />}
         </div>
     );
 }
