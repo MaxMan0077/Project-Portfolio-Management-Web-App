@@ -4,6 +4,7 @@ import Dashboard from './components/dashboard';
 import UserCreate from './components/UserCreate';
 import CreateProject from './components/createProject';
 import UserOverview from './components/userOverview';
+import Kanban from './components/kanban';
 
 
 function App() {
@@ -15,6 +16,7 @@ function App() {
         <Route path="/user-overview" element={<UserOverview />} />
         <Route path="/create-user" element={<UserCreate />} />
         <Route path="/create-project" element={<CreateProject />} />
+        <Route path="/kanban" element={<Kanban />} />
       </Routes>
     </Router>
   );

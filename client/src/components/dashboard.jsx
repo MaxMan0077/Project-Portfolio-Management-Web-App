@@ -17,6 +17,11 @@ export default function Dashboard() {
         navigate('/create-project');
     };
 
+    const handleSection3Click = () => {
+        navigate('/kanban');
+    };
+
+
     return (
         <div className={`dashboard transition-opacity duration-2000 ${isFadingIn ? 'opacity-100' : 'opacity-0'}`}>
             <nav className="bg-gray-800 p-4 text-white">
@@ -35,15 +40,18 @@ export default function Dashboard() {
                          </button>
                     </div>
                     <div className="bg-white p-4 rounded shadow">
-                        <h3 className="font-bold text-lg">Section 2</h3>
+                        <h3 className="font-bold text-lg">Project Maintainance</h3>
                         <p>Details about Section 2...</p>
                         <button onClick={handleCreateProjectClick} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
                             Create New Project
                         </button>
                     </div>
                     <div className="bg-white p-4 rounded shadow">
-                        <h3 className="font-bold text-lg">Section 3</h3>
+                        <h3 className="font-bold text-lg">Kanban Board</h3>
                         <p>Details about Section 3...</p>
+                        <button onClick={handleSection3Click} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
+                            Kanban
+                        </button>
                     </div>
                     {/* Add more sections as needed */}
                 </div>
