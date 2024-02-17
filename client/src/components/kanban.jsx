@@ -97,10 +97,12 @@ const KanbanBoard = () => {
       const columns = placeholderData;
 
   return (
-    <div className="flex space-x-4 overflow-x-auto p-4">
-      {columns.map((column, index) => (
-        <KanbanColumn key={index} title={column.title} cards={column.cards} />
-      ))}
+    <div className="flex justify-center min-h-screen pt-4 pb-4">
+      <div className="flex space-x-4 overflow-x-auto p-4 bg-gray-300 rounded-lg shadow">
+        {columns.map((column, index) => (
+          <KanbanColumn key={index} title={column.title} cards={column.cards} />
+        ))}
+      </div>
     </div>
   );
 };
