@@ -1,7 +1,10 @@
-import React from 'react';
+import React, { useState } from 'react';
 import KanbanColumn from './kanbanComponents/kanbanColumn';
+import Sidebar from './kanbanComponents/sidebar';
 
 const KanbanBoard = () => {
+  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
+  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
 
     const placeholderData = [
         {
@@ -79,6 +82,20 @@ const KanbanBoard = () => {
           ]
         },
         {
+          title: 'Test',
+          cards: [
+            {
+              id: 6,
+              title: '100 Widgets',
+              name: 'Leslie Craghead',
+              amount: 'US$10,000.00',
+              closingDate: '2023-07-28',
+              probability: 60,
+              expectedRevenue: 6000
+            },
+          ]
+        },
+        {
           title: 'Proposal/Price Quote',
           cards: [
             {
@@ -98,6 +115,9 @@ const KanbanBoard = () => {
 
   return (
     <div className="flex justify-center min-h-screen pt-4 pb-4">
+      <button onClick={toggleSidebar} className="p-4 m-4 bg-blue-500 text-white rounded-lg">
+        Toggle Sidebar
+      </button>
       <div className="flex space-x-4 overflow-x-auto p-4 bg-gray-300 rounded-lg shadow">
         {columns.map((column, index) => (
           <KanbanColumn key={index} title={column.title} cards={column.cards} />
