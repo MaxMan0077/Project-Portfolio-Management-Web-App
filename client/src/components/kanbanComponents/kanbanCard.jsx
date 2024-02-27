@@ -7,6 +7,7 @@ const KanbanCard = ({ title, name, amount, closingDate, probability, expectedRev
     <div className="bg-white rounded-lg shadow-lg mb-4 relative overflow-hidden">
       {/* Colored strip at the top of the card */}
       <div className={`${stripColor} h-3`} style={{ width: '100%' }}></div>
+      
       <div className="p-4">
         <div className="absolute top-0 right-0 mt-2 mr-2 w-16 h-16 bg-white rounded-full overflow-hidden border-2 border-white shadow">
           <img src={photoUrl} alt="Profile" className="w-full h-full object-cover"/>

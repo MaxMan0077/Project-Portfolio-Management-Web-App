@@ -16,7 +16,7 @@ router.post('/add', async (req, res) => {
         budget_approved
     } = req.body;
 
-    // Your SQL INSERT query to add a project to the database
+    // SQL INSERT query to add a project to the database
     const query = `
         INSERT INTO project (name, program, location, complexity, project_manager, business_owner, description, status, budget_approved)
         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
@@ -32,4 +32,18 @@ router.post('/add', async (req, res) => {
     }
 });
 
+// GET route to fetch all projects
+router.get('/getall', async (req, res) => {
+    // SQL SELECT query to fetch all projects from the database
+    const query = `SELECT * FROM project`;
+
+    // Execute the query
+    try {
+        const [projects] = await db.promise().query(query);
+        res.status(200).json(projects);
+    } catch (err) {
+        console.error('Error fetching projects:', err);
+        res.status(500).send('Error fetching projects');
+    }
+});
 module.exports = router;

@@ -14,7 +14,7 @@ export default function Dashboard() {
     };
 
     const handleCreateProjectClick = () => {
-        navigate('/create-project');
+        navigate('/projects-overview');
     };
 
     const handleSection3Click = () => {
