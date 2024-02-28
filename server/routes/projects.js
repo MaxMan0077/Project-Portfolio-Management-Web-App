@@ -4,6 +4,7 @@ const router = express.Router();
 
 router.post('/add', async (req, res) => {
     // Extract project data from the request
+    console.log(req.body);
     const {
         name,
         program,
@@ -13,18 +14,46 @@ router.post('/add', async (req, res) => {
         business_owner,
         description,
         status,
-        budget_approved
+        budget_approved,
+        phase,
+        phase_start,
+        phase_end
     } = req.body;
 
     // SQL INSERT query to add a project to the database
     const query = `
-        INSERT INTO project (name, program, location, complexity, project_manager, business_owner, description, status, budget_approved)
-        VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)
+        INSERT INTO project (
+            name,
+            program,
+            location,
+            complexity,
+            project_manager,
+            business_owner,
+            description,
+            status,
+            budget_approved,
+            phase,
+            phase_start,
+            phase_end
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     // Execute the query
     try {
-        const [result] = await db.promise().query(query, [name, program, location, complexity, project_manager, business_owner, description, status, budget_approved]);
+        const [result] = await db.promise().query(query, [
+            name,
+            program,
+            location,
+            complexity,
+            project_manager,
+            business_owner,
+            description,
+            status,
+            budget_approved,
+            phase,
+            phase_start,
+            phase_end
+        ]);
         res.status(201).json({ projectId: result.insertId, message: 'Project created successfully' });
     } catch (err) {
         console.error('Error adding new project:', err);

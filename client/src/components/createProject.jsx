@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 export default function CreateProject() {
+    const navigate = useNavigate();
     const [formData, setFormData] = useState({
         name: '',
         program: '',
@@ -11,7 +13,9 @@ export default function CreateProject() {
         description: '',
         status: '',
         budgetApproved: '',
-        // Add more fields as necessary
+        phase: '',
+        phaseStart: '',
+        phaseEnd: '',
     });
 
     const handleInputChange = (event) => {
@@ -35,7 +39,10 @@ export default function CreateProject() {
             business_owner: parseInt(formData.businessOwner),
             description: formData.description,
             status: formData.status,
-            budget_approved: parseFloat(formData.budgetApproved)
+            budget_approved: parseFloat(formData.budgetApproved),
+            phase: formData.phase,
+            phase_start: formData.phaseStart,
+            phase_end: formData.phaseEnd,
         };
         console.log('Formatted data:', formattedData);
     
@@ -54,10 +61,10 @@ export default function CreateProject() {
     
             const data = await response.json();
             console.log('Project created:', data);
-            // Handle success (maybe navigate to another page or show a success message)
+            navigate('/projects-overview'); // Navigate to the projects overview page on success
         } catch (error) {
             console.error('Error creating project:', error);
-            // Handle error (show error message)
+            // Optionally handle error (show error message)
         }
     };    
     
@@ -217,6 +224,56 @@ export default function CreateProject() {
                             placeholder="Budget Approved"
                             value={formData.budgetApproved}
                             onChange={handleInputChange}
+                        />
+                    </div>
+                </div>
+
+                <div className="flex mb-4">
+                    {/* Project Phase Dropdown */}
+                    <div className="w-1/3 mr-2">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phase">
+                        Project Phase
+                        </label>
+                        <select
+                        className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        name="phase"
+                        value={formData.phase}
+                        onChange={handleInputChange}
+                        >
+                        <option value="">Select Phase</option>
+                        <option value="planning">Planning</option>
+                        <option value="design">Design</option>
+                        <option value="development">Development</option>
+                        <option value="testing">Testing</option>
+                        <option value="deployment">Deployment</option>
+                        </select>
+                    </div>
+
+                    {/* Phase Start Date Input */}
+                    <div className="w-1/3 mx-2">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phaseStart">
+                        Phase Start Date
+                        </label>
+                        <input
+                        className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        name="phaseStart"
+                        type="date"
+                        value={formData.phaseStart}
+                        onChange={handleInputChange}
+                        />
+                    </div>
+
+                    {/* Phase End Date Input */}
+                    <div className="w-1/3 ml-2">
+                        <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phaseEnd">
+                        Phase End Date
+                        </label>
+                        <input
+                        className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        name="phaseEnd"
+                        type="date"
+                        value={formData.phaseEnd}
+                        onChange={handleInputChange}
                         />
                     </div>
                 </div>
