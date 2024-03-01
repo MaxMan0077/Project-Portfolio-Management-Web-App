@@ -75,4 +75,25 @@ router.get('/getall', async (req, res) => {
         res.status(500).send('Error fetching projects');
     }
 });
+
+router.get('/:projectId', async (req, res) => {
+    const { projectId } = req.params; // Extract the project ID from the URL parameter
+
+    try {
+        // Replace 'your_projects_table' with the actual name of your projects table in the database
+        const query = 'SELECT * FROM project WHERE idproject = ?';
+        const [project] = await db.promise().query(query, [projectId]);
+
+        if (project.length > 0) {
+            res.json(project[0]); // Send back the project details
+        } else {
+            res.status(404).send('Project not found');
+        }
+    } catch (error) {
+        console.error('Error fetching project details:', error);
+        res.status(500).send('Error fetching project details');
+    }
+});
+
+module.exports = router;
 module.exports = router;

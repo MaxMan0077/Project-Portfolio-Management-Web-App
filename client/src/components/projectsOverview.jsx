@@ -32,6 +32,10 @@ const ProjectsOverview = () => {
         navigate(-1);
     };
 
+    const handleRowClick = (projectId) => {
+        navigate(`/project-details/${projectId}`);
+    };    
+
     const handleCreateProjectClick = () => {
         navigate('/create-project');
     };
@@ -176,19 +180,21 @@ const ProjectsOverview = () => {
                         </thead>
                         <tbody>
                             {getProjectsByPhase(phase).length > 0 ? (
-                                getProjectsByPhase(phase).map((project, index) => (
-                                    <tr key={index} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.name}</td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.program}</td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.status}</td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.location}</td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.business_owner}</td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.project_manager}</td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.budget_approved}</td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.phase_start.split('T')[0]}</td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.phase_end.split('T')[0]}</td>
-                                    </tr>
-                                ))
+                                getProjectsByPhase(phase).map((project, index) => {
+                                    console.log(project.idproject);
+                                    return (
+                                        <tr key={index} onClick={() => handleRowClick(project.idproject)} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
+                                            <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.name}</td>
+                                            <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.program}</td>
+                                            <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.location}</td>
+                                            <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.business_owner}</td>
+                                            <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.project_manager}</td>
+                                            <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.budget_approved}</td>
+                                            <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.phase_start.split('T')[0]}</td>
+                                            <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.phase_end.split('T')[0]}</td>
+                                        </tr>
+                                    );
+                                })
                             ) : (
                                 <tr>
                                     <td colSpan="9" className="text-center px-5 py-5 border-b border-gray-200 text-lg font-bold">No projects in this phase</td>
