@@ -16,19 +16,23 @@ router.get('/status-reports/:projectId', async (req, res) => {
 });
 
 // Route to add a status report
-router.post('/status-reports', async (req, res) => {
-    const { date, scope_rag, time_rag, cost_rag, percentage, revised_start, revised_end, project } = req.body;
+router.post('/:projectId', async (req, res) => {
+  const projectId = req.params.projectId;
+  const { scopeRag, timeRag, costRag, percentage, revisedStart, revisedEnd, date } = req.body;
 
-    try {
-        const [result] = await db.promise().query(
-            'INSERT INTO status_report (date, scope_rag, time_rag, cost_rag, percentage, revised_start, revised_end, project) VALUES (?, ?, ?, ?, ?, ?, ?, ?)',
-            [date, scope_rag, time_rag, cost_rag, percentage, revised_start, revised_end, project]
-        );
-        res.status(201).json({ statusReportId: result.insertId, message: 'Status report added successfully' });
-    } catch (error) {
-        console.error('Error adding status report:', error);
-        res.status(500).send('Error adding status report');
-    }
+  const query = `
+    INSERT INTO status_report (scope_rag, time_rag, cost_rag, percentage, revised_start, revised_end, date, project)
+    VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+
+  try {
+    const [result] = await db.promise().query(query, [scopeRag, timeRag, costRag, percentage, revisedStart, revisedEnd, date, projectId]);
+    res.status(201).json({ message: 'Status report created successfully', insertId: result.insertId });
+  } catch (err) {
+    console.error('Error creating status report:', err);
+    res.status(500).json({ message: 'Error creating status report', error: err });
+  }
 });
+  
 
 module.exports = router;

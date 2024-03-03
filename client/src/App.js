@@ -7,6 +7,7 @@ import UserOverview from './components/userOverview';
 import ProjectsOverview from './components/projectsOverview'; 
 import Kanban from './components/kanban';
 import ProjectDetails from './components/projectDetails'
+import CreateStatusReport from './components/createReport';
 
 
 function App() {
@@ -21,6 +22,7 @@ function App() {
         <Route path="/projects-overview" element={<ProjectsOverview />} />
         <Route path="/kanban" element={<Kanban />} />
         <Route path="/project-details/:projectId" element={<ProjectDetails />} />
+        <Route path="/project/:projectId/create-status-report" element={<CreateStatusReport />} />
       </Routes>
     </Router>
   );
