@@ -36,7 +36,7 @@ const CreateStatusReportForm = () => {
     try {
       const response = await axios.post(`http://localhost:5000/api/reports/${projectId}`, statusReportData);
       // Handle success response
-      navigate(`/projects/${projectId}`); // Navigate to the project details page
+      navigate(`/project-details/${projectId}`); // Navigate to the project details page
     } catch (error) {
       console.error('Error submitting status report:', error);
       // Handle error response

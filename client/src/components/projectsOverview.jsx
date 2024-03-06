@@ -18,6 +18,7 @@ const ProjectsOverview = () => {
     const fetchProjects = async () => {
         try {
             const response = await axios.get('http://localhost:5000/api/projects/getall');
+            console.log('Projects Data:', response.data);
             setProjects(response.data);
         } catch (error) {
             console.error('Failed to fetch projects:', error);
@@ -162,7 +163,7 @@ const ProjectsOverview = () => {
             {/* Render a table for each phase */}
             {phases.map((phase, phaseIndex) => (
             <div key={phase} className="mb-8 w-full">
-                <h2 className="text-xl font-bold mb-3">{phase} Phase</h2>
+                <h2 className="text-xl font-bold mb-3">{phase}</h2>
                 <div className="overflow-y-auto max-h-[calc(6*4.5rem)]">
                     <table className="min-w-full leading-normal w-full">
                         <thead className={`text-white ${['bg-blue-500', 'bg-green-500', 'bg-red-500', 'bg-yellow-500', 'bg-purple-500'][phaseIndex % 5]}`}>
@@ -181,11 +182,13 @@ const ProjectsOverview = () => {
                         <tbody>
                             {getProjectsByPhase(phase).length > 0 ? (
                                 getProjectsByPhase(phase).map((project, index) => {
+                                    console.log('Project End Date:', project.phase_end);
                                     console.log(project.idproject);
                                     return (
                                         <tr key={index} onClick={() => handleRowClick(project.idproject)} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
                                             <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.name}</td>
                                             <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.program}</td>
+                                            <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.status}</td>
                                             <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.location}</td>
                                             <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.business_owner}</td>
                                             <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.project_manager}</td>
