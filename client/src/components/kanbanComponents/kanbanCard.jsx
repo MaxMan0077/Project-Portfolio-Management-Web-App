@@ -1,23 +1,22 @@
 import React from 'react';
 
-const KanbanCard = ({ title, name, amount, closingDate, probability, expectedRevenue, photoUrl }) => {
-  const stripColor = 'bg-blue-500';
+const KanbanCard = ({ title, status, businessManager, projectManager, budget, phaseStart, phaseEnd }) => {
+  const stripColor = 'bg-blue-500'; // The color strip at the top of the card
 
   return (
-    <div className="bg-white rounded-lg shadow-lg mb-4 relative overflow-hidden">
+    <div className="bg-white rounded-lg shadow-lg mb-4 overflow-hidden">
       {/* Colored strip at the top of the card */}
       <div className={`${stripColor} h-3`} style={{ width: '100%' }}></div>
-      
+
       <div className="p-4">
-        <div className="absolute top-0 right-0 mt-2 mr-2 w-16 h-16 bg-white rounded-full overflow-hidden border-2 border-white shadow">
-          <img src={photoUrl} alt="Profile" className="w-full h-full object-cover"/>
-        </div>
-        <h3 className="font-bold text-md">{title}</h3>
-        <p>{name}</p>
-        <p>Amount: {amount}</p>
-        <p>Closing Date: {closingDate}</p>
-        <p>Probability: {probability}%</p>
-        <p>Expected Revenue: {expectedRevenue}</p>
+        {/* Card content */}
+        <h3 className="font-bold text-xl mb-2">{title}</h3>
+        <p className="mb-1"><strong>Status:</strong> {status}</p>
+        <p className="mb-1"><strong>Business Manager:</strong> {businessManager}</p>
+        <p className="mb-1"><strong>Project Manager:</strong> {projectManager}</p>
+        <p className="mb-1"><strong>Budget:</strong> {budget.toLocaleString()}</p>
+        <p className="mb-1"><strong>Phase Start:</strong> {new Date(phaseStart).toLocaleDateString()}</p>
+        <p className="mb-1"><strong>Phase End:</strong> {new Date(phaseEnd).toLocaleDateString()}</p>
       </div>
     </div>
   );

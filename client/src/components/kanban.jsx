@@ -1,124 +1,75 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import axios from 'axios';
 import KanbanColumn from './kanbanComponents/kanbanColumn';
-import Sidebar from './kanbanComponents/sidebar';
 
 const KanbanBoard = () => {
-  const [isSidebarOpen, setIsSidebarOpen] = useState(false);
-  const toggleSidebar = () => setIsSidebarOpen(!isSidebarOpen);
+  const [projects, setProjects] = useState([]);
+  const [isLoading, setIsLoading] = useState(true);
 
-    const placeholderData = [
-        {
-          title: 'Qualification',
-          cards: [
-            {
-              id: 1,
-              title: '40 Widgets',
-              name: 'Leslie Craghead',
-              amount: 'US$4,000.00',
-              closingDate: '2023-07-28',
-              probability: 10,
-              expectedRevenue: 400
-            },
-            {
-              id: 2,
-              title: '10 Widgets',
-              name: 'Leslie Craghead',
-              amount: 'US$1,000.00',
-              closingDate: '2023-08-11',
-              probability: 10,
-              expectedRevenue: 100
-            },
-          ]
-        },
-        {
-          title: 'Needs Analysis',
-          cards: [
-            {
-              id: 3,
-              title: '25 Widgets',
-              name: 'Leslie Craghead',
-              amount: 'US$2,500.00',
-              closingDate: '2023-07-11',
-              probability: 20,
-              expectedRevenue: 500
-            },
-            {
-              id: 4,
-              title: '20 Widgets',
-              name: 'Leslie Craghead',
-              amount: 'US$2,000.00',
-              closingDate: '2023-07-27',
-              probability: 20,
-              expectedRevenue: 400
-            },
-          ]
-        },
-        {
-          title: 'Value Proposition',
-          cards: [
-            {
-              id: 5,
-              title: '80 Widgets',
-              name: 'Leslie Craghead',
-              amount: 'US$8,000.00',
-              closingDate: '2023-08-25',
-              probability: 40,
-              expectedRevenue: 3200
-            },
-          ]
-        },
-        {
-          title: 'Identify Decision Makers',
-          cards: [
-            {
-              id: 6,
-              title: '100 Widgets',
-              name: 'Leslie Craghead',
-              amount: 'US$10,000.00',
-              closingDate: '2023-07-28',
-              probability: 60,
-              expectedRevenue: 6000
-            },
-          ]
-        },
-        {
-          title: 'Test',
-          cards: [
-            {
-              id: 6,
-              title: '100 Widgets',
-              name: 'Leslie Craghead',
-              amount: 'US$10,000.00',
-              closingDate: '2023-07-28',
-              probability: 60,
-              expectedRevenue: 6000
-            },
-          ]
-        },
-        {
-          title: 'Proposal/Price Quote',
-          cards: [
-            {
-              id: 7,
-              title: '1 Widget',
-              name: 'Leslie Craghead',
-              amount: 'US$100.00',
-              closingDate: '2023-09-09',
-              probability: 75,
-              expectedRevenue: 75
-            },
-          ]
-        },
-      ];
-      
-      const columns = placeholderData;
+  useEffect(() => {
+    const fetchProjects = async () => {
+      try {
+        const response = await axios.get('http://localhost:5001/api/projects/getall');
+        console.log("Projects fetched:", response.data); // Log the fetched projects
+        setProjects(response.data);
+        setIsLoading(false);
+      } catch (error) {
+        console.error('Failed to fetch projects:', error);
+        setIsLoading(false);
+      }
+    };
+    
+
+    fetchProjects();
+  }, []);
+
+  const organizeProjectsIntoColumns = () => {
+    // Mapping phase names from your backend to the titles used in the UI
+    const columnTitles = {
+      'Planning': 'Planning',
+      'Design': 'Design',
+      'Development': 'Development',
+      'Testing': 'Testing',
+      'Deployment': 'Deployment',
+    };
+  
+    // Initialize columns with the appropriate titles and empty card arrays
+    const columns = Object.keys(columnTitles).map(phase => ({
+      title: columnTitles[phase],
+      cards: [],
+      phase
+    }));
+  
+    // Iterate over the projects and place them into the correct columns
+    projects.forEach(project => {
+      // Find the column that corresponds to the project's phase
+      const column = columns.find(c => c.phase.toLowerCase() === project.phase.toLowerCase());
+      if (column) {
+        // Push the project card into the corresponding column
+        column.cards.push({
+          id: project.idproject, // Using 'idproject' as the identifier in your project table
+          title: project.name, // Project name
+          status: project.status, // Project status
+          businessManager: `${project.business_owner}`, // Example to show business owner
+          projectManager: `${project.project_manager}`, // Example to show project manager
+          budget: `$${project.budget_approved}`, // Assuming 'budget_approved' is in dollars
+          phaseStart: new Date(project.phase_start).toLocaleDateString(), // Convert to locale date string
+          phaseEnd: new Date(project.phase_end).toLocaleDateString(), // Convert to locale date string
+        });
+      }
+    });
+  
+    // Return the array of columns with their cards filled in
+    return columns;
+  };
+  
+  if (isLoading) return <div>Loading...</div>;
+
+  const columns = organizeProjectsIntoColumns();
 
   return (
-    <div className="flex justify-center min-h-screen pt-4 pb-4">
-      <button onClick={toggleSidebar} className="p-4 m-4 bg-blue-500 text-white rounded-lg">
-        Toggle Sidebar
-      </button>
-      <div className="flex space-x-4 overflow-x-auto p-4 bg-gray-300 rounded-lg shadow">
+    <div className="flex justify-center w-full h-screen pt-4 pb-4">
+      <div className="flex space-x-1 overflow-x-auto p-1 w-full h-full">
         {columns.map((column, index) => (
           <KanbanColumn key={index} title={column.title} cards={column.cards} />
         ))}
