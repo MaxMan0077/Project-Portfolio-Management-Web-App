@@ -21,24 +21,55 @@ const ProjectDetails = () => {
  
 
   useEffect(() => {
-    // Fetch project details
+    const fetchProjectDetails = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5001/api/projects/${projectId}`);
+        if (response.data) {
+          setProject(response.data);
+          setEditFormData({
+            businessOwner: response.data.business_owner || '',
+            projectManager: response.data.project_manager || '',
+            phase: response.data.phase || '',
+            budget: response.data.budget_approved.toString(), // Convert to string for the input field
+            phaseStart: response.data.phase_start.split('T')[0], // Assuming it's in ISO format
+            phaseEnd: response.data.phase_end.split('T')[0], // Assuming it's in ISO format
+          });
+        } else {
+          throw new Error('No project data received');
+        }
+      } catch (error) {
+        console.error("There was an error fetching the project details:", error);
+        // Optionally set an error state here to inform the user
+      }
+    };
+  
     fetchProjectDetails();
-    // Fetch status reports for the project
     fetchStatusReports();
+    // Optionally, fetch status reports for the project here as well
   }, [projectId]);
+  
 
   const fetchProjectDetails = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/projects/${projectId}`);
+      const response = await axios.get(`http://localhost:5001/api/projects/${projectId}`);
       setProject(response.data);
+      // Populate edit form with the current project details
+      setEditFormData({
+        businessOwner: response.data.business_owner,
+        projectManager: response.data.project_manager,
+        phase: response.data.phase,
+        budget: response.data.budget_approved.toString(), // Convert to string for the input field
+        phaseStart: response.data.phase_start.split('T')[0], // Assuming it's in ISO format
+        phaseEnd: response.data.phase_end.split('T')[0], // Assuming it's in ISO format
+      });
     } catch (error) {
       console.error("There was an error fetching the project details:", error);
     }
   };
-
+  
   const fetchStatusReports = async () => {
     try {
-      const response = await axios.get(`http://localhost:5000/api/reports/status-reports/${projectId}`);
+      const response = await axios.get(`http://localhost:5001/api/reports/status-reports/${projectId}`);
       setStatusReports(response.data);
     } catch (error) {
       console.error("There was an error fetching the status reports:", error);
@@ -52,11 +83,50 @@ const ProjectDetails = () => {
   const handleBackClick = () => {
     navigate(-1);
   };
+
+  const handleInputChange = (event) => {
+    const { name, value } = event.target;
+    setEditFormData((prevFormData) => ({
+      ...prevFormData,
+      [name]: value
+    }));
+  };
+
+  const handleEditProjectSubmit = async (event) => {
+    event.preventDefault();
+    
+    // Construct the payload with only edited fields
+    const payload = {};
   
-  const handleEditProject = () => {
-    // Placeholder for project edit logic
-    console.log('Editing project');
-    setIsEditModalOpen(false); // Close modal after edit
+    if (editFormData.businessOwner && editFormData.businessOwner !== project.business_owner) {
+      payload.business_owner = editFormData.businessOwner;
+    }
+    if (editFormData.projectManager && editFormData.projectManager !== project.project_manager) {
+      payload.project_manager = editFormData.projectManager;
+    }
+    if (editFormData.phase && editFormData.phase !== project.phase) {
+      payload.phase = editFormData.phase;
+    }
+    if (editFormData.budget && editFormData.budget.toString() !== project.budget_approved.toString()) {
+      payload.budget_approved = parseFloat(editFormData.budget);
+    }
+    if (editFormData.phaseStart && editFormData.phaseStart !== project.phase_start.split('T')[0]) {
+      const phaseStartDate = new Date(editFormData.phaseStart);
+      payload.phase_start = `${phaseStartDate.getFullYear()}-${(phaseStartDate.getMonth() + 1).toString().padStart(2, '0')}-${phaseStartDate.getDate().toString().padStart(2, '0')} 00:00:00`;
+    }
+    if (editFormData.phaseEnd && editFormData.phaseEnd !== project.phase_end.split('T')[0]) {
+      const phaseEndDate = new Date(editFormData.phaseEnd);
+      payload.phase_end = `${phaseEndDate.getFullYear()}-${(phaseEndDate.getMonth() + 1).toString().padStart(2, '0')}-${phaseEndDate.getDate().toString().padStart(2, '0')} 00:00:00`;
+    }
+  
+    try {
+      const response = await axios.put(`http://localhost:5001/api/projects/update/${projectId}`, payload);
+      console.log('Project updated successfully:', response.data);
+      setIsEditModalOpen(false);
+      fetchProjectDetails(); // Refetch the project details to update UI
+    } catch (error) {
+      console.error("There was an error updating the project details:", error);
+    }
   };
 
   const handleDeleteProject = () => {
@@ -166,35 +236,48 @@ const ProjectDetails = () => {
       </div>
       {isEditModalOpen && (
         <div className="fixed z-10 inset-0 overflow-y-auto">
+          {/* Modal backdrop and alignment container */}
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
-            <div className="fixed inset-0 transition-opacity" aria-hidden="true">
-              <div className="absolute inset-0 bg-gray-500 opacity-75"></div>
-            </div>
-            <span className="hidden sm:inline-block sm:align-middle sm:h-screen" aria-hidden="true">&#8203;</span>
+            {/* Modal panel */}
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
-              <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              {/* Modal content */}
+              <form onSubmit={handleEditProjectSubmit} className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                 <div className="sm:flex sm:items-start">
-                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-headline">
+                  <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left w-full">
+                    <h3 className="text-lg leading-6 font-medium text-gray-900" id="modal-title">
                       Edit Project
                     </h3>
+                    {/* Form fields for editing project */}
                     <div className="mt-2">
-                      {/* Edit form fields */}
+                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="businessOwner">Business Owner</label>
+                      <input type="text" id="businessOwner" name="businessOwner" value={editFormData.businessOwner} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+
+                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="projectManager">Project Manager</label>
+                      <input type="text" id="projectManager" name="projectManager" value={editFormData.projectManager} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+
+                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phase">Phase</label>
+                      <input type="text" id="phase" name="phase" value={editFormData.phase} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+
+                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="budget">Budget</label>
+                      <input type="number" id="budget" name="budget" value={editFormData.budget} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+
+                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phaseStart">Phase Start</label>
+                      <input type="date" id="phaseStart" name="phaseStart" value={editFormData.phaseStart} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+
+                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phaseEnd">Phase End</label>
+                      <input type="date" id="phaseEnd" name="phaseEnd" value={editFormData.phaseEnd} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
                     </div>
                   </div>
                 </div>
-              </div>
-              <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
-                <button onClick={handleEditProject} className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
-                  Save
-                </button>
-                <button onClick={handleCloseEditModal} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
-                  Cancel
-                </button>
-                <button onClick={handleDeleteProject} className="mt-3 w-full inline-flex justify-center rounded-md border border-red-600 shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:mt-0 sm:w-auto sm:text-sm">
-                  Delete Project
-                </button>
-              </div>
+                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:flex-row-reverse">
+                  <button type="submit" className="w-full inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    Save
+                  </button>
+                  <button type="button" onClick={() => setIsEditModalOpen(false)} className="mt-3 w-full inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm">
+                    Cancel
+                  </button>
+                </div>
+              </form>
             </div>
           </div>
         </div>

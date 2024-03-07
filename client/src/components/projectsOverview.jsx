@@ -17,7 +17,7 @@ const ProjectsOverview = () => {
     // Fetch Projects
     const fetchProjects = async () => {
         try {
-            const response = await axios.get('http://localhost:5000/api/projects/getall');
+            const response = await axios.get('http://localhost:5001/api/projects/getall');
             console.log('Projects Data:', response.data);
             setProjects(response.data);
         } catch (error) {

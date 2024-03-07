@@ -24,7 +24,7 @@ export default function Login() {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:5000/api/users/login', credentials);
+            const response = await axios.post('http://localhost:5001/api/users/login', credentials);
             if (response.status === 200) {
                 console.log("Login successful");
                 fadeToDashboard(); // Use fade function to navigate

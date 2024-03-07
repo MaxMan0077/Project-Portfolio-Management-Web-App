@@ -95,5 +95,32 @@ router.get('/:projectId', async (req, res) => {
     }
 });
 
-module.exports = router;
+// Update project details
+router.put('/update/:projectId', async (req, res) => {
+    const { projectId } = req.params;
+    const updateData = req.body;
+
+    // Start building the SQL query dynamically
+    let query = 'UPDATE project SET ';
+    let queryParams = [];
+    for (let field in updateData) {
+        if (updateData[field] !== null && updateData[field] !== undefined) {
+            query += `${field} = ?, `;
+            queryParams.push(updateData[field]);
+        }
+    }
+    query = query.slice(0, -2); // Remove the last comma and space
+    query += ' WHERE idproject = ?';
+    queryParams.push(projectId);
+
+    try {
+        const [result] = await db.promise().query(query, queryParams);
+        res.json({ message: 'Project updated successfully', result });
+    } catch (error) {
+        console.error('Error updating project:', error);
+        res.status(500).send('Error updating project');
+    }
+});
+
+
 module.exports = router;

@@ -47,7 +47,7 @@ export default function CreateProject() {
         console.log('Formatted data:', formattedData);
     
         try {
-            const response = await fetch('http://localhost:5000/api/projects/add', {
+            const response = await fetch('http://localhost:5001/api/projects/add', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
