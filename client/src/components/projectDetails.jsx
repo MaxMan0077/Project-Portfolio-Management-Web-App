@@ -45,7 +45,6 @@ const ProjectDetails = () => {
   
     fetchProjectDetails();
     fetchStatusReports();
-    // Optionally, fetch status reports for the project here as well
   }, [projectId]);
   
 

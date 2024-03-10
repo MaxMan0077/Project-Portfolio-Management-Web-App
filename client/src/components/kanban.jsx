@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
+import { DndContext } from '@dnd-kit/core';
 import KanbanColumn from './kanbanComponents/kanbanColumn';
+
 
 const KanbanBoard = () => {
   const [projects, setProjects] = useState([]);
@@ -62,19 +64,32 @@ const KanbanBoard = () => {
     // Return the array of columns with their cards filled in
     return columns;
   };
+
+  const handleDragEnd = (event) => {
+    const { active, over } = event;
+  
+    if (!over || active.id === over.id) {
+      return;
+    }
+  
+    // Logic to reorder items within your state
+    // and potentially update your backend.
+  };
   
   if (isLoading) return <div>Loading...</div>;
 
   const columns = organizeProjectsIntoColumns();
 
   return (
-    <div className="flex justify-center w-full h-screen pt-4 pb-4">
-      <div className="flex space-x-1 overflow-x-auto p-1 w-full h-full">
-        {columns.map((column, index) => (
-          <KanbanColumn key={index} title={column.title} cards={column.cards} />
-        ))}
+    <DndContext onDragEnd={handleDragEnd}>
+      <div className="flex justify-center w-full h-screen pt-4 pb-4">
+        <div className="flex space-x-1 overflow-x-auto p-1 w-full h-full">
+          {columns.map((column, index) => (
+            <KanbanColumn key={index} title={column.title} cards={column.cards} />
+          ))}
+        </div>
       </div>
-    </div>
+    </DndContext>
   );
 };
 

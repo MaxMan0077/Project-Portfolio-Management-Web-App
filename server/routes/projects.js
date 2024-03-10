@@ -122,5 +122,21 @@ router.put('/update/:projectId', async (req, res) => {
     }
 });
 
+router.put('/updatePhase/:projectId', async (req, res) => {
+    const { projectId } = req.params;
+    const { phase } = req.body;
+  
+    const query = `
+      UPDATE project SET phase = ? WHERE idproject = ?
+    `;
+  
+    try {
+      await db.promise().query(query, [phase, projectId]);
+      res.status(200).json({ message: 'Project phase updated successfully' });
+    } catch (err) {
+      res.status(500).send('Error updating project phase');
+    }
+  });
+
 
 module.exports = router;
