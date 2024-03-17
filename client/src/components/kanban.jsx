@@ -1,95 +1,96 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { DndContext } from '@dnd-kit/core';
+import { DragDropContext } from 'react-beautiful-dnd';
 import KanbanColumn from './kanbanComponents/kanbanColumn';
 
-
 const KanbanBoard = () => {
-  const [projects, setProjects] = useState([]);
-  const [isLoading, setIsLoading] = useState(true);
+  const [columns, setColumns] = useState({});
 
   useEffect(() => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get('http://localhost:5001/api/projects/getall');
-        console.log("Projects fetched:", response.data); // Log the fetched projects
-        setProjects(response.data);
-        setIsLoading(false);
-      } catch (error) {
-        console.error('Failed to fetch projects:', error);
-        setIsLoading(false);
-      }
-    };
+        const fetchedProjects = response.data;
+        console.log(fetchedProjects);
+        const initialColumns = {
+          planning: [],
+          design: [],
+          development: [],
+          testing: [],
+          deployment: [],
+        };
     
-
+        // This assumes your projects have a 'phase' property to sort them into columns
+        fetchedProjects.forEach(project => {
+          if (initialColumns[project.phase]) {
+            initialColumns[project.phase].push(project);
+          } else {
+            // Handle the case where the project phase doesn't match any column
+            console.error(`Project phase '${project.phase}' does not match any column`);
+          }
+        });
+    
+        setColumns(initialColumns);
+      } catch (error) {
+        console.error('Error fetching projects:', error);
+      }
+    };    
     fetchProjects();
   }, []);
+  
 
-  const organizeProjectsIntoColumns = () => {
-    // Mapping phase names from your backend to the titles used in the UI
-    const columnTitles = {
-      'Planning': 'Planning',
-      'Design': 'Design',
-      'Development': 'Development',
-      'Testing': 'Testing',
-      'Deployment': 'Deployment',
-    };
-  
-    // Initialize columns with the appropriate titles and empty card arrays
-    const columns = Object.keys(columnTitles).map(phase => ({
-      title: columnTitles[phase],
-      cards: [],
-      phase
-    }));
-  
-    // Iterate over the projects and place them into the correct columns
-    projects.forEach(project => {
-      // Find the column that corresponds to the project's phase
-      const column = columns.find(c => c.phase.toLowerCase() === project.phase.toLowerCase());
-      if (column) {
-        // Push the project card into the corresponding column
-        column.cards.push({
-          id: project.idproject, // Using 'idproject' as the identifier in your project table
-          title: project.name, // Project name
-          status: project.status, // Project status
-          businessManager: `${project.business_owner}`, // Example to show business owner
-          projectManager: `${project.project_manager}`, // Example to show project manager
-          budget: `$${project.budget_approved}`, // Assuming 'budget_approved' is in dollars
-          phaseStart: new Date(project.phase_start).toLocaleDateString(), // Convert to locale date string
-          phaseEnd: new Date(project.phase_end).toLocaleDateString(), // Convert to locale date string
-        });
-      }
-    });
-  
-    // Return the array of columns with their cards filled in
-    return columns;
-  };
-
-  const handleDragEnd = (event) => {
-    const { active, over } = event;
-  
-    if (!over || active.id === over.id) {
+  const onDragEnd = (result) => {
+    const { source, destination } = result;
+    
+    // Do nothing if dropped outside a droppable area or in the same place
+    if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) {
       return;
     }
-  
-    // Logic to reorder items within your state
-    // and potentially update your backend.
-  };
-  
-  if (isLoading) return <div>Loading...</div>;
 
-  const columns = organizeProjectsIntoColumns();
+    // Create a copy of the current state to manipulate
+    const startColumn = columns[source.droppableId];
+    const finishColumn = columns[destination.droppableId];
+    const movedItem = startColumn[source.index];
+
+    // Moving within the same column
+    if (source.droppableId === destination.droppableId) {
+      const newColumn = Array.from(startColumn);
+      newColumn.splice(source.index, 1); // Remove the item from its original position
+      newColumn.splice(destination.index, 0, movedItem); // Insert the item at its new position
+      setColumns({
+        ...columns,
+        [source.droppableId]: newColumn,
+      });
+    } else {
+      // Moving from one column to another
+      const startColumnCopy = Array.from(startColumn);
+      const finishColumnCopy = Array.from(finishColumn);
+      startColumnCopy.splice(source.index, 1); // Remove the item from the source column
+      finishColumnCopy.splice(destination.index, 0, movedItem); // Insert the item into the destination column
+
+      setColumns({
+        ...columns,
+        [source.droppableId]: startColumnCopy,
+        [destination.droppableId]: finishColumnCopy,
+      });
+    }
+  };
 
   return (
-    <DndContext onDragEnd={handleDragEnd}>
-      <div className="flex justify-center w-full h-screen pt-4 pb-4">
-        <div className="flex space-x-1 overflow-x-auto p-1 w-full h-full">
-          {columns.map((column, index) => (
-            <KanbanColumn key={index} title={column.title} cards={column.cards} />
+    <DragDropContext onDragEnd={onDragEnd}>
+      <div className="flex justify-center w-full h-screen">
+        <div className="flex w-full">
+          {Object.keys(columns).map((columnId) => (
+            <KanbanColumn
+              key={columnId}
+              columnId={columnId}
+              title={columnId}
+              tasks={columns[columnId]}
+            />
           ))}
         </div>
       </div>
-    </DndContext>
+    </DragDropContext>
   );
 };
 
