@@ -37,21 +37,20 @@ const KanbanBoard = () => {
     };    
     fetchProjects();
   }, []);
-  
 
-  const onDragEnd = (result) => {
-    const { source, destination } = result;
+  const onDragEnd = async (result) => {
+    const { source, destination, draggableId } = result;
     
     // Do nothing if dropped outside a droppable area or in the same place
     if (!destination || (source.droppableId === destination.droppableId && source.index === destination.index)) {
       return;
     }
-
+  
     // Create a copy of the current state to manipulate
     const startColumn = columns[source.droppableId];
     const finishColumn = columns[destination.droppableId];
     const movedItem = startColumn[source.index];
-
+  
     // Moving within the same column
     if (source.droppableId === destination.droppableId) {
       const newColumn = Array.from(startColumn);
@@ -67,14 +66,28 @@ const KanbanBoard = () => {
       const finishColumnCopy = Array.from(finishColumn);
       startColumnCopy.splice(source.index, 1); // Remove the item from the source column
       finishColumnCopy.splice(destination.index, 0, movedItem); // Insert the item into the destination column
-
+  
       setColumns({
         ...columns,
         [source.droppableId]: startColumnCopy,
         [destination.droppableId]: finishColumnCopy,
       });
+  
+      // Send the update to the backend
+      try {
+        const response = await axios.put(`http://localhost:5001/api/projects/updatePhase/${draggableId}`, {
+          phase: destination.droppableId
+        });
+  
+        // Log the success response from the server
+        console.log('Project phase updated successfully:', response.data.message);
+        console.log(`Project ${draggableId} moved to ${destination.droppableId} phase.`);
+      } catch (error) {
+        console.error('Error updating project phase:', error);
+        // Optionally, you could revert state here if you wanted to handle the error by resetting the UI
+      }
     }
-  };
+  };  
 
   return (
     <DragDropContext onDragEnd={onDragEnd}>
