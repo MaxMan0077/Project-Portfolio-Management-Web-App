@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { DragDropContext } from 'react-beautiful-dnd';
 import KanbanColumn from './kanbanComponents/kanbanColumn';
+import Navbar from './navbar';
 
 const KanbanBoard = () => {
   const [columns, setColumns] = useState({});
@@ -90,20 +91,25 @@ const KanbanBoard = () => {
   };  
 
   return (
-    <DragDropContext onDragEnd={onDragEnd}>
-      <div className="flex justify-center w-full h-screen">
-        <div className="flex w-full">
-          {Object.keys(columns).map((columnId) => (
-            <KanbanColumn
-              key={columnId}
-              columnId={columnId}
-              title={columnId}
-              tasks={columns[columnId]}
-            />
-          ))}
-        </div>
+    <>
+      <Navbar />
+      {/* This div wraps the entire Kanban board below the navbar */}
+      <div className="flex flex-col h-screen pt-6"> {/* Use flex-col and h-screen to organize the content in a column and take up the full height */}
+        <DragDropContext onDragEnd={onDragEnd}>
+          {/* Ensure the div below takes up all available space and allows flex children to expand */}
+          <div className="flex flex-grow overflow-auto"> {/* Use flex-grow to take up available space */}
+            {Object.keys(columns).map((columnId) => (
+              <KanbanColumn
+                key={columnId}
+                columnId={columnId}
+                title={columnId}
+                tasks={columns[columnId]}
+              />
+            ))}
+          </div>
+        </DragDropContext>
       </div>
-    </DragDropContext>
+    </>
   );
 };
 

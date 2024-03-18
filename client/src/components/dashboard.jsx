@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import Navbar from './navbar';
 
 export default function Dashboard() {
     const navigate = useNavigate();
@@ -24,11 +25,7 @@ export default function Dashboard() {
 
     return (
         <div className={`dashboard transition-opacity duration-2000 ${isFadingIn ? 'opacity-100' : 'opacity-0'}`}>
-            <nav className="bg-gray-800 p-4 text-white">
-                <div className="container mx-auto">
-                    <h1 className="text-xl font-semibold">Dashboard</h1>
-                </div>
-            </nav>
+            <Navbar /> {/* Include the Navbar component */}
             <div className="container mx-auto mt-8">
                 <h2 className="text-2xl font-bold mb-4">Welcome to the Dashboard</h2>
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
