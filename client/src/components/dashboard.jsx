@@ -1,58 +1,108 @@
 import React, { useEffect, useState } from "react";
-import { useNavigate } from "react-router-dom";
+import axios from 'axios';
 import Navbar from './navbar';
+import { PieChart, Pie, Cell, Legend, Tooltip } from 'recharts';
 
 export default function Dashboard() {
-    const navigate = useNavigate();
     const [isFadingIn, setIsFadingIn] = useState(false);
+    const [projects, setProjects] = useState([]);
+    const [totalExpenditure, setTotalExpenditure] = useState(0);
+
+    // Hardcoded total budget
+    const totalBudget = 100000; // Example figure
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
 
     useEffect(() => {
         setIsFadingIn(true); // Trigger the fade-in effect
-    }, []); // Empty array ensures this effect only runs once on mount
 
-    const handleCreateUserClick = () => {
-        navigate('/user-overview');
+        // Fetch all projects
+        const fetchProjects = async () => {
+            try {
+                const response = await axios.get('http://localhost:5001/api/projects/getall');
+                setProjects(response.data);
+
+                // Calculate the sum of budget_approved from all projects
+                const totalExpenditure = response.data.reduce((acc, project) => acc + project.budget_approved, 0);
+                setTotalExpenditure(totalExpenditure);
+            } catch (err) {
+                console.error('Error fetching projects:', err);
+            }
+        };
+
+        fetchProjects();
+    },[]);
+
+    // Function to transform data into chart format
+    const generateChartData = (projects, key) => {
+        const groupBy = projects.reduce((acc, project) => {
+        const keyValue = project[key];
+        if (!acc[keyValue]) {
+            acc[keyValue] = { name: keyValue, value: 0 };
+        }
+        acc[keyValue].value += 1;
+        return acc;
+        }, {});
+    
+        return Object.values(groupBy);
     };
 
-    const handleCreateProjectClick = () => {
-        navigate('/projects-overview');
-    };
+    const dataByPhase = generateChartData(projects, 'phase');
+    const dataByLocation = generateChartData(projects, 'location');
+    const dataByComplexity = generateChartData(projects, 'complexity');
 
-    const handleSection3Click = () => {
-        navigate('/kanban');
-    };
-
-
-    return (
-        <div className={`dashboard transition-opacity duration-2000 ${isFadingIn ? 'opacity-100' : 'opacity-0'}`}>
-            <Navbar /> {/* Include the Navbar component */}
-            <div className="container mx-auto mt-8">
-                <h2 className="text-2xl font-bold mb-4">Welcome to the Dashboard</h2>
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                    <div className="bg-white p-4 rounded shadow">
-                        <h3 className="font-bold text-lg">User Maintainance</h3>
-                        <p>Details about Section 1...</p>
-                        <button onClick={handleCreateUserClick} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
-                             Create User/Resource
-                         </button>
-                    </div>
-                    <div className="bg-white p-4 rounded shadow">
-                        <h3 className="font-bold text-lg">Project Maintainance</h3>
-                        <p>Details about Section 2...</p>
-                        <button onClick={handleCreateProjectClick} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
-                            Create New Project
-                        </button>
-                    </div>
-                    <div className="bg-white p-4 rounded shadow">
-                        <h3 className="font-bold text-lg">Kanban Board</h3>
-                        <p>Details about Section 3...</p>
-                        <button onClick={handleSection3Click} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
-                            Kanban
-                        </button>
-                    </div>
-                    {/* Add more sections as needed */}
-                </div>
-            </div>
+    const renderPieChart = (data, name) => (
+        <div className="chart-container bg-white rounded shadow p-4 text-center flex justify-center items-center">
+            <PieChart width={200} height={200}>
+                <Pie
+                    dataKey="value"
+                    data={data}
+                    cx="50%"
+                    cy="50%"
+                    outerRadius={80}
+                    fill="#8884d8"
+                    isAnimationActive={true}
+                    animationDuration={800}
+                >
+                    {data.map((entry, index) => (
+                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
+                    ))}
+                </Pie>
+                <Tooltip />
+            </PieChart>
         </div>
     );
+
+    return (
+        <>
+            <Navbar />
+            <div className="dashboard transition-opacity duration-2000 mt-4 p-4 flex items-stretch ${isFadingIn ? 'opacity-100' : 'opacity-0'}">
+                {/* Stat Boxes */}
+                <div className="stat-box flex-1 bg-white rounded shadow p-4 text-center flex flex-col justify-center mr-2">
+                    <div className="stat-title text-gray-500 text-md font-semibold">Total Projects</div>
+                    <div className="stat-value text-5xl font-bold">{projects.length}</div>
+                </div>
+                <div className="stat-box flex-1 bg-white rounded shadow p-4 text-center flex flex-col justify-center mx-2">
+                    <div className="stat-title text-gray-500 text-md font-semibold">Total Budget</div>
+                    <div className="stat-value text-5xl font-bold">{`$${totalBudget.toLocaleString()}`}</div>
+                </div>
+                <div className="stat-box flex-1 bg-white rounded shadow p-4 text-center flex flex-col justify-center ml-2">
+                    <div className="stat-title text-gray-500 text-md font-semibold">Total Expenditure</div>
+                    <div className="stat-value text-5xl font-bold">{`$${totalExpenditure.toLocaleString()}`}</div>
+                </div>
+    
+                {/* Pie Charts */}
+                <div className="pie-charts-container flex flex-1 items-stretch justify-center ml-2 gap-2">
+                    <div className="pie-chart bg-white rounded shadow p-4 flex justify-center items-center flex-1">
+                        {renderPieChart(dataByPhase, 'Phase')}
+                    </div>
+                    <div className="pie-chart bg-white rounded shadow p-4 flex justify-center items-center flex-1">
+                        {renderPieChart(dataByLocation, 'Location')}
+                    </div>
+                    <div className="pie-chart bg-white rounded shadow p-4 flex justify-center items-center flex-1">
+                        {renderPieChart(dataByComplexity, 'Complexity')}
+                    </div>
+                </div>
+            </div>
+        </>
+    );       
 }
