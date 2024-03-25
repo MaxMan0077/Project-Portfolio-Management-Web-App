@@ -47,6 +47,16 @@ const ProjectsOverview = () => {
         setSearchTerm(e.target.value);
     };
 
+    const handleDeleteProject = async (projectId) => {
+        try {
+            await axios.delete(`http://localhost:5001/api/projects/delete/${projectId}`);
+            // Filter out the deleted project from the projects state to update the UI.
+            setProjects(prevProjects => prevProjects.filter(project => project.idproject !== projectId));
+        } catch (error) {
+            console.error('Error deleting project:', error);
+        }
+    };
+
     // Simplified filteredProjects to only filter by project name
     const filteredProjects = projects.filter(project => 
         project.name.toLowerCase().includes(searchTerm.toLowerCase())
@@ -189,27 +199,33 @@ const ProjectsOverview = () => {
                             </thead>
                             <tbody>
                                 {getProjectsByPhase(phase).length > 0 ? (
-                                    getProjectsByPhase(phase).map((project, index) => {
-                                        console.log('Project End Date:', project.phase_end);
-                                        console.log(project.idproject);
-                                        return (
-                                            <tr key={index} onClick={() => handleRowClick(project.idproject)} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
-                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.name}</td>
-                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.program}</td>
-                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.status}</td>
-                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.location}</td>
-                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.business_owner}</td>
-                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.project_manager}</td>
-                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.budget_approved}</td>
-                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">
-                                                    {`${formatDate(project.phase_start)} - ${formatDate(project.phase_end)}`}
-                                                </td>
-                                            </tr>
-                                        );
-                                    })
+                                    getProjectsByPhase(phase).map((project, index) => (
+                                        <tr key={project.idproject} 
+                                            className={`group cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200 relative`} 
+                                            onClick={() => handleRowClick(project.idproject)}
+                                        >
+                                            <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.name}</td>
+                                            <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.program}</td>
+                                            <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.status}</td>
+                                            <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.location}</td>
+                                            <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.business_owner}</td>
+                                            <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.project_manager}</td>
+                                            <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.budget_approved}</td>
+                                            <td className="px-5 py-2 border-b border-gray-200 text-sm flex justify-between items-center">
+                                                {`${formatDate(project.phase_start)} - ${formatDate(project.phase_end)}`}
+                                                <div className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out absolute right-0 pr-4">
+                                                    <button onClick={(e) => { e.stopPropagation(); handleDeleteProject(project.idproject); }} className="text-red-500 hover:text-red-700">
+                                                        <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                                                        </svg>
+                                                    </button>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                    ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="9" className="text-center px-5 py-5 border-b border-gray-200 text-lg font-bold">No projects in this phase</td>
+                                        <td colSpan="8" className="text-center px-5 py-5 border-b border-gray-200 text-lg font-bold">No projects in this phase</td>
                                     </tr>
                                 )}
                             </tbody>

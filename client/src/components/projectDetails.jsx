@@ -70,7 +70,10 @@ const ProjectDetails = () => {
   const fetchStatusReports = async () => {
     try {
       const response = await axios.get(`http://localhost:5001/api/reports/status-reports/${projectId}`);
-      setStatusReports(response.data);
+      // Assuming the date is in a format that can be directly used for comparison
+      // Sort the reports by date in descending order
+      const sortedReports = response.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+      setStatusReports(sortedReports);
     } catch (error) {
       console.error("There was an error fetching the status reports:", error);
     }
