@@ -62,6 +62,11 @@ const ProjectsOverview = () => {
                 (businessOwnerFilter ? project.business_owner.includes(businessOwnerFilter) : true);
         });
     };
+
+    const formatDate = (dateString) => {
+        const options = { day: '2-digit', month: 'short', year: 'numeric' };
+        return new Date(dateString).toLocaleDateString('en-GB', options);
+    };
     
     // An array of phases for demonstration purposes
     const phases = ['Planning', 'Design', 'Development', 'Testing', 'Deployment'];
@@ -179,8 +184,7 @@ const ProjectsOverview = () => {
                                     <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">Business Owner</th>
                                     <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">Project Manager</th>
                                     <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">Budget Approved</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">Phase Start</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">Phase End</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">Phase Timeline</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -190,15 +194,16 @@ const ProjectsOverview = () => {
                                         console.log(project.idproject);
                                         return (
                                             <tr key={index} onClick={() => handleRowClick(project.idproject)} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
-                                                <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.name}</td>
-                                                <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.program}</td>
-                                                <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.status}</td>
-                                                <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.location}</td>
-                                                <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.business_owner}</td>
-                                                <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.project_manager}</td>
-                                                <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.budget_approved}</td>
-                                                <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.phase_start.split('T')[0]}</td>
-                                                <td className="px-5 py-5 border-b border-gray-200 text-sm">{project.phase_end.split('T')[0]}</td>
+                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.name}</td>
+                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.program}</td>
+                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.status}</td>
+                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.location}</td>
+                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.business_owner}</td>
+                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.project_manager}</td>
+                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.budget_approved}</td>
+                                                <td className="px-5 py-2 border-b border-gray-200 text-sm">
+                                                    {`${formatDate(project.phase_start)} - ${formatDate(project.phase_end)}`}
+                                                </td>
                                             </tr>
                                         );
                                     })

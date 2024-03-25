@@ -12,8 +12,8 @@ const Navbar = () => {
           <img className="h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow" />
         </div>
         <div className="hidden sm:flex justify-center flex-1 items-center">
-          {/* Adjusted Links for Team, Projects, Calendar, and Contacts */}
-          {[{icon: <FaUsers className="text-3xl text-white"/>, to: "/user-overview", label: "Users"},
+          {/* Element List */}
+          {[{icon: <FaUsers className="text-3xl text-white"/>, to: "/user-overview", label: "People"},
             {icon: <FaTasks className="text-3xl text-white"/>, to: "/projects-overview", label: "Projects"},
             {icon: <FaHome className="text-5xl text-white"/>, to: "/dashboard", label: "Dashboard", special: true},
             {icon: <FaTrello className="text-3xl text-white"/>, to: "/kanban", label: "Kanban"},

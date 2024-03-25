@@ -1,22 +1,25 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocation
 import UserModal from './userModal';
 import ResourceModal from './resourceModal';
 import Navbar from './navbar';
 
-
 export default function UserOverview() {
     const navigate = useNavigate();
+    const location = useLocation(); // Use location to access navigation state
     const [searchTerm, setSearchTerm] = useState('');
     const [users, setUsers] = useState([]);
     const [resources, setResources] = useState([]);
-    const [isSearchingUsers, setIsSearchingUsers] = useState(true);
+    
+    // Initialize isSearchingUsers based on the navigation state
+    // If formType in the state is 'resource', initialize to false, else true
+    const [isSearchingUsers, setIsSearchingUsers] = useState(location.state?.formType !== 'resource');
+    
     const [selectedResource, setSelectedResource] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [selectedUser, setSelectedUser] = useState(null);
     const [notification, setNotification] = useState({ show: false, message: '', fadingOut: false });
-
     const [selectedItem, setSelectedItem] = useState(null);
     const [isResourceModalOpen, setIsResourceModalOpen] = useState(false);
 
@@ -80,8 +83,9 @@ export default function UserOverview() {
     };
 
     const handleCreateClick = () => {
-        navigate(isSearchingUsers ? '/create-user' : '/create-resource');
+        navigate('/create-user', { state: { formType: isSearchingUsers ? 'user' : 'resource' } });
     };
+    
 
     const toggleSearchType = () => {
         setIsSearchingUsers(!isSearchingUsers);
@@ -179,7 +183,7 @@ export default function UserOverview() {
                         onClick={handleCreateClick}
                         className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded"
                     >
-                        Add User/Resource
+                        {isSearchingUsers ? 'Create User' : 'Create Resource'}
                     </button>
                 </div>
                 <input
@@ -205,12 +209,12 @@ export default function UserOverview() {
                             <tbody>
                                 {filteredUsers.map((user, index) => (
                                     <tr key={index} onClick={() => openModal(user)} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                                        <td className="px-5 py-2 border-b border-gray-200 text-sm">
                                             {`${user.name_first} ${user.name_second}`}
                                         </td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{user.office}</td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{user.department}</td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{user.user_type}</td>
+                                        <td className="px-5 py-2 border-b border-gray-200 text-sm">{user.office}</td>
+                                        <td className="px-5 py-2 border-b border-gray-200 text-sm">{user.department}</td>
+                                        <td className="px-5 py-2 border-b border-gray-200 text-sm">{user.user_type}</td>
                                     </tr>
                                 ))}
                             </tbody>
@@ -233,13 +237,13 @@ export default function UserOverview() {
                             <tbody>
                                 {filteredResources.map((resource, index) => (
                                     <tr key={index} onClick={() => openResourceModal(resource)} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-100'} hover:bg-gray-200`}>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                                        <td className="px-5 py-2 border-b border-gray-200 text-sm">
                                             {`${resource.name_first} ${resource.name_second}`}
                                         </td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{resource.department}</td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{resource.office}</td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{resource.role}</td>
-                                        <td className="px-5 py-5 border-b border-gray-200 text-sm">{resource.type}</td>
+                                        <td className="px-5 py-2 border-b border-gray-200 text-sm">{resource.department}</td>
+                                        <td className="px-5 py-2 border-b border-gray-200 text-sm">{resource.office}</td>
+                                        <td className="px-5 py-2 border-b border-gray-200 text-sm">{resource.role}</td>
+                                        <td className="px-5 py-2 border-b border-gray-200 text-sm">{resource.type}</td>
                                     </tr>
                                 ))}
                             </tbody>

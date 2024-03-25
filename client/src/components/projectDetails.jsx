@@ -203,25 +203,25 @@ const ProjectDetails = () => {
             {statusReports.length > 0 ? (
               statusReports.map((report, index) => (
                 <tr key={report.code || index} className={`hover:bg-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
-                  <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                  <td className="px-5 py-2 border-b border-gray-200 text-sm">
                     {new Date(report.date).toLocaleDateString()}
                   </td>
-                  <td className="px-5 py-5 border-b border-gray-200 text-center">
+                  <td className="px-5 py-2 border-b border-gray-200 text-center">
                     <RagStatusCircle status={report.time_rag} />
                   </td>
-                  <td className="px-5 py-5 border-b border-gray-200 text-center">
+                  <td className="px-5 py-2 border-b border-gray-200 text-center">
                     <RagStatusCircle status={report.scope_rag} />
                   </td>
-                  <td className="px-5 py-5 border-b border-gray-200 text-center">
+                  <td className="px-5 py-2 border-b border-gray-200 text-center">
                     <RagStatusCircle status={report.cost_rag} />
                   </td>
-                  <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                  <td className="px-5 py-2 border-b border-gray-200 text-sm">
                     {report.percentage}
                   </td>
-                  <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                  <td className="px-5 py-2 border-b border-gray-200 text-sm">
                     {report.revised_start ? new Date(report.revised_start).toLocaleDateString() : ''}
                   </td>
-                  <td className="px-5 py-5 border-b border-gray-200 text-sm">
+                  <td className="px-5 py-2 border-b border-gray-200 text-sm">
                     {report.revised_end ? new Date(report.revised_end).toLocaleDateString() : ''}
                   </td>
                 </tr>

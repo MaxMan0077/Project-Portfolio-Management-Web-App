@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
+import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './navbar';
 
@@ -26,12 +27,14 @@ export default function UserCreate() {
     };
 
     const [formData, setFormData] = useState(initialUserFormData);
-    const [formType, setFormType] = useState('user'); // 'user' or 'resource'
+    const location = useLocation();
+    const navigate = useNavigate();
+    const [formType, setFormType] = useState(location.state?.formType || 'user');
 
-    const toggleFormType = () => {
-        setFormType(formType === 'user' ? 'resource' : 'user');
-        setFormData(formType === 'user' ? initialResourceFormData : initialUserFormData);
-    };
+    useEffect(() => {
+        // Set initial form data based on formType when component mounts or when formType changes
+        setFormData(formType === 'user' ? initialUserFormData : initialResourceFormData);
+    }, [formType]);
 
     const handleInputChange = (event) => {
         const { name, value, files } = event.target;
@@ -60,20 +63,15 @@ export default function UserCreate() {
         }
     };
 
+    const handleCancel = () => {
+        // Ensure the correct formType is being passed back to UserOverview
+        navigate('/user-overview', { state: { formType } });
+    };
+
     return (
         <>
             <Navbar />
-            <div className="container mx-auto p-8">
-                {/* Toggle Button */}
-                <div className="flex justify-center mb-4">
-                    <button
-                        onClick={toggleFormType}
-                        className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                    >
-                        Switch to {formType === 'user' ? 'Create Resource' : 'Create User'}
-                    </button>
-                </div>
-        
+            <div className="container mx-auto p-8">       
                 <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
                     <h2 className="text-2xl font-bold text-gray-700 mb-4">
                         {formType === 'user' ? 'Create User' : 'Create Resource'}
@@ -328,9 +326,16 @@ export default function UserCreate() {
                     <div className="flex items-center justify-between">
                         <button
                             type="submit"
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         >
-                            {formType === 'user' ? 'Create User' : 'Create Resource'}
+                            {formType === 'user' ? 'Create' : 'Create'}
+                        </button>
+                        <button
+                            type="button"
+                            onClick={() => navigate('/user-overview', { state: { formType: formType }})}
+                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        >
+                            Cancel
                         </button>
                     </div>
                 </form>
