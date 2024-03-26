@@ -8,6 +8,7 @@ import ProjectsOverview from './components/projectsOverview';
 import Kanban from './components/kanban';
 import ProjectDetails from './components/projectDetails'
 import CreateStatusReport from './components/createReport';
+import Roadmap from './components/roadmap';
 
 
 function App() {
@@ -23,6 +24,7 @@ function App() {
         <Route path="/kanban" element={<Kanban />} />
         <Route path="/project-details/:projectId" element={<ProjectDetails />} />
         <Route path="/project/:projectId/create-status-report" element={<CreateStatusReport />} />
+        <Route path="/roadmap" element={<Roadmap />} />
       </Routes>
     </Router>
   );

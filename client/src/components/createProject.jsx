@@ -244,11 +244,11 @@ export default function CreateProject() {
                             onChange={handleInputChange}
                             >
                             <option value="">Select Phase</option>
-                            <option value="planning">Planning</option>
-                            <option value="design">Design</option>
-                            <option value="development">Development</option>
-                            <option value="testing">Testing</option>
-                            <option value="deployment">Deployment</option>
+                            <option value="Funnel">Funnel</option>
+                            <option value="Review & Evaluation">Review & Evaluation</option>
+                            <option value="Business Case Development">Business Case Development</option>
+                            <option value="In Implementation">In Implementation</option>
+                            <option value="Closed">Closed</option>
                             </select>
                         </div>
 

@@ -128,8 +128,8 @@ export default function Dashboard() {
                                 </tr>
                             </thead>
                             <tbody>
-                                {getProjectsByPhase("testing").length > 0 ? (
-                                    getProjectsByPhase("testing").map((project, index) => (
+                                {getProjectsByPhase("In Implementation").length > 0 ? (
+                                    getProjectsByPhase("In Implementation").map((project, index) => (
                                         <tr key={index} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
                                             <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.name}</td>
                                             <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.program}</td>

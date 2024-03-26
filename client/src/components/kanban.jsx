@@ -14,11 +14,11 @@ const KanbanBoard = () => {
         const fetchedProjects = response.data;
         console.log(fetchedProjects);
         const initialColumns = {
-          planning: [],
-          design: [],
-          development: [],
-          testing: [],
-          deployment: [],
+          "Funnel": [],
+          "Review & Evaluation": [],
+          "Business Case Development": [],
+          "In Implementation": [],
+          "Closed": [],
         };
     
         // This assumes your projects have a 'phase' property to sort them into columns

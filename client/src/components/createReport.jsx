@@ -5,6 +5,7 @@ import Navbar from './navbar';
 
 const CreateStatusReportForm = () => {
   const [statusReport, setStatusReport] = useState({
+    date: '',
     scopeRag: '',
     timeRag: '',
     costRag: '',
@@ -27,11 +28,9 @@ const CreateStatusReportForm = () => {
   const handleSubmit = async (event) => {
     event.preventDefault();
   
-    // Construct the status report data to be sent to the backend
     const statusReportData = {
       ...statusReport,
-      date: new Date().toISOString().split('T')[0], // Current date in ISO format, only date part
-      project: projectId // Assuming projectId is from the URL params
+      project: projectId
     };
   
     try {
@@ -43,6 +42,10 @@ const CreateStatusReportForm = () => {
       // Handle error response
     }
   };
+
+  const handleCancel = () => {
+    navigate(`/project-details/${projectId}`);
+  };
   
   return (
     <>
@@ -50,6 +53,29 @@ const CreateStatusReportForm = () => {
       <div className="container mx-auto p-8">
         <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
           <h2 className="text-2xl font-bold text-gray-700 mb-4">Create Status Report for Project {projectId}</h2>
+          
+          {/* First row of inputs including the date */}
+          <div className="flex mb-4">
+            {/* Date Field */}
+            <div className="w-1/3 mr-2">
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="date">
+                Date
+              </label>
+              <input
+                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                id="date"
+                name="date"
+                type="date"
+                value={statusReport.date}
+                onChange={handleInputChange}
+              />
+            </div>
+
+            {/* Placeholder for alignment */}
+            <div className="w-1/3 mx-2"></div>
+            <div className="w-1/3 ml-2"></div>
+          </div>
+
           {/* RAG Status Fields */}
           <div className="flex mb-4">
             {/* Scope RAG */}
@@ -152,13 +178,20 @@ const CreateStatusReportForm = () => {
               </div>
           </div>
 
-          {/* Submit Button */}
-          <div className="flex items-center justify-between">
+          {/* Submit and Cancel Buttons */}
+          <div className="flex items-center justify-between mt-4">
             <button
               type="submit"
               className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
             >
-              Submit Status Report
+              Save
+            </button>
+            <button
+              type="button"
+              onClick={handleCancel}
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+            >
+              Cancel
             </button>
           </div>
         </form>

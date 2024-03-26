@@ -79,7 +79,13 @@ const ProjectsOverview = () => {
     };
     
     // An array of phases for demonstration purposes
-    const phases = ['Planning', 'Design', 'Development', 'Testing', 'Deployment'];
+    const phases = [
+        'Funnel', 
+        'Review & Evaluation', 
+        'Business Case Development', 
+        'In Implementation', 
+        'Closed'
+    ];
 
     return (
         <>

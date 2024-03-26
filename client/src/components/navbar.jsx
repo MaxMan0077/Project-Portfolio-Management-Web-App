@@ -17,7 +17,7 @@ const Navbar = () => {
             {icon: <FaTasks className="text-3xl text-white"/>, to: "/projects-overview", label: "Projects"},
             {icon: <FaHome className="text-5xl text-white"/>, to: "/dashboard", label: "Dashboard", special: true},
             {icon: <FaTrello className="text-3xl text-white"/>, to: "/kanban", label: "Kanban"},
-            {icon: <FaAddressBook className="text-3xl text-white"/>, to: "/contacts", label: "Contacts"}]
+            {icon: <FaAddressBook className="text-3xl text-white"/>, to: "/roadmap", label: "Roadmap"}]
             .map((item, index) => (
               <div key={index} className={`px-10 py-2 relative flex flex-col items-center group ${item.special ? 'mx-10' : ''}`}>
                 <Link to={item.to} className={`text-center ${item.special ? 'bg-blue-800 rounded-full p-1 transition duration-300 ease-in-out hover:bg-orange-500 flex justify-center items-center' : ''}`} style={item.special ? { width: '80px', height: '80px' } : {}}>

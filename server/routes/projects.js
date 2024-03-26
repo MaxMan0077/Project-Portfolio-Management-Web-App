@@ -63,7 +63,6 @@ router.post('/add', async (req, res) => {
 
 // GET route to fetch all projects
 router.get('/getall', async (req, res) => {
-    // SQL SELECT query to fetch all projects from the database
     const query = `SELECT * FROM project`;
 
     // Execute the query
@@ -79,8 +78,8 @@ router.get('/getall', async (req, res) => {
 router.get('/:projectId', async (req, res) => {
     const { projectId } = req.params; // Extract the project ID from the URL parameter
 
+    // Execute the query
     try {
-        // Replace 'your_projects_table' with the actual name of your projects table in the database
         const query = 'SELECT * FROM project WHERE idproject = ?';
         const [project] = await db.promise().query(query, [projectId]);
 
@@ -136,7 +135,20 @@ router.put('/updatePhase/:projectId', async (req, res) => {
     } catch (err) {
       res.status(500).send('Error updating project phase');
     }
-  });
+});
 
+router.delete('/delete/:projectId', async (req, res) => {
+    const { projectId } = req.params;
+    
+    try {
+        const query = 'DELETE FROM project WHERE idproject = ?';
+        await db.promise().query(query, [projectId]);
+
+        res.json({ message: 'Project deleted successfully' });
+    } catch (error) {
+        console.error('Error deleting project:', error);
+        res.status(500).send('Error deleting project');
+    }
+});
 
 module.exports = router;
