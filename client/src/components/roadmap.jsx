@@ -49,6 +49,7 @@ const Roadmap = () => {
       height: '20px', // Set a fixed height for the bars
       position: 'absolute',
       minWidth: '2px', // Ensuring that the bar is visible even if it's very short
+      zIndex: 1, // Ensure bars are above the division lines
     };
   };
 
