@@ -325,17 +325,17 @@ export default function UserCreate() {
                     {/* Submit Button */}
                     <div className="flex items-center justify-between">
                         <button
-                            type="submit"
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-                        >
-                            {formType === 'user' ? 'Create' : 'Create'}
-                        </button>
-                        <button
                             type="button"
                             onClick={() => navigate('/user-overview', { state: { formType: formType }})}
                             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         >
                             Cancel
+                        </button>
+                        <button
+                            type="submit"
+                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+                        >
+                            {formType === 'user' ? 'Create' : 'Create'}
                         </button>
                     </div>
                 </form>

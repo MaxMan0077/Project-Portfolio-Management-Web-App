@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { format, addMonths, differenceInDays, startOfMonth, endOfMonth } from 'date-fns';
+import { format, addMonths, startOfMonth, endOfMonth, differenceInDays } from 'date-fns';
+import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './navbar';
 
 const Roadmap = () => {
   const [projects, setProjects] = useState([]);
-  const [timeSeries, setTimeSeries] = useState(12); // Default to 12 months
+  const [timeSeries, setTimeSeries] = useState(12);
   const today = new Date();
 
   useEffect(() => {
@@ -19,37 +20,16 @@ const Roadmap = () => {
       }
     };
     fetchProjects();
-  }, []); 
+  }, []);
 
   const months = Array.from({ length: timeSeries }, (_, i) => format(addMonths(today, i), 'MMM'));
 
   const phaseColors = {
-    "Funnel": '#3b82f6', // blue-500
-    "Review & Evaluation": '#22c55e', // green-500
-    "Business Case Development": '#eab308', // yellow-500
-    "In Implementation": '#ef4444', // red-500
-    "Closed": '#a855f7', // purple-400
-  };
-
-  const PhaseColorKey = () => {
-    const phases = [
-      { name: "Funnel", color: phaseColors["Funnel"] },
-      { name: "Review & Evaluation", color: phaseColors["Review & Evaluation"] },
-      { name: "Business Case Development", color: phaseColors["Business Case Development"] },
-      { name: "In Implementation", color: phaseColors["In Implementation"] },
-      { name: "Closed", color: phaseColors["Closed"] },
-    ];
-  
-    return (
-      <div className="flex justify-between items-center mb-4">
-        {phases.map(phase => (
-          <div key={phase.name} className="flex items-center mr-4">
-            <span className="inline-block w-32 h-5 mr-2" style={{ backgroundColor: phase.color }}></span>
-            <span className="text-sm font-medium">{phase.name}</span>
-          </div>
-        ))}
-      </div>
-    );
+    "Funnel": '#3b82f6',
+    "Review & Evaluation": '#22c55e',
+    "Business Case Development": '#eab308',
+    "In Implementation": '#ef4444',
+    "Closed": '#a855f7',
   };
 
   const getBarStyles = (project, monthIndex) => {
@@ -59,8 +39,7 @@ const Roadmap = () => {
     const phaseEnd = new Date(project.phase_end);
 
     if (phaseEnd < monthStart || phaseStart > monthEnd) {
-      // Project phase is not within the month
-      return { display: 'none' };
+      return {}; // Instead of returning none, we return an empty object for framer-motion to handle
     }
 
     const phaseStartInMonth = phaseStart < monthStart ? monthStart : phaseStart;
@@ -71,17 +50,12 @@ const Roadmap = () => {
 
     let offset = differenceInDays(phaseStartInMonth, monthStart);
     offset = (offset / differenceInDays(monthEnd, monthStart)) * 100;
-    const barColor = phaseColors[project.phase] || '#bee3f8'; // default color
+    const barColor = phaseColors[project.phase] || '#bee3f8';
 
     return {
       left: `${offset}%`,
-      top: '30%',
       width: `${width}%`,
       backgroundColor: barColor,
-      height: '20px',
-      position: 'absolute',
-      minWidth: '2px',
-      zIndex: 1,
     };
   };
 
@@ -89,13 +63,27 @@ const Roadmap = () => {
     setTimeSeries(Number(event.target.value));
   };
 
-  const gridTemplateColumns = `auto repeat(${timeSeries}, minmax(0, 1fr))`;
+  // Animation variants for the grid columns and bars
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: { 
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1,
+      }
+    }
+  };
+
+  const itemVariants = {
+    hidden: { width: '0%', opacity: 0 },
+    show: { width: '100%', opacity: 1 }
+  };
 
   return (
     <>
       <Navbar />
       <div className="flex justify-center items-center my-4">
-        <div className="text-xl mr-3">Time Series:</div>
+        <div className="text-xl mr-3">Time Period:</div>
         <select
           id="timeSeries"
           value={timeSeries}
@@ -108,41 +96,98 @@ const Roadmap = () => {
           <option value="24">24 months</option>
         </select>
       </div>
-      <div className="w-full overflow-x-auto px-2 pt-2">
-        <PhaseColorKey />
-        {/* Adjusted Timeline container with dynamic grid layout */}
-        <div
-          className="grid"
-          style={{
-            gridTemplateColumns: gridTemplateColumns,
-            minWidth: 'max-content'
-          }}
-        >
-          {/* Fixed column for project names */}
-          <div className="col-span-1 bg-gray-200 text-center font-bold p-2 sticky left-0 z-10">Projects</div>
-          {/* Dynamic Header for months based on time series */}
-          {months.map((month, index) => (
-            <div key={index} className={`text-center font-bold p-2 bg-gray-200 border-l border-gray-300 ${index === 0 ? "border-t" : ""}`}>
-              {month}
+      {/* Phase Color Key centered with labels below bars */}
+      <div className="flex justify-center items-center mb-4">
+        <div className="flex">
+          {Object.entries(phaseColors).map(([phase, color]) => (
+            <div key={phase} className="flex flex-col items-center mr-4">
+              <div style={{ backgroundColor: color, width: '200px', height: '20px' }}></div>
+              <span style={{ marginTop: '4px' }}>{phase}</span>
             </div>
-          ))}
-          {/* Project rows */}
-          {projects.map((project, projectIndex) => (
-            <React.Fragment key={project.idproject}>
-              <div className="bg-gray-100 p-2 border-t border-gray-300 sticky left-0 z-0">
-                {project.name}
-              </div>
-              {Array.from({ length: timeSeries }, (_, monthIndex) => (
-                <div key={monthIndex} className="border-t border-l border-gray-300 relative" style={{ height: '50px' }}>
-                  <div style={getBarStyles(project, monthIndex)} />
-                </div>
-              ))}
-            </React.Fragment>
           ))}
         </div>
       </div>
+      <div className="w-full overflow-x-auto px-2 pt-2">
+        <motion.div
+          className="grid"
+          style={{
+            gridTemplateColumns: `200px repeat(${timeSeries}, minmax(0, 1fr))`,
+          }}
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+        >
+          {/* Projects header */}
+          <motion.div
+            className="text-center font-bold p-2 bg-gray-200 border-r border-gray-300 sticky top-0"
+            style={{
+              gridColumn: "1",
+              gridRow: "1",
+            }}
+            variants={itemVariants}
+          >
+            Projects
+          </motion.div>
+  
+          {/* Month headers */}
+          {months.map((month, index) => (
+            <motion.div
+              key={index}
+              className="text-center font-bold p-2 bg-gray-200 border-l border-gray-300 sticky top-0"
+              style={{
+                gridColumn: index + 2,
+              }}
+              variants={itemVariants}
+            >
+              {month}
+            </motion.div>
+          ))}
+  
+          {/* Project names and bars */}
+          {projects.map((project, projectIndex) => (
+            <React.Fragment key={project.idproject}>
+              <motion.div
+                layout
+                className="bg-gray-100 p-2 border-t border-gray-300"
+                style={{
+                  gridColumn: "1",
+                  gridRowStart: projectIndex + 2,
+                }}
+                variants={itemVariants}
+              >
+                {project.name}
+              </motion.div>
+  
+              {Array.from({ length: timeSeries }, (_, monthIndex) => (
+                <motion.div
+                  key={monthIndex}
+                  className="border-t border-l border-gray-300 relative"
+                  style={{
+                    height: '50px',
+                    gridColumn: monthIndex + 2,
+                    gridRowStart: projectIndex + 2,
+                  }}
+                  layout
+                  variants={itemVariants}
+                >
+                  <motion.div
+                    className="absolute"
+                    style={{ ...getBarStyles(project, monthIndex), height: '20px', top: '30%', minWidth: '2px', zIndex: 1 }}
+                    initial={{ width: '0%' }}
+                    animate={{
+                      width: getBarStyles(project, monthIndex).width,
+                      backgroundColor: getBarStyles(project, monthIndex).backgroundColor,
+                      transition: { duration: 0.5 },
+                    }}
+                  />
+                </motion.div>
+              ))}
+            </React.Fragment>
+          ))}
+        </motion.div>
+      </div>
     </>
-  );
+  );  
 };
 
 export default Roadmap;

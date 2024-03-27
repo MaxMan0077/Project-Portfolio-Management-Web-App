@@ -198,14 +198,14 @@ export default function UserOverview() {
                 {isSearchingUsers && (
                     <div className="overflow-x-auto">
                         <table className="min-w-full leading-normal">
-                            <thead>
-                                <tr>
-                                    <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Name</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Office</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">Department</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">UserType</th>
-                                </tr>
-                            </thead>
+                        <thead className="bg-blue-500">
+                            <tr>
+                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Name</th>
+                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Office</th>
+                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Department</th>
+                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">UserType</th>
+                            </tr>
+                        </thead>
                             <tbody>
                                 {filteredUsers.map((user, index) => (
                                     <tr key={index} onClick={() => openModal(user)} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
@@ -225,15 +225,15 @@ export default function UserOverview() {
                 {!isSearchingUsers && (
                     <div className="overflow-x-auto">
                         <table className="min-w-full leading-normal">
-                            <thead>
-                                <tr>
-                                    <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Name</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Department</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Office</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Role</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-700 uppercase tracking-wider">Type</th>
-                                </tr>
-                            </thead>
+                        <thead className="bg-blue-500">
+                            <tr>
+                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Name</th>
+                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Department</th>
+                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Office</th>
+                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Role</th>
+                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Type</th>
+                            </tr>
+                        </thead>
                             <tbody>
                                 {filteredResources.map((resource, index) => (
                                     <tr key={index} onClick={() => openResourceModal(resource)} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-100'} hover:bg-gray-200`}>
