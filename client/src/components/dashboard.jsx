@@ -1,6 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import Navbar from './navbar';
+import { motion, AnimatePresence } from 'framer-motion';
 import { PieChart, Pie, Cell, Legend, Tooltip } from 'recharts';
 
 export default function Dashboard() {
