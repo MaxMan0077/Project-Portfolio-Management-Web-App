@@ -80,5 +80,10 @@
   "name_second_placeholder": "Прізвище",
   "office_placeholder": "Офіс",
   "department_placeholder": "Відділ",
-  "user_type_placeholder": "Тип користувача"
+  "user_type_placeholder": "Тип користувача",
+  "resource": "Ресурс",
+  "resource_details": "Деталі ресурсу",
+  "name_native": "Нативне ім'я",
+  "role_placeholder": "Виберіть роль",
+  "type_placeholder": "Виберіть тип"
 }

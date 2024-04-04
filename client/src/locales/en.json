@@ -69,5 +69,11 @@
   "name_second_placeholder": "Last Name",
   "office_placeholder": "Office",
   "department_placeholder": "Department",
-  "user_type_placeholder": "User Type"
+  "user_type_placeholder": "User Type",
+  "resource": "Resource",
+  "resource_details": "Resource Details",
+  "name_native": "Native Name",
+  "name_native_placeholder": "Enter native name",
+  "role_placeholder": "Select role",
+  "type_placeholder": "Select type"
 }
