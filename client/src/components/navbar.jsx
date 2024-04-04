@@ -2,10 +2,51 @@ import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { FaHome, FaUsers, FaTasks, FaTrello, FaAddressBook } from 'react-icons/fa';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '../LanguageContext';
+
+const SettingsModal = ({ isOpen, onClose }) => {
+  const { language, toggleLanguage } = useLanguage(); // Destructure to get the current language as well
+
+  const handleLanguageChange = (event) => {
+    const newLang = event.target.value === 'English' ? 'en' : 'ua';
+    toggleLanguage(newLang);
+    console.log("Language confirmed to:", newLang); // Confirm the language change
+    onClose();
+  };
+  
+
+  if (!isOpen) return null;
+
+  return (
+    <div className="fixed inset-0 bg-black bg-opacity-30 backdrop-blur-sm flex justify-center items-center z-50">
+      <div className="bg-white p-4 rounded-lg shadow-lg">
+        <h2 className="text-lg font-bold">Settings</h2>
+        <div className="my-4">
+          <label htmlFor="language-select" className="block text-sm font-medium text-gray-700">System Language</label>
+          <select 
+            id="language-select" 
+            value={language === 'en' ? 'English' : 'Ukrainian'} // Adjust value based on the current language
+            onChange={handleLanguageChange} 
+            className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
+          >
+            <option value="English">English</option>
+            <option value="Ukrainian">Ukrainian</option>
+          </select>
+        </div>
+        <button onClick={onClose} className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">
+          Close
+        </button>
+      </div>
+    </div>
+  );
+};
+
 
 const Navbar = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const navigate = useNavigate();
+
   const handleProfileClick = () => {
     setIsProfileMenuOpen(prev => !prev);
   };
@@ -16,6 +57,11 @@ const Navbar = () => {
       console.log("User confirmed logout.");
       navigate('/');
     }
+  };
+
+  const handleOpenSettings = () => {
+    setIsSettingsModalOpen(true);
+    setIsProfileMenuOpen(false); // Close the profile menu when opening settings
   };
 
   const menuVariants = {
@@ -101,34 +147,48 @@ const Navbar = () => {
                 }}
                 className="origin-top-right absolute right-0 mt-48 w-48 rounded-md shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 z-50"
               >
-                {['Your Profile', 'Settings', 'Logout'].map((text, index) => (
-                  <motion.div
-                    key={text}
-                    variants={{
-                      hidden: { x: -10, opacity: 0 },
-                      visible: {
-                        x: 0,
-                        opacity: 1,
-                        transition: { duration: 0.1 } // Adjust as needed
-                      }
-                    }}
-                  >
-                    {text !== 'Logout' ? (
-                      <Link to={`/${text.toLowerCase().replace(' ', '-')}`} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        {text}
-                      </Link>
-                    ) : (
-                      <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
-                        {text}
-                      </button>
-                    )}
-                  </motion.div>
-                ))}
+                <motion.div variants={{
+                  hidden: { x: -10, opacity: 0 },
+                  visible: {
+                    x: 0,
+                    opacity: 1,
+                    transition: { duration: 0.1 }
+                  }
+                }}>
+                  <Link to="/your-profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Your Profile
+                  </Link>
+                </motion.div>
+                <motion.div variants={{
+                  hidden: { x: -10, opacity: 0 },
+                  visible: {
+                    x: 0,
+                    opacity: 1,
+                    transition: { duration: 0.1 }
+                  }
+                }}>
+                  <button onClick={handleOpenSettings} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Settings
+                  </button>
+                </motion.div>
+                <motion.div variants={{
+                  hidden: { x: -10, opacity: 0 },
+                  visible: {
+                    x: 0,
+                    opacity: 1,
+                    transition: { duration: 0.1 }
+                  }
+                }}>
+                  <button onClick={handleLogout} className="block w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">
+                    Logout
+                  </button>
+                </motion.div>
               </motion.div>
             )}
           </AnimatePresence>
         </div>
       </div>
+      <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
     </nav>
   );  
 };

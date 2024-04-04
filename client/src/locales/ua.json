@@ -1,0 +1,23 @@
+{
+    "total_projects": "Загальна кількість проєктів",
+    "total_budget": "Загальний бюджет",
+    "total_expenditure": "Загальні витрати",
+    "phase": "Фаза",
+    "location": "Розташування",
+    "complexity": "Складність",
+    "active_projects": "Активні проєкти",
+    "project_name": "Назва проєкту",
+    "program": "Програма",
+    "status": "Статус",
+    "business_owner": "Власник бізнесу",
+    "project_manager": "Менеджер проєкту",
+    "budget_approved": "Бюджет затверджено",
+    "phase_timeline": "Часова шкала фази",
+    "no_projects_in_phase": "Немає проєктів на цій фазі",
+    "phase_funnel": "Воронка",
+    "phase_review_evaluation": "Перегляд і оцінка",
+    "phase_business_case_development": "Розробка бізнес-кейсу",
+    "phase_in_implementation": "Впровадження",
+    "phase_closed": "Закрито"
+  }
+  

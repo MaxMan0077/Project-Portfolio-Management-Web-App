@@ -1,0 +1,23 @@
+{
+    "total_projects": "Total Projects",
+    "total_budget": "Total Budget",
+    "total_expenditure": "Total Expenditure",
+    "active_projects": "Active Projects",
+    "project_name": "Project Name",
+    "program": "Program",
+    "status": "Status",
+    "location": "Location",
+    "business_owner": "Business Owner",
+    "project_manager": "Project Manager",
+    "budget_approved": "Budget Approved",
+    "phase_timeline": "Phase Timeline",
+    "no_projects_in_phase": "No projects in this phase",
+    "complexity": "Complexity",
+    "phase": "Phase",
+    "phase_funnel": "Funnel",
+    "phase_review_evaluation": "Review & Evaluation",
+    "phase_business_case_development": "Business Case Development",
+    "phase_in_implementation": "In Implementation",
+    "phase_closed": "Closed"
+  }
+  
