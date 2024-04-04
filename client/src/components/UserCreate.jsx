@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './navbar';
+import { useIntl } from 'react-intl'; // Import useIntl
 
 export default function UserCreate() {
     const initialUserFormData = {
@@ -30,6 +31,8 @@ export default function UserCreate() {
     const location = useLocation();
     const navigate = useNavigate();
     const [formType, setFormType] = useState(location.state?.formType || 'user');
+    const { formatMessage } = useIntl(); // useIntl hook to format messages
+    const t = (id) => formatMessage({ id });
 
     useEffect(() => {
         // Set initial form data based on formType when component mounts or when formType changes
@@ -57,6 +60,7 @@ export default function UserCreate() {
             const response = await axios.post(endpoint, data);
             console.log(response.data);
             // Additional handling based on response
+            navigate('/user-overview', { state: { formType: formType }});
         } catch (error) {
             console.error('Error:', error);
             // Error handling
@@ -71,39 +75,39 @@ export default function UserCreate() {
     return (
         <>
             <Navbar />
-            <div className="container mx-auto p-8">       
+            <div className="container mx-auto p-8">
                 <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
                     <h2 className="text-2xl font-bold text-gray-700 mb-4">
-                        {formType === 'user' ? 'Create User' : 'Create Resource'}
+                        {formType === 'user' ? t('create_user') : t('create_resource')}
                     </h2>
-        
+
                     {formType === 'user' ? (
                         // User Form Fields
-                        <div>
+                        <>
                             {/* Firstname & Lastname */}
                             <div className="flex mb-4">
                                 <div className="w-1/2 mr-2">
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name_first">
-                                        First Name
+                                        {t('first_name')}
                                     </label>
                                     <input
                                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                         name="name_first"
                                         type="text"
-                                        placeholder="First Name"
+                                        placeholder={t('first_name')}
                                         value={formData.name_first}
                                         onChange={handleInputChange}
                                     />
                                 </div>
                                 <div className="w-1/2 ml-2">
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name_second">
-                                        Last Name
+                                        {t('last_name')}
                                     </label>
                                     <input
                                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                         name="name_second"
                                         type="text"
-                                        placeholder="Last Name"
+                                        placeholder={t('last_name')}
                                         value={formData.name_second}
                                         onChange={handleInputChange}
                                     />
@@ -114,26 +118,26 @@ export default function UserCreate() {
                             <div className="flex mb-4">
                                 <div className="w-1/2 mr-2">
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="username">
-                                        Username
+                                        {t('username')}
                                     </label>
                                     <input
                                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                         name="username"
                                         type="text"
-                                        placeholder="Username"
+                                        placeholder={t('username')}
                                         value={formData.username}
                                         onChange={handleInputChange}
                                     />
                                 </div>
                                 <div className="w-1/2 ml-2">
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="password">
-                                        Password
+                                        {t('password')}
                                     </label>
                                     <input
                                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                         name="password"
                                         type="password"
-                                        placeholder="Password"
+                                        placeholder={t('password')}
                                         value={formData.password}
                                         onChange={handleInputChange}
                                     />
@@ -144,26 +148,26 @@ export default function UserCreate() {
                             <div className="flex mb-4">
                                 <div className="w-1/2 mr-2">
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="office">
-                                        Office
+                                        {t('office')}
                                     </label>
                                     <input
                                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                         name="office"
                                         type="text"
-                                        placeholder="Office"
+                                        placeholder={t('office')}
                                         value={formData.office}
                                         onChange={handleInputChange}
                                     />
                                 </div>
                                 <div className="w-1/2 ml-2">
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="department">
-                                        Department
+                                        {t('department')}
                                     </label>
                                     <input
                                         className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
                                         name="department"
                                         type="text"
-                                        placeholder="Department"
+                                        placeholder={t('department')}
                                         value={formData.department}
                                         onChange={handleInputChange}
                                     />
@@ -172,8 +176,8 @@ export default function UserCreate() {
         
                             {/* User Type */}
                             <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="userType">
-                                    User Type
+                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="user_type">
+                                    {t('user_type')}
                                 </label>
                                 <select
                                     className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
@@ -181,18 +185,16 @@ export default function UserCreate() {
                                     value={formData.user_type}
                                     onChange={handleInputChange}
                                 >
-                                    {/* Add options for user types here */}
-                                    <option value="">Select User Type</option>
-                                    <option value="admin">Admin</option>
-                                    <option value="user">User</option>
-                                    {/* Add more options as needed */}
+                                    <option value="">{t('select_user_type')}</option>
+                                    <option value="admin">{t('admin')}</option>
+                                    <option value="user">{t('user')}</option>
                                 </select>
                             </div>
         
                             {/* Photo Upload */}
                             <div className="mb-4">
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="photo">
-                                    Upload Photo
+                                    {t('upload_photo')}
                                 </label>
                                 <input
                                     type="file"
@@ -201,141 +203,108 @@ export default function UserCreate() {
                                     onChange={handleInputChange}
                                 />
                             </div>
-                        </div>
+                        </>
                     ) : (
                         // Resource Form Fields
                         <div>
-                            {/* First Name, Second Name, and Native Translation */}
-                            <div className="flex mb-4">
-                                <div className="w-1/3 mr-2">
-                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="resourceFirstName">
-                                        First Name
-                                    </label>
-                                    <input
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        name="resourceFirstName"
-                                        type="text"
-                                        placeholder="First Name"
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                                <div className="w-1/3 mx-2">
-                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="resourceSecondName">
-                                        Second Name
-                                    </label>
-                                    <input
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        name="resourceSecondName"
-                                        type="text"
-                                        placeholder="Second Name"
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                                <div className="w-1/3 ml-2">
-                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="nativeTranslation">
-                                        Native Translation
-                                    </label>
-                                    <input
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        name="nativeTranslation"
-                                        type="text"
-                                        placeholder="Native Translation"
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Office & Department */}
-                            <div className="flex mb-4">
-                                <div className="w-1/2 mr-2">
-                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="resourceOffice">
-                                        Office
-                                    </label>
-                                    <input
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        name="resourceOffice"
-                                        type="text"
-                                        placeholder="Office"
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                                <div className="w-1/2 ml-2">
-                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="resourceDepartment">
-                                        Department
-                                    </label>
-                                    <input
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        name="resourceDepartment"
-                                        type="text"
-                                        placeholder="Department"
-                                        onChange={handleInputChange}
-                                    />
-                                </div>
-                            </div>
-
-                            {/* Role Dropdown */}
-                            <div className="flex mb-4">
-                                <div className="w-1/2 mr-2">
-                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
-                                        Role
-                                    </label>
-                                    <select
-                                        className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        name="role"
-                                        value={formData.role} // Set the value here
-                                        onChange={handleInputChange}
-                                    >
-                                        <option value="">Select Role</option>
-                                        <option value="admin">Admin</option>
-                                        <option value="user">User</option>
-                                    </select>
-                                </div>
-                                <div className="w-1/2 ml-2">
-                                    <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="type">
-                                        Internal/External
-                                    </label>
-                                    <select
-                                        className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                        name="type"
-                                        value={formData.type}
-                                        onChange={handleInputChange}
-                                    >
-                                        <option value="">Select</option>
-                                        <option value="internal">Internal</option>
-                                        <option value="external">External</option>
-                                    </select>
-                                </div>
-                            </div>
-
-                            {/* Photo Upload */}
-                            <div className="mb-4">
-                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="photo">
-                                    Upload Photo
+                        {/* First Name, Second Name, and Native Translation */}
+                        <div className="flex mb-4">
+                            {["resourceFirstName", "resourceSecondName", "nativeTranslation"].map((field, index) => (
+                            <div className={`w-1/3 ${index !== 1 ? "mr-2" : "mx-2"}`} key={field}>
+                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={field}>
+                                {t(field)}
                                 </label>
                                 <input
-                                    type="file"
-                                    name="photo"
-                                    className="shadow w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                    onChange={handleInputChange}
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                name={field}
+                                type="text"
+                                placeholder={t(`${field}_placeholder`)}
+                                onChange={handleInputChange}
                                 />
                             </div>
+                            ))}
+                        </div>
+
+                        {/* Office & Department */}
+                        <div className="flex mb-4">
+                            {["resourceOffice", "resourceDepartment"].map((field, index) => (
+                            <div className={`w-1/2 ${index === 0 ? "mr-2" : "ml-2"}`} key={field}>
+                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={field}>
+                                {t(field)}
+                                </label>
+                                <input
+                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                name={field}
+                                type="text"
+                                placeholder={t(`${field}_placeholder`)}
+                                onChange={handleInputChange}
+                                />
+                            </div>
+                            ))}
+                        </div>
+
+                        {/* Role & Type */}
+                        <div className="flex mb-4">
+                            <div className="w-1/2 mr-2">
+                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="role">
+                                {t("role")}
+                            </label>
+                            <select
+                                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                name="role"
+                                onChange={handleInputChange}
+                            >
+                                {/* Dynamically populate these options based on available roles */}
+                                <option value="">{t("select_role")}</option>
+                                <option value="admin">{t("admin")}</option>
+                                <option value="user">{t("user")}</option>
+                            </select>
+                            </div>
+                            <div className="w-1/2 ml-2">
+                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="type">
+                                {t("type")}
+                            </label>
+                            <select
+                                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                name="type"
+                                onChange={handleInputChange}
+                            >
+                                {/* Dynamically populate these options based on types */}
+                                <option value="">{t("select_type")}</option>
+                                <option value="internal">{t("internal")}</option>
+                                <option value="external">{t("external")}</option>
+                            </select>
+                            </div>
+                        </div>
+
+                        {/* Photo Upload */}
+                        <div className="mb-4">
+                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="photo">
+                            {t("upload_photo")}
+                            </label>
+                            <input
+                            type="file"
+                            name="photo"
+                            className="shadow w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            onChange={handleInputChange}
+                            />
+                        </div>
                         </div>
                     )}
-        
                     {/* Submit Button */}
                     <div className="flex items-center justify-between">
                         <button
                             type="button"
-                            onClick={() => navigate('/user-overview', { state: { formType: formType }})}
+                            onClick={handleCancel}
                             className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         >
-                            Cancel
+                            {t('cancel')}
                         </button>
                         <button
                             type="submit"
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
                         >
-                            {formType === 'user' ? 'Create' : 'Create'}
+                            {formType === 'user' ? t('create') : t('create')}
                         </button>
                     </div>
                 </form>

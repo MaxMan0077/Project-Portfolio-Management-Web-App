@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from 'react';
 import axios from 'axios';
-import { useNavigate, useLocation } from 'react-router-dom'; // Import useLocation
+import { useNavigate, useLocation } from 'react-router-dom';
 import UserModal from './userModal';
 import ResourceModal from './resourceModal';
 import Navbar from './navbar';
+import { useIntl } from 'react-intl';
 
 export default function UserOverview() {
     const navigate = useNavigate();
-    const location = useLocation(); // Use location to access navigation state
+    const location = useLocation();
     const [searchTerm, setSearchTerm] = useState('');
     const [users, setUsers] = useState([]);
     const [resources, setResources] = useState([]);
@@ -23,6 +24,8 @@ export default function UserOverview() {
     const [selectedItem, setSelectedItem] = useState(null);
     const [isResourceModalOpen, setIsResourceModalOpen] = useState(false);
 
+    const intl = useIntl();
+    const t = (id) => intl.formatMessage({ id });
 
     const fetchUsers = async () => {
         try {
@@ -167,7 +170,7 @@ export default function UserOverview() {
                         onClick={handleBackClick}
                         className="py-2 px-4 bg-gray-300 hover:bg-gray-400 text-black font-bold rounded"
                     >
-                        Back
+                        {t('back')}
                     </button>
                     <label htmlFor="toggleSearch" className="flex items-center cursor-pointer">
                         <div className="relative">
@@ -176,36 +179,35 @@ export default function UserOverview() {
                             <div className={`dot absolute left-1 top-1 bg-white w-6 h-6 rounded-full transition transform ${isSearchingUsers ? 'translate-x-0' : 'translate-x-6'}`}></div>
                         </div>
                         <div className="ml-3 text-font-bold text-sm">
-                            {isSearchingUsers ? 'Search Users' : 'Search Resources'}
+                            {isSearchingUsers ? t('search_users') : t('search_resources')}
                         </div>
                     </label>
                     <button
                         onClick={handleCreateClick}
                         className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded"
                     >
-                        {isSearchingUsers ? 'Create User' : 'Create Resource'}
+                        {isSearchingUsers ? t('create_user') : t('create_resource')}
                     </button>
                 </div>
                 <input
                     type="text"
-                    placeholder={`Search ${isSearchingUsers ? 'users' : 'resources'}...`}
+                    placeholder={t(isSearchingUsers ? 'search_users_placeholder' : 'search_resources_placeholder')}
                     value={searchTerm}
                     onChange={handleSearchChange}
                     className="border p-2 w-full mb-4"
                 />
-
-                {/* User Table */}
-                {isSearchingUsers && (
+    
+                {isSearchingUsers ? (
                     <div className="overflow-x-auto">
                         <table className="min-w-full leading-normal">
-                        <thead className="bg-blue-500">
-                            <tr>
-                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Name</th>
-                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Office</th>
-                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Department</th>
-                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">UserType</th>
-                            </tr>
-                        </thead>
+                            <thead className="bg-blue-500">
+                                <tr>
+                                    <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">{t('name')}</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">{t('office')}</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">{t('department')}</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">{t('user_type')}</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 {filteredUsers.map((user, index) => (
                                     <tr key={index} onClick={() => openModal(user)} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
@@ -220,20 +222,18 @@ export default function UserOverview() {
                             </tbody>
                         </table>
                     </div>
-                )}
-                {/* Resources Table */}
-                {!isSearchingUsers && (
+                ) : (
                     <div className="overflow-x-auto">
                         <table className="min-w-full leading-normal">
-                        <thead className="bg-blue-500">
-                            <tr>
-                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Name</th>
-                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Department</th>
-                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Office</th>
-                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Role</th>
-                                <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">Type</th>
-                            </tr>
-                        </thead>
+                            <thead className="bg-blue-500">
+                                <tr>
+                                    <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">{t('name')}</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">{t('department')}</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">{t('office')}</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">{t('role')}</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-300 text-left text-xs font-semibold text-white uppercase tracking-wider">{t('type')}</th>
+                                </tr>
+                            </thead>
                             <tbody>
                                 {filteredResources.map((resource, index) => (
                                     <tr key={index} onClick={() => openResourceModal(resource)} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-100'} hover:bg-gray-200`}>
@@ -250,16 +250,16 @@ export default function UserOverview() {
                         </table>
                     </div>
                 )}
-                {notification.show ? (
+                {notification.show && (
                     <div className="fixed inset-0 bg-transparent flex justify-center items-center z-50">
                         <div className={`transition-opacity duration-1000 ease-in-out ${notification.show ? 'opacity-100' : 'opacity-0 pointer-events-none'} p-4 max-w-sm mx-auto bg-blue-500 text-white text-center rounded-lg shadow-lg`}>
                             {notification.message}
                         </div>
                     </div>
-                ) : null}
+                )}
                 {isModalOpen && <UserModal user={selectedUser} onClose={() => setIsModalOpen(false)} onSave={handleSaveUser} onDelete={handleDeleteUser} />}
                 {isResourceModalOpen && <ResourceModal resource={selectedResource} onClose={() => setIsResourceModalOpen(false)} onSave={handleSaveResource} onDelete={handleDeleteResource} />}
             </div>
-        </> 
-    );
+        </>
+    );    
 }
