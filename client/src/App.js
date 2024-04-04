@@ -11,7 +11,7 @@ import ProjectDetails from './components/projectDetails'
 import CreateStatusReport from './components/createReport';
 import Roadmap from './components/roadmap';
 import { IntlProvider } from 'react-intl';
-import { LanguageContext } from './LanguageContext'; // Adjust the import path as necessary
+import { LanguageContext } from './LanguageContext';
 import messagesEN from './locales/en.json';
 import messagesUA from './locales/ua.json';
 

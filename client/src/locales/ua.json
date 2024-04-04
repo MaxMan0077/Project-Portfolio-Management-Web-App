@@ -70,5 +70,15 @@
   "resourceSecondName_placeholder": "Прізвище",
   "nativeTranslation_placeholder": "Переклад",
   "resourceOffice_placeholder": "Офіс",
-  "resourceDepartment_placeholder": "Департамент"
+  "resourceDepartment_placeholder": "Департамент",
+  "user_details": "Деталі користувача",
+  "name_first": "Ім'я",
+  "name_second": "Прізвище",
+  "save": "Зберегти",
+  "delete": "Видалити",
+  "name_first_placeholder": "Ім'я",
+  "name_second_placeholder": "Прізвище",
+  "office_placeholder": "Офіс",
+  "department_placeholder": "Відділ",
+  "user_type_placeholder": "Тип користувача"
 }

@@ -59,5 +59,15 @@
   "resourceSecondName_placeholder": "Second Name",
   "nativeTranslation_placeholder": "Native Translation",
   "resourceOffice_placeholder": "Office",
-  "resourceDepartment_placeholder": "Department"
+  "resourceDepartment_placeholder": "Department",
+  "user_details": "User Details",
+  "name_first": "First Name",
+  "name_second": "Last Name",
+  "save": "Save",
+  "delete": "Delete",
+  "name_first_placeholder": "First Name",
+  "name_second_placeholder": "Last Name",
+  "office_placeholder": "Office",
+  "department_placeholder": "Department",
+  "user_type_placeholder": "User Type"
 }
