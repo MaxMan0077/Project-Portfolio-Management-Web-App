@@ -171,5 +171,12 @@
   "project_status_active": "Active",
   "project_status_planning": "Planning",
   "project_status_completed": "Completed",
-  "project_status_paused": "Paused"
+  "project_status_paused": "Paused",
+  "time_period": "Time Period",
+  "export_to_pdf": "Export to PDF",
+  "3_months": "3 months",
+  "6_months": "6 months",
+  "12_months": "12 months",
+  "24_months": "24 months",
+  "projects_header": "Projects"
 }

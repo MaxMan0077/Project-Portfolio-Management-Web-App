@@ -5,11 +5,14 @@ import { motion, AnimatePresence } from 'framer-motion';
 import Navbar from './navbar';
 import jsPDF from 'jspdf';
 import html2canvas from 'html2canvas';
+import { useIntl } from 'react-intl';
 
 const Roadmap = () => {
   const [projects, setProjects] = useState([]);
   const [timeSeries, setTimeSeries] = useState(12);
   const today = new Date();
+  const { formatMessage } = useIntl();
+  const t = (id) => formatMessage({ id });
 
   useEffect(() => {
     const fetchProjects = async () => {
@@ -170,21 +173,21 @@ const Roadmap = () => {
         <div className="flex justify-between items-center my-4">
           <div></div>
           <div className="flex items-center justify-center ml-40">
-            <div className="text-xl mr-3">Time Period:</div>
+          <div className="text-xl mr-3">{t('time_period')}:</div>
             <select
               id="timeSeries"
               value={timeSeries}
               onChange={handleTimeSeriesChange}
               className="border border-gray-300 rounded px-4 py-2 text-lg"
             >
-              <option value="3">3 months</option>
-              <option value="6">6 months</option>
-              <option value="12">12 months</option>
-              <option value="24">24 months</option>
+              <option value="3">{t('3_months')}</option>
+              <option value="6">{t('6_months')}</option>
+              <option value="12">{t('12_months')}</option>
+              <option value="24">{t('24_months')}</option>
             </select>
           </div>
           <button onClick={exportPDF} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded ml-4">
-            Export to PDF
+            {t('export_to_pdf')}
           </button>
         </div>
         <div id="exportContent" className="w-full overflow-x-auto px-2 pt-2">
@@ -213,11 +216,11 @@ const Roadmap = () => {
               className="text-center font-bold p-2 bg-gray-200 border-r border-gray-300 sticky top-0"
               style={{
                 gridColumn: "1",
-                gridRow: "1 / span 3", // Adjusted to span through the year and month rows
+                gridRow: "1 / span 3",
               }}
               variants={itemVariants}
             >
-              Projects
+              {t('projects_header')}
             </motion.div>
   
             {/* Year Rows Implementation */}
@@ -230,7 +233,7 @@ const Roadmap = () => {
                 className="text-center font-bold p-2 bg-gray-200 border-l border-gray-300 sticky top-0"
                 style={{
                   gridColumn: index + 2,
-                  gridRow: 3, // Adjusted to position months below the year rows
+                  gridRow: 3,
                 }}
                 variants={itemVariants}
               >
@@ -246,7 +249,7 @@ const Roadmap = () => {
                   className="bg-gray-100 p-2 border-t border-gray-300"
                   style={{
                     gridColumn: "1",
-                    gridRowStart: projectIndex + 4, // Adjusted to account for year, month rows, and header
+                    gridRowStart: projectIndex + 4,
                   }}
                   variants={itemVariants}
                 >
@@ -259,7 +262,7 @@ const Roadmap = () => {
                     style={{
                       height: '50px',
                       gridColumn: monthIndex + 2,
-                      gridRowStart: projectIndex + 4, // Adjusted to align with the project name
+                      gridRowStart: projectIndex + 4,
                     }}
                     layout
                     variants={itemVariants}

@@ -154,5 +154,12 @@
   "project_status_active": "Активний",
   "project_status_planning": "Планування",
   "project_status_completed": "Завершений",
-  "project_status_paused": "Призупинений"
+  "project_status_paused": "Призупинений",
+  "time_period": "Часовий Період",
+  "export_to_pdf": "Експорт в PDF",
+  "3_months": "3 місяці",
+  "6_months": "6 місяців",
+  "12_months": "12 місяців",
+  "24_months": "24 місяці",
+  "projects_header": "Проекти"
 }
