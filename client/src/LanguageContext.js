@@ -10,6 +10,7 @@ export const LanguageProvider = ({ children }) => {
   const toggleLanguage = (lang) => {
     setLanguage(lang);
     console.log("Language changed to:", lang);
+    
   };
 
   return (

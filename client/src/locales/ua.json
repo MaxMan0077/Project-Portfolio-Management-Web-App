@@ -149,5 +149,10 @@
   "revised_phase_end_date": "Виправлена дата завершення фази",
   "scope_rag": "RAG за обсягом",
   "time_rag": "RAG за часом",
-  "cost_rag": "RAG за вартістю"
+  "cost_rag": "RAG за вартістю",
+  "not_applicable": "Не застосовується",
+  "project_status_active": "Активний",
+  "project_status_planning": "Планування",
+  "project_status_completed": "Завершений",
+  "project_status_paused": "Призупинений"
 }

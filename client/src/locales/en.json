@@ -166,5 +166,10 @@
   "revised_phase_end_date": "Revised Phase End Date",
   "scope_rag": "Scope RAG",
   "time_rag": "Time RAG",
-  "cost_rag": "Cost RAG"
+  "cost_rag": "Cost RAG",
+  "not_applicable": "N/A",
+  "project_status_active": "Active",
+  "project_status_planning": "Planning",
+  "project_status_completed": "Completed",
+  "project_status_paused": "Paused"
 }
