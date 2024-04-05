@@ -1,9 +1,12 @@
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './navbar';
+import { useIntl } from 'react-intl';
 
 export default function CreateProject() {
     const navigate = useNavigate();
+    const { formatMessage } = useIntl();
+    const t = (id) => formatMessage({ id });
     const [formData, setFormData] = useState({
         name: '',
         program: '',
@@ -75,223 +78,218 @@ export default function CreateProject() {
             <Navbar />
             <div className="container mx-auto p-8">
                 <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-                    <h2 className="text-2xl font-bold text-gray-700 mb-4">Create New Project</h2>
-
-                    {/* First Line: Name and Program */}
+                    <h2 className="text-2xl font-bold text-gray-700 mb-4">{t('create_new_project')}</h2>
+    
                     <div className="flex mb-4">
                         <div className="w-1/2 mr-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name">
-                                Name
+                                {t('project_name')}
                             </label>
                             <input
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="name"
                                 name="name"
                                 type="text"
-                                placeholder="Project Name"
+                                placeholder={t('project_name_placeholder')}
                                 value={formData.name}
                                 onChange={handleInputChange}
                             />
                         </div>
                         <div className="w-1/2 ml-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="program">
-                                Program
+                                {t('program')}
                             </label>
                             <select
                                 className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="program"
                                 name="program"
                                 value={formData.program}
                                 onChange={handleInputChange}
                             >
-                                <option value="">Select Program</option>
-                                {/* Populate with program options */}
-                                <option value="high">Internal</option>
+                                <option value="">{t('select_program')}</option>
+                                <option value="internal">{t('internal')}</option>
+                                <option value="external">{t('external')}</option>
                             </select>
                         </div>
                     </div>
-
-                    {/* Second Line: Location and Complexity */}
+    
                     <div className="flex mb-4">
-                        {/* Location */}
                         <div className="w-1/2 mr-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="location">
-                                Location
+                                {t('location')}
                             </label>
                             <select
                                 className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="location"
                                 name="location"
                                 value={formData.location}
                                 onChange={handleInputChange}
                             >
-                                <option value="">Select Location</option>
-                                {/* Populate with location options */}
-                                <option value="1">1</option>
+                                <option value="">{t('select_location')}</option>
+                                <option value="1">{t('location_1')}</option>
+                                <option value="2">{t('location_2')}</option>
                             </select>
                         </div>
-                        {/* Complexity Dropdown */}
                         <div className="w-1/2 ml-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="complexity">
-                                Complexity
+                                {t('complexity')}
                             </label>
                             <select
                                 className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="complexity"
                                 name="complexity"
                                 value={formData.complexity}
                                 onChange={handleInputChange}
                             >
-                                <option value="">Select Complexity</option>
-                                <option value="low">Low</option>
-                                <option value="medium">Medium</option>
-                                <option value="high">High</option>
+                                <option value="">{t('select_complexity')}</option>
+                                <option value="low">{t('low')}</option>
+                                <option value="medium">{t('medium')}</option>
+                                <option value="high">{t('high')}</option>
                             </select>
                         </div>
                     </div>
-
-                    {/* Third Line: Project Manager and Business Owner */}
+    
                     <div className="flex mb-4">
-                        {/* Project Manager Dropdown */}
                         <div className="w-1/2 mr-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="projectManager">
-                                Project Manager
+                                {t('project_manager')}
                             </label>
                             <select
                                 className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="projectManager"
                                 name="projectManager"
                                 value={formData.projectManager}
                                 onChange={handleInputChange}
                             >
-                                <option value="">Select Project Manager</option>
-                                {/* Populate with project manager options */}
-                                <option value="1">1</option>
+                                <option value="">{t('select_project_manager')}</option>
+                                <option value="1">{t('manager_1')}</option>
+                                <option value="2">{t('manager_2')}</option>
                             </select>
                         </div>
-                        {/* Business Owner Dropdown */}
                         <div className="w-1/2 ml-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="businessOwner">
-                                Business Owner
+                                {t('business_owner')}
                             </label>
                             <select
                                 className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="businessOwner"
                                 name="businessOwner"
                                 value={formData.businessOwner}
                                 onChange={handleInputChange}
                             >
-                                <option value="">Select Business Owner</option>
-                                {/* Populate with business owner options */}
-                                <option value="1">1</option>
+                                <option value="">{t('select_business_owner')}</option>
+                                <option value="1">{t('owner_1')}</option>
+                                <option value="2">{t('owner_2')}</option>
                             </select>
                         </div>
                     </div>
-
-                    {/* Fourth Line: Description */}
+    
                     <div className="mb-4">
                         <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
-                            Description
+                            {t('description')}
                         </label>
                         <textarea
                             className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                            id="description"
                             name="description"
-                            placeholder="Project Description"
+                            placeholder={t('project_description_placeholder')}
                             value={formData.description}
                             onChange={handleInputChange}
                         />
                     </div>
-
-                    {/* Fifth Line: Status Dropdown and Budget Approved */}
+    
                     <div className="flex mb-4">
-                        {/* Status Dropdown */}
                         <div className="w-1/2 mr-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="status">
-                                Status
+                                {t('status')}
                             </label>
                             <select
                                 className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="status"
                                 name="status"
                                 value={formData.status}
                                 onChange={handleInputChange}
                             >
-                                <option value="">Select Status</option>
-                                <option value="planning">Planning</option>
-                                <option value="active">Active</option>
-                                <option value="completed">Completed</option>
+                                <option value="">{t('select_status')}</option>
+                                <option value="planning">{t('planning')}</option>
+                                <option value="active">{t('active')}</option>
+                                <option value="completed">{t('completed')}</option>
                             </select>
                         </div>
-                        {/* Budget Approved */}
                         <div className="w-1/2 ml-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="budgetApproved">
-                                Budget Approved
+                                {t('budget_approved')}
                             </label>
                             <input
                                 className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="budgetApproved"
                                 name="budgetApproved"
                                 type="text"
-                                placeholder="Budget Approved"
+                                placeholder={t('budget_approved_placeholder')}
                                 value={formData.budgetApproved}
                                 onChange={handleInputChange}
                             />
                         </div>
                     </div>
-
+    
                     <div className="flex mb-4">
-                        {/* Project Phase Dropdown */}
                         <div className="w-1/3 mr-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phase">
-                            Project Phase
+                                {t('project_phase')}
                             </label>
                             <select
-                            className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            name="phase"
-                            value={formData.phase}
-                            onChange={handleInputChange}
+                                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="phase"
+                                name="phase"
+                                value={formData.phase}
+                                onChange={handleInputChange}
                             >
-                            <option value="">Select Phase</option>
-                            <option value="Funnel">Funnel</option>
-                            <option value="Review & Evaluation">Review & Evaluation</option>
-                            <option value="Business Case Development">Business Case Development</option>
-                            <option value="In Implementation">In Implementation</option>
-                            <option value="Closed">Closed</option>
+                                <option value="">{t('select_phase')}</option>
+                                <option value="Funnel">{t('funnel')}</option>
+                                <option value="Review & Evaluation">{t('review_evaluation')}</option>
+                                <option value="Business Case Development">{t('business_case_development')}</option>
+                                <option value="In Implementation">{t('in_implementation')}</option>
+                                <option value="Closed">{t('closed')}</option>
                             </select>
                         </div>
-
-                        {/* Phase Start Date Input */}
                         <div className="w-1/3 mx-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phaseStart">
-                            Phase Start Date
+                                {t('phase_start_date')}
                             </label>
                             <input
-                            className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            name="phaseStart"
-                            type="date"
-                            value={formData.phaseStart}
-                            onChange={handleInputChange}
+                                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="phaseStart"
+                                name="phaseStart"
+                                type="date"
+                                value={formData.phaseStart}
+                                onChange={handleInputChange}
                             />
                         </div>
-
-                        {/* Phase End Date Input */}
                         <div className="w-1/3 ml-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phaseEnd">
-                            Phase End Date
+                                {t('phase_end_date')}
                             </label>
                             <input
-                            className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            name="phaseEnd"
-                            type="date"
-                            value={formData.phaseEnd}
-                            onChange={handleInputChange}
+                                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                id="phaseEnd"
+                                name="phaseEnd"
+                                type="date"
+                                value={formData.phaseEnd}
+                                onChange={handleInputChange}
                             />
                         </div>
                     </div>
-
-                    {/* Submit Button */}
+    
                     <div className="flex items-center justify-between">
                         <button
                             type="submit"
                             className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
                         >
-                            Create Project
+                            {t('create_project')}
                         </button>
                     </div>
                 </form>
             </div>
         </>
-    );
+    );    
 }

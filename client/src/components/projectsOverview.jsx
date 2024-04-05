@@ -2,10 +2,13 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './navbar';
+import { useIntl } from 'react-intl';
 
 
 const ProjectsOverview = () => {
     const navigate = useNavigate();
+    const { formatMessage } = useIntl();
+    const t = (id) => formatMessage({ id });
     const [projects, setProjects] = useState([]);
     const [searchTerm, setSearchTerm] = useState('');
     const [isFilterVisible, setIsFilterVisible] = useState(false);
@@ -93,36 +96,36 @@ const ProjectsOverview = () => {
             <div className="container mx-auto py-8">
                 <div className="flex justify-between items-center mb-4">
                     <button onClick={handleBackClick} className="py-2 px-4 bg-gray-300 hover:bg-gray-400 text-black font-bold rounded">
-                        Back
+                        {t("back")}
                     </button>
                     <div className="flex items-center gap-2">
                         <input
                             type="text"
-                            placeholder="Search by project name..."
+                            placeholder={t("search_by_project_name")}
                             value={searchTerm}
                             onChange={handleSearchChange}
                             className="border p-2 w-96"
                         />
                         <button onClick={() => setIsFilterVisible(!isFilterVisible)} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
-                            Filters
+                            {t("filters")}
                         </button>
                     </div>
                     <button onClick={handleCreateProjectClick} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
-                        Create Project
+                        {t("create_project")}
                     </button>
                 </div>
         
                 {isFilterVisible && (
                     <div className="bg-white p-4 mb-4 shadow rounded">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
                             <div>
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="locationFilter">
-                                    Location
+                                    {t("location")}
                                 </label>
                                 <input
                                     type="text"
                                     id="locationFilter"
-                                    placeholder="Location"
+                                    placeholder={t("location")}
                                     value={locationFilter}
                                     onChange={(e) => setLocationFilter(e.target.value)}
                                     className="border p-2 rounded w-full"
@@ -130,12 +133,12 @@ const ProjectsOverview = () => {
                             </div>
                             <div>
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="programFilter">
-                                    Program
+                                    {t("program")}
                                 </label>
                                 <input
                                     type="text"
                                     id="programFilter"
-                                    placeholder="Program"
+                                    placeholder={t("program")}
                                     value={programFilter}
                                     onChange={(e) => setProgramFilter(e.target.value)}
                                     className="border p-2 rounded w-full"
@@ -143,7 +146,7 @@ const ProjectsOverview = () => {
                             </div>
                             <div>
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="statusFilter">
-                                    Status
+                                    {t("status")}
                                 </label>
                                 <select
                                     id="statusFilter"
@@ -151,18 +154,18 @@ const ProjectsOverview = () => {
                                     value={statusFilter}
                                     onChange={(e) => setStatusFilter(e.target.value)}
                                 >
-                                    <option value="">Select Status</option>
-                                    {/* Add options dynamically if you have them */}
+                                    <option value="">{t("select_status")}</option>
+                                    {/* Dynamically generated options */}
                                 </select>
                             </div>
                             <div>
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="projectManagerFilter">
-                                    Project Manager
+                                    {t("project_manager")}
                                 </label>
                                 <input
                                     type="text"
                                     id="projectManagerFilter"
-                                    placeholder="Project Manager"
+                                    placeholder={t("project_manager")}
                                     value={projectManagerFilter}
                                     onChange={(e) => setProjectManagerFilter(e.target.value)}
                                     className="border p-2 rounded w-full"
@@ -170,12 +173,12 @@ const ProjectsOverview = () => {
                             </div>
                             <div>
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="businessOwnerFilter">
-                                    Business Owner
+                                    {t("business_owner")}
                                 </label>
                                 <input
                                     type="text"
                                     id="businessOwnerFilter"
-                                    placeholder="Business Owner"
+                                    placeholder={t("business_owner")}
                                     value={businessOwnerFilter}
                                     onChange={(e) => setBusinessOwnerFilter(e.target.value)}
                                     className="border p-2 rounded w-full"
@@ -188,19 +191,19 @@ const ProjectsOverview = () => {
                 {/* Render a table for each phase */}
                 {phases.map((phase, phaseIndex) => (
                 <div key={phase} className="mb-8 w-full">
-                    <h2 className="text-xl font-bold mb-3">{phase}</h2>
+                    <h2 className="text-xl font-bold mb-3">{t(phase)}</h2>
                     <div className="overflow-y-auto max-h-[calc(6*4.5rem)]">
                         <table className="min-w-full leading-normal w-full">
                             <thead className={`text-white ${['bg-blue-500', 'bg-green-500', 'bg-red-500', 'bg-yellow-500', 'bg-purple-500'][phaseIndex % 5]}`}>
                                 <tr>
-                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">Project Name</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">Program</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">Status</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">Location</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">Business Owner</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">Project Manager</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">Budget Approved</th>
-                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">Phase Timeline</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t("project_name")}</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t("program")}</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t("status")}</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t("location")}</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t("business_owner")}</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t("project_manager")}</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t("budget_approved")}</th>
+                                    <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t("phase_timeline")}</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -231,7 +234,9 @@ const ProjectsOverview = () => {
                                     ))
                                 ) : (
                                     <tr>
-                                        <td colSpan="8" className="text-center px-5 py-5 border-b border-gray-200 text-lg font-bold">No projects in this phase</td>
+                                        <td colSpan="8" className="text-center px-5 py-5 border-b border-gray-200 text-sm">
+                                            {t("no_projects_in_phase")}
+                                        </td>
                                     </tr>
                                 )}
                             </tbody>
