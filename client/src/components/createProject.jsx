@@ -1,12 +1,16 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './navbar';
 import { useIntl } from 'react-intl';
+import Dropdown from './dropdown';
 
 export default function CreateProject() {
     const navigate = useNavigate();
     const { formatMessage } = useIntl();
     const t = (id) => formatMessage({ id });
+    const [resources, setResources] = useState([]);
+    const [selectedResourceId, setSelectedResourceId] = useState(null);
+    const [selectedBusinessOwnerId, setSelectedBusinessOwnerId] = useState(null);
     const [formData, setFormData] = useState({
         name: '',
         program: '',
@@ -22,11 +26,47 @@ export default function CreateProject() {
         phaseEnd: '',
     });
 
+    useEffect(() => {
+        // Fetch resources when the component mounts
+        const fetchResources = async () => {
+            try {
+                const response = await fetch('http://localhost:5001/api/resources/getall');
+                if (!response.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                const data = await response.json();
+                setResources(data);
+            } catch (error) {
+                console.error('Error fetching resources:', error);
+            }
+        };
+
+        fetchResources();
+    }, []);
+
     const handleInputChange = (event) => {
         const { name, value } = event.target;
         setFormData(prevState => ({
             ...prevState,
             [name]: value,
+        }));
+    };
+
+    const handleSelectProjectManager = (selectedId) => {
+        setSelectedResourceId(selectedId);
+        console.log('Selected ID:', selectedId); // Log the selected ID for debugging
+        // Update the formData state to include the selected project manager's idresource
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            projectManager: selectedId, // Assuming this is the correct field for the project manager's ID
+        }));
+    };    
+
+    const handleSelectBusinessOwner = (selectedId) => {
+        setSelectedBusinessOwnerId(selectedId);
+        setFormData(prevFormData => ({
+            ...prevFormData,
+            businessOwner: selectedId,
         }));
     };
 
@@ -154,33 +194,21 @@ export default function CreateProject() {
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="projectManager">
                                 {t('project_manager')}
                             </label>
-                            <select
-                                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                id="projectManager"
-                                name="projectManager"
-                                value={formData.projectManager}
-                                onChange={handleInputChange}
-                            >
-                                <option value="">{t('select_project_manager')}</option>
-                                <option value="1">{t('manager_1')}</option>
-                                <option value="2">{t('manager_2')}</option>
-                            </select>
+                            <Dropdown
+                                resources={resources}
+                                onSelect={handleSelectProjectManager}
+                                selectedResourceId={selectedResourceId}
+                            />
                         </div>
                         <div className="w-1/2 ml-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="businessOwner">
                                 {t('business_owner')}
                             </label>
-                            <select
-                                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                                id="businessOwner"
-                                name="businessOwner"
-                                value={formData.businessOwner}
-                                onChange={handleInputChange}
-                            >
-                                <option value="">{t('select_business_owner')}</option>
-                                <option value="1">{t('owner_1')}</option>
-                                <option value="2">{t('owner_2')}</option>
-                            </select>
+                            <Dropdown
+                                resources={resources}
+                                onSelect={handleSelectBusinessOwner}
+                                selectedResourceId={selectedBusinessOwnerId}
+                            />
                         </div>
                     </div>
     

@@ -16,23 +16,30 @@ const ResourceModal = ({ resource, onClose, onSave, onDelete }) => {
 
     const handleChange = (e) => {
         const { name, value } = e.target;
+        if (name === "photo") {
+          // If you don't want to update the photo on handleChange, simply return.
+          return;
+        }
         setResourceData(prevState => ({ ...prevState, [name]: value }));
-    };
+    };      
 
     const handleSaveClick = async () => {
         if (!resourceData.idresource) {
             console.error('Resource ID is undefined');
             return;
         }
+    
+        console.log('Saving resource data:', resourceData); // Log to check if photo is included
+    
         onSave(resourceData);
-    };
+    };    
 
     return (
         <div className="fixed inset-0 bg-gray-600 bg-opacity-50 overflow-y-auto h-full w-full flex justify-center items-start pt-10">
             <div className="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                 <div className="flex justify-center mb-4">
                     {resourceData.photo ? (
-                        <img src={imageUrl} alt="User" className="h-24 w-24 object-cover rounded-full border-2 border-gray-300" />
+                        <img src={imageUrl} alt="Resource" className="h-24 w-24 object-cover rounded-full border-2 border-gray-300" />
                     ) : (
                         <div className="rounded-full bg-gray-300 p-4">
                             <PhotographIcon className="h-16 w-16 text-gray-600" />

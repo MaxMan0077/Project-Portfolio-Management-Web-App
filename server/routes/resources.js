@@ -75,9 +75,14 @@ router.get('/getall', async (req, res) => {
 router.put('/update/:id', async (req, res) => {
     const { id } = req.params;
     const { name_first, name_second, name_native, office, department, role, type } = req.body;
-    const photo = req.file ? req.file.path : ''; // Adjust based on how you handle file uploads
 
     try {
+        // Assume db.promise().query() to fetch existing resource, including photo
+        const [existingResource] = await db.promise().query('SELECT photo FROM resource WHERE idresource = ?', [id]);
+        const currentPhoto = existingResource[0].photo;
+
+        const photo = req.file ? req.file.path : currentPhoto; // Use existing photo if no new file
+
         const query = `
             UPDATE resource
             SET name_first = ?, 
@@ -86,7 +91,7 @@ router.put('/update/:id', async (req, res) => {
                 office = ?, 
                 department = ?, 
                 role = ?, 
-                type = ?, 
+                type = ?,
                 photo = ?
             WHERE idresource = ?
         `;
@@ -97,7 +102,6 @@ router.put('/update/:id', async (req, res) => {
         res.status(500).send('Error updating resource');
     }
 });
-
 
 // DELETE route to delete a resource
 router.delete('/delete/:id', async (req, res) => {
