@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './navbar';
-import { useIntl } from 'react-intl'; // Import useIntl
+import { useIntl } from 'react-intl';
 
 export default function UserCreate() {
     const initialUserFormData = {

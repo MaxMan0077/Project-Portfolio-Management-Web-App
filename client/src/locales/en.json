@@ -178,5 +178,12 @@
   "6_months": "6 months",
   "12_months": "12 months",
   "24_months": "24 months",
-  "projects_header": "Projects"
+  "projects_header": "Projects",
+  "people": "people",
+  "projects": "projects",
+  "dashboard": "dashboard",
+  "kanban": "kanban",
+  "roadmap": "roadmap",
+  "open_user_menu": "open user menu",
+  "logout": "Logout"
 }

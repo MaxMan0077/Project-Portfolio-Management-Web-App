@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { PhotographIcon } from '@heroicons/react/outline';
 import { useIntl } from 'react-intl';
 
 const UserModal = ({ user, onClose, onSave, onDelete }) => {
     const [userData, setUserData] = useState(user || {});
     const { formatMessage } = useIntl();
+    const filename = atob(userData.photo);
+    const imageUrl = `http://localhost:5001/uploads/${filename}`;
 
     const t = (id) => formatMessage({ id });
 
@@ -31,14 +32,14 @@ const UserModal = ({ user, onClose, onSave, onDelete }) => {
             <div className="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                 <div className="flex justify-center mb-4">
                     {userData.photo ? (
-                        <img src={userData.photo} alt="User" className="h-24 w-24 object-cover rounded-full border-2 border-gray-300" />
+                        // Point the src attribute to the URL where the image is served
+                        <img src={imageUrl} alt="User" className="h-24 w-24 object-cover rounded-full border-2 border-gray-300" />
                     ) : (
                         <div className="rounded-full bg-gray-300 p-4">
                             <PhotographIcon className="h-16 w-16 text-gray-600" />
                         </div>
                     )}
                 </div>
-
                 <div className="mt-3 text-center">
                     <h3 className="text-lg leading-6 font-bold text-gray-900 mb-4">{t('user_details')}</h3>
                     <form className="space-y-3">
@@ -59,27 +60,14 @@ const UserModal = ({ user, onClose, onSave, onDelete }) => {
                         ))}
                     </form>
                 </div>
-
                 <div className="mt-5 sm:mt-6 space-y-3">
-                    <button
-                        type="button"
-                        className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm"
-                        onClick={handleSaveClick}
-                    >
+                    <button type="button" className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:text-sm" onClick={handleSaveClick}>
                         {t('save')}
                     </button>
-                    <button
-                        type="button"
-                        className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm"
-                        onClick={() => onDelete(userData.iduser)}
-                    >
+                    <button type="button" className="inline-flex justify-center w-full rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm" onClick={() => onDelete(userData.iduser)}>
                         {t('delete')}
                     </button>
-                    <button
-                        type="button"
-                        className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm"
-                        onClick={onClose}
-                    >
+                    <button type="button" className="inline-flex justify-center w-full rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm" onClick={onClose}>
                         {t('cancel')}
                     </button>
                 </div>

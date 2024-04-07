@@ -15,7 +15,7 @@ export default function Login() {
         de: 'Meine Projekte',
     };
     const [currentTranslation, setCurrentTranslation] = useState(translations.en);
-    const [opacityClass, setOpacityClass] = useState('opacity-100');
+    const [opacityClass, setOpacityClass] = useState('opacity-100'); 
 
     useEffect(() => {
         let currentLangs = Object.keys(translations);
@@ -32,7 +32,7 @@ export default function Login() {
 
                 // Fade in with new translation
                 setOpacityClass('opacity-100');
-            }, 2000); // Fade duration
+            }, 1000); // Fade duration
         };
 
         const intervalId = setInterval(cycleLanguages, 6000); // Change translation every 3 seconds

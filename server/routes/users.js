@@ -3,35 +3,46 @@ const multer = require('multer');
 const bcryptjs = require('bcryptjs');
 const router = express.Router();
 const db = require('../database');
+const path = require('path');
 
 // Configure multer for file upload handling
-const upload = multer({ dest: 'uploads/' });
-
+const storage = multer.diskStorage({
+    destination: function (req, file, callback) {
+      callback(null, 'uploads/');
+    },
+    filename: function (req, file, callback) {
+      // Use the original file name and append the original extension
+      callback(null, file.originalname);
+    }
+  });
+  
+  const upload = multer({ storage: storage });
+  
 // POST route to add a new user
 router.post('/register', upload.single('photo'), async (req, res) => {
-    console.log("Register Request body: ", req.body);
-    console.log("Uploaded file: ", req.file);
+  console.log("Register Request body: ", req.body);
+  console.log("Uploaded file: ", req.file);
 
-    const { name_first, name_second, office, department, user_type, username, password } = req.body;
-    const photo = req.file ? req.file.path : '';
+  const { name_first, name_second, office, department, user_type, username, password } = req.body;
+  const photo = req.file ? req.file.filename : ''; // Use the filename which includes the original extension
 
-    try {
-        // Hash the password
-        const salt = await bcryptjs.genSalt(10);
-        const hashedPassword = await bcryptjs.hash(password, salt);
+  try {
+    // Hash the password
+    const salt = await bcryptjs.genSalt(10);
+    const hashedPassword = await bcryptjs.hash(password, salt);
 
-        // Insert the user with the hashed password
-        const query = `
-            INSERT INTO user (name_first, name_second, office, department, user_type, photo, username, password)
-            VALUES (?, ?, ?, ?, ?, ?, ?, ?)
-        `;
-        await db.promise().query(query, [name_first, name_second, office, department, user_type, photo, username, hashedPassword]);
+    // Insert the user with the hashed password and photo (if provided)
+    const query = `
+      INSERT INTO user (name_first, name_second, office, department, user_type, photo, username, password)
+      VALUES (?, ?, ?, ?, ?, ?, ?, ?)
+    `;
+    await db.promise().query(query, [name_first, name_second, office, department, user_type, photo, username, hashedPassword]);
 
-        res.status(201).json({ message: 'New user added successfully' });
-    } catch (err) {
-        console.error('Error adding new user:', err);
-        res.status(500).send('Error adding new user');
-    }
+    res.status(201).json({ message: 'New user added successfully', photo: photo });
+  } catch (err) {
+    console.error('Error adding new user:', err);
+    res.status(500).send('Error adding new user');
+  }
 });
 
 // POST route for user login
@@ -67,15 +78,22 @@ router.post('/login', async (req, res) => {
 // GET route to fetch all users
 router.get('/getall', async (req, res) => {
     try {
-        // Include iduser in the SELECT statement
-        const sql = 'SELECT iduser, name_first, name_second, office, department, user_type FROM user';
+        const sql = 'SELECT iduser, name_first, name_second, office, department, user_type, photo FROM user';
         const [users] = await db.promise().query(sql);
-        res.json(users);
+
+        // Assuming you want to convert the photo BLOB to a Base64 string before sending it to the client
+        const usersWithBase64Photos = users.map(user => ({
+            ...user,
+            photo: user.photo ? Buffer.from(user.photo).toString('base64') : null,
+        }));
+
+        res.json(usersWithBase64Photos);
     } catch (err) {
         console.error("Error fetching users: ", err);
         res.status(500).json({ message: "Error fetching users" });
     }
 });
+
 
 
 // PUT route to update an existing user
