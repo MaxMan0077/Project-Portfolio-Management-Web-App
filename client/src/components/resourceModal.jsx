@@ -1,11 +1,12 @@
 import React, { useState, useEffect } from 'react';
-import axios from 'axios';
 import { PhotographIcon } from '@heroicons/react/outline';
 import { useIntl } from 'react-intl';
 
 const ResourceModal = ({ resource, onClose, onSave, onDelete }) => {
     const [resourceData, setResourceData] = useState(resource || {});
     const { formatMessage } = useIntl();
+    const filename = atob(resourceData.photo);
+    const imageUrl = `http://localhost:5001/uploads/${filename}`;
 
     const t = (id) => formatMessage({ id });
 
@@ -31,11 +32,7 @@ const ResourceModal = ({ resource, onClose, onSave, onDelete }) => {
             <div className="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                 <div className="flex justify-center mb-4">
                     {resourceData.photo ? (
-                        <img
-                            src={resourceData.photo}
-                            alt={t('resource')}
-                            className="h-24 w-24 object-cover rounded-full border-2 border-gray-300"
-                        />
+                        <img src={imageUrl} alt="User" className="h-24 w-24 object-cover rounded-full border-2 border-gray-300" />
                     ) : (
                         <div className="rounded-full bg-gray-300 p-4">
                             <PhotographIcon className="h-16 w-16 text-gray-600" />
@@ -89,6 +86,6 @@ const ResourceModal = ({ resource, onClose, onSave, onDelete }) => {
             </div>
         </div>
     );
-};
+}; 
 
 export default ResourceModal;

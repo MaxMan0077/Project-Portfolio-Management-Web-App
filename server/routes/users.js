@@ -62,7 +62,11 @@ router.post('/login', async (req, res) => {
             console.log("Password match: ", passwordMatch);
 
             if (passwordMatch) {
-                res.status(200).json({ message: "Login successful" });
+                // Assuming `photo` is the column name where the photo filename is stored
+                const photo = user.photo ? `http://localhost:5001/uploads/${user.photo}` : null;
+
+                // Including the photo URL in the response
+                res.status(200).json({ message: "Login successful", photo: photo });
             } else {
                 res.status(401).json({ message: "Invalid credentials" });
             }

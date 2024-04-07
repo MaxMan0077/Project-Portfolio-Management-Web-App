@@ -59,6 +59,10 @@ export default function Login() {
             const response = await axios.post('http://localhost:5001/api/users/login', credentials);
             if (response.status === 200) {
                 console.log("Login successful");
+                
+                // Assuming the response includes the user's photo info
+                localStorage.setItem('userPhoto', response.data.photo);
+    
                 fadeToDashboard();
             } else {
                 console.log("Login failed: ", response.data.message);
@@ -66,7 +70,7 @@ export default function Login() {
         } catch (error) {
             console.error('Login error:', error);
         }
-    };
+    };    
 
     return(
         <div className={`relative w-full h-screen bg-zinc-900/90 transition-opacity duration-500 ${isFadingOut ? 'opacity-0' : 'opacity-100'}`}>

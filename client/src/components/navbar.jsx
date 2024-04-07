@@ -50,6 +50,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   const { formatMessage } = useIntl(); // Use useIntl hook
   const t = (id) => formatMessage({ id }); // Helper function for translations
+  
+  // Retrieve the user's photo from localStorage
+  const userPhoto = localStorage.getItem('userPhoto');
 
   const handleProfileClick = () => {
     setIsProfileMenuOpen(prev => !prev);
@@ -117,14 +120,10 @@ const Navbar = () => {
             ))}
         </div>
         <div className="flex items-center justify-end">
-          <button
-            onClick={handleProfileClick}
-            className="rounded-full text-gray-400 hover:text-white focus:outline-none"
-            aria-haspopup="true"
-            aria-expanded={isProfileMenuOpen}
-          >
+          {/* Profile photo */}
+          <button onClick={handleProfileClick} className="rounded-full text-gray-400 hover:text-white focus:outline-none" aria-haspopup="true" aria-expanded={isProfileMenuOpen}>
             <span className="sr-only">{t('open_user_menu')}</span>
-            <img className="h-8 w-8 rounded-full" src="https://images.unsplash.com/photo-1564069114553-7215e1ff1890?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80" alt="" />
+            <img className="h-8 w-8 rounded-full" src={userPhoto || "https://images.unsplash.com/photo-1564069114553-7215e1ff1890?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"} alt="" />
           </button>
           <AnimatePresence>
             {isProfileMenuOpen && (
