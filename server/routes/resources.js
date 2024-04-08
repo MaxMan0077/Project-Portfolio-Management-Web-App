@@ -2,6 +2,8 @@ const express = require('express');
 const multer = require('multer');
 const db = require('../database');
 const router = express.Router();
+const path = require('path');
+const fs = require('fs');
 
 // Configure multer for file upload handling
 const storage = multer.diskStorage({
@@ -68,6 +70,33 @@ router.get('/getall', async (req, res) => {
     } catch (err) {
         console.error("Error fetching resources: ", err);
         res.status(500).json({ message: "Error fetching resources" });
+    }
+});
+
+// GET route to fetch and return a resource's photo
+router.get('/photo/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [rows] = await db.promise().query('SELECT photo FROM resource WHERE idresource = ?', [id]);
+        if (rows.length > 0 && rows[0].photo) {
+            // Decode the Base64-encoded filename
+            const filename = Buffer.from(rows[0].photo, 'base64').toString('utf-8');
+            const photoPath = path.join(__dirname, '..', 'uploads', filename);
+
+            // Check if the file exists before sending it
+            if (fs.existsSync(photoPath)) {
+                res.sendFile(photoPath);
+            } else {
+                // If the file does not exist, send a placeholder or 404
+                res.status(404).send('Photo not found');
+            }
+        } else {
+            // If no photo found or resource does not exist, send a placeholder or 404
+            res.status(404).send('Photo not found');
+        }
+    } catch (err) {
+        console.error('Error fetching resource photo:', err);
+        res.status(500).send('Error fetching resource photo');
     }
 });
 
