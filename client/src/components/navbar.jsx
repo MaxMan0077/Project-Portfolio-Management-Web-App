@@ -98,6 +98,28 @@ const Navbar = () => {
     }
   };
 
+  const ringVariants = {
+    hover: {
+      scale: 1.1,
+      boxShadow: "0 0 0 4px rgba(59, 130, 246, 0.5)",
+      transition: {
+        scale: { duration: 0.2, ease: "easeInOut" },
+        boxShadow: { duration: 0.4, ease: "easeInOut" }, // Smooth fade in for the ring
+      },
+    },
+    pressed: {
+      boxShadow: "0 0 0 4px rgba(59, 130, 246, 0.5)",
+    },
+    none: {
+      scale: 1,
+      boxShadow: "0 0 0 0px rgba(0, 0, 0, 0)",
+      transition: {
+        scale: { duration: 0.2, ease: "easeInOut" },
+        boxShadow: { duration: 0.4, ease: "easeInOut" }, // Smooth fade out for the ring
+      },
+    },
+  };
+  
   return (
     <nav className="bg-gray-800 relative rounded-b-3xl shadow-lg">
       <div className="max-w-full mx-auto px-4 flex justify-between items-center h-16">
@@ -121,9 +143,16 @@ const Navbar = () => {
         </div>
         <div className="flex items-center justify-end">
           {/* Profile photo */}
-          <button onClick={handleProfileClick} className="rounded-full text-gray-400 hover:text-white focus:outline-none" aria-haspopup="true" aria-expanded={isProfileMenuOpen}>
-            <span className="sr-only">{t('open_user_menu')}</span>
-            <img className="h-10 w-10 rounded-full" src={userPhoto || "https://images.unsplash.com/photo-1564069114553-7215e1ff1890?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=facearea&facepad=2&w=256&h=256&q=80"} alt="" />
+          <button onClick={() => setIsProfileMenuOpen(prev => !prev)} className="relative rounded-full focus:outline-none">
+            <motion.div
+              className="inline-block rounded-full"
+              variants={ringVariants}
+              initial="none"
+              whileHover="hover"
+              animate={isProfileMenuOpen ? "pressed" : "none"}
+            >
+              <img className="h-12 w-12 rounded-full" src={userPhoto || "https://via.placeholder.com/150"} alt="Profile" />
+            </motion.div>
           </button>
           <AnimatePresence>
             {isProfileMenuOpen && (
