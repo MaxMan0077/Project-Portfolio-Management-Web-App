@@ -1,11 +1,13 @@
 import React, { useState } from 'react';
-// If using react-icons
 import { MdArrowDropDown } from 'react-icons/md';
+import { useIntl } from 'react-intl';
 
 const Dropdown = ({ resources, onSelect, selectedResourceId }) => {
   const [isOpen, setIsOpen] = useState(false);
   const [searchTerm, setSearchTerm] = useState('');
   const toggleDropdown = () => setIsOpen(!isOpen);
+  const { formatMessage } = useIntl();
+  const t = (id) => formatMessage({ id });
 
   const selectedResource = resources.find(resource => resource.idresource === selectedResourceId);
 
@@ -22,7 +24,7 @@ const Dropdown = ({ resources, onSelect, selectedResourceId }) => {
             <span className="flex-1 text-left">{selectedResource.name_first} {selectedResource.name_second}</span>
           </div>
         ) : (
-          <span className="flex-1 text-left">Select Project Manager</span>
+          <span className="flex-1 text-left">{t('select')}</span>
         )}
         {/* Using react-icons for the dropdown arrow */}
         <MdArrowDropDown className="text-xl" />

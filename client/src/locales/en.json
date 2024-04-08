@@ -185,5 +185,6 @@
   "kanban": "kanban",
   "roadmap": "roadmap",
   "open_user_menu": "open user menu",
-  "logout": "Logout"
+  "logout": "Logout",
+  "select": "Select Resource"
 }
