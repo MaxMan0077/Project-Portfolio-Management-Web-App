@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
-import { FaHome, FaUsers, FaTasks, FaTrello, FaAddressBook } from 'react-icons/fa';
+import { FaHome, FaUsers, FaTasks, FaTrello,} from 'react-icons/fa';
+import { FaChartBar } from "react-icons/fa6";
 import { motion, AnimatePresence } from 'framer-motion';
 import { useIntl } from 'react-intl';
 import { useLanguage } from '../LanguageContext'; // Ensure this path is correct
@@ -126,12 +127,12 @@ const Navbar = () => {
         <div className="flex items-center justify-start">
           <img className="h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-indigo-500.svg" alt="Workflow" />
         </div>
-        <div className="hidden sm:flex justify-center flex-1 items-center">
+        <div className="hidden sm:flex justify-center flex-1 items-center ml-2">
           {[{ icon: <FaUsers className="text-3xl text-white" />, to: "/user-overview", label: t('people') },
             { icon: <FaTasks className="text-3xl text-white" />, to: "/projects-overview", label: t('projects') },
             { icon: <FaHome className="text-5xl text-white" />, to: "/dashboard", label: t('dashboard'), special: true },
             { icon: <FaTrello className="text-3xl text-white" />, to: "/kanban", label: t('kanban') },
-            { icon: <FaAddressBook className="text-3xl text-white" />, to: "/roadmap", label: t('roadmap') }]
+            { icon: <FaChartBar className="text-3xl text-white" />, to: "/roadmap", label: t('roadmap') }]
             .map((item, index) => (
               <div key={index} className={`px-10 py-2 relative flex flex-col items-center group ${item.special ? 'mx-10' : ''}`}>
                 <Link to={item.to} className={`text-center ${item.special ? 'bg-blue-800 rounded-full p-1 transition duration-300 ease-in-out hover:bg-orange-500 flex justify-center items-center' : ''}`} style={item.special ? { width: '80px', height: '80px' } : {}}>
@@ -143,16 +144,16 @@ const Navbar = () => {
         </div>
         <div className="flex items-center justify-end">
           {/* Profile photo */}
-          <button onClick={() => setIsProfileMenuOpen(prev => !prev)} className="relative rounded-full focus:outline-none">
+          <button onClick={() => setIsProfileMenuOpen(prev => !prev)} className="relative rounded-full focus:outline-none mt-1">
             <motion.div
-              className="inline-block rounded-full"
-              variants={ringVariants}
-              initial="none"
-              whileHover="hover"
-              animate={isProfileMenuOpen ? "pressed" : "none"}
-            >
-              <img className="h-12 w-12 rounded-full" src={userPhoto || "https://via.placeholder.com/150"} alt="Profile" />
-            </motion.div>
+            className="inline-block rounded-full"
+            variants={ringVariants}
+            initial="none"
+            whileHover="hover"
+            animate={isProfileMenuOpen ? "pressed" : "none"}
+          >
+            <img className="h-12 w-12 rounded-full" src={userPhoto || "https://via.placeholder.com/150"} alt="Profile" />
+          </motion.div>
           </button>
           <AnimatePresence>
             {isProfileMenuOpen && (

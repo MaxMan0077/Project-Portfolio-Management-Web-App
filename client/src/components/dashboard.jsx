@@ -1,8 +1,7 @@
 import React, { useEffect, useState } from "react";
 import axios from 'axios';
 import Navbar from './navbar';
-import { motion, AnimatePresence } from 'framer-motion';
-import { PieChart, Pie, Cell, Legend, Tooltip } from 'recharts';
+import { PieChart, Pie, Cell, Tooltip } from 'recharts';
 import { useIntl } from 'react-intl';
 import { useLanguage } from '../LanguageContext';
 
@@ -11,45 +10,49 @@ export default function Dashboard() {
     const [projects, setProjects] = useState([]);
     const [totalExpenditure, setTotalExpenditure] = useState(0);
     const { language } = useLanguage();
+    const phaseOrder = ["Funnel", "Review & Evaluation", "Business Case Development", "In Implementation", "Closed"];
+    const complexityOrder = ["low", "medium", "high"];
+    const [chartKey, setChartKey] = useState(Date.now());
     const intl = useIntl();
     const t = (id) => intl.formatMessage({ id });
+    const [totalProjects, setTotalProjects] = useState(0);
 
     // Hardcoded total budget
     const totalBudget = 100000; // Example figure
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042'];
+    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A4A4A4'];
 
     useEffect(() => {
-        setIsFadingIn(true); // Trigger the fade-in effect
+      setIsFadingIn(true);
+      const fetchProjects = async () => {
+        try {
+          const response = await axios.get('http://localhost:5001/api/projects/getall');
+          const fetchedProjects = response.data;
+          setProjects(fetchedProjects);
+          setTotalExpenditure(fetchedProjects.reduce((acc, project) => acc + project.budget_approved, 0));
+          setTotalProjects(fetchedProjects.length);
+          setChartKey(Date.now());
+        } catch (err) {
+          console.error('Error fetching projects:', err);
+        }
+      };
+      fetchProjects();
+    }, [language]);
 
-        // Fetch all projects
-        const fetchProjects = async () => {
-            try {
-                const response = await axios.get('http://localhost:5001/api/projects/getall');
-                setProjects(response.data);
-
-                // Calculate the sum of budget_approved from all projects
-                const totalExpenditure = response.data.reduce((acc, project) => acc + project.budget_approved, 0);
-                setTotalExpenditure(totalExpenditure);
-            } catch (err) {
-                console.error('Error fetching projects:', err);
-            }
-        };
-
-        fetchProjects();
-    },[language]);
+    const getActiveProjectsCount = () => {
+      return projects.filter(project => project.phase === "In Implementation").length;
+    }; 
 
     // Function to transform data into chart format
     const generateChartData = (projects, key) => {
-        const groupBy = projects.reduce((acc, project) => {
+      const groupBy = projects.reduce((acc, project) => {
         const keyValue = project[key];
         if (!acc[keyValue]) {
-            acc[keyValue] = { name: keyValue, value: 0 };
+          acc[keyValue] = { name: keyValue, value: 0 };
         }
         acc[keyValue].value += 1;
         return acc;
-        }, {});
-    
-        return Object.values(groupBy);
+      }, {});
+      return Object.values(groupBy);
     };
 
     const getProjectsByPhase = (phase) => {
@@ -61,58 +64,88 @@ export default function Dashboard() {
         return new Date(dateString).toLocaleDateString('en-GB', options);
     };
     
-    const dataByPhase = generateChartData(projects, 'phase');
+    const sortData = (data, order) => {
+      return data.sort((a, b) => order.indexOf(a.name) - order.indexOf(b.name));
+    };
+    // Correcting the sorting and use of sorted data
+    const dataByPhaseSorted = sortData(generateChartData(projects, 'phase'), phaseOrder);
     const dataByLocation = generateChartData(projects, 'location');
-    const dataByComplexity = generateChartData(projects, 'complexity');
+    const dataByComplexitySorted = sortData(generateChartData(projects, 'complexity'), complexityOrder);
 
+
+    const CustomLegend = ({ data }) => (
+      <div className="legend flex flex-col justify-center">
+        {data.map((entry, index) => (
+          <div key={index} className="flex items-center mb-1">
+            <div className="w-3 h-3 mr-2" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
+            <div className="text-sm">{entry.name}</div>
+          </div>
+        ))}
+      </div>
+    );
+          
     const renderPieChart = (data, name) => (
-        <div className="flex-1 bg-white rounded shadow p-4 text-center flex flex-col justify-center items-center m-2">
-            {/* Header in bold */}
-            <h3 className="font-bold text-xl mb-4">{name}</h3>
-            <PieChart width={400} height={200}>
-                <Pie
-                    dataKey="value"
-                    data={data}
-                    cx="50%"
-                    cy="50%"
-                    outerRadius={80}
-                    innerRadius={50} // This turns the pie chart into a ring
-                    fill="#8884d8"
-                    isAnimationActive={true}
-                    animationDuration={1300}
-                >
-                    {data.map((entry, index) => (
-                        <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />
-                    ))}
-                </Pie>
-                <Tooltip />
-                <Legend layout="vertical" align="right" verticalAlign="middle" />
+      <div className="p-4" style={{ width: "420px" }}>
+        <div className="bg-white rounded shadow flex p-4 justify-start items-center">
+          <div>
+            <h3 className="font-bold text-xl mb-4 text-center">{name}</h3>
+            <PieChart key={chartKey} width={200} height={200}>
+              <Pie
+                dataKey="value"
+                data={data}
+                cx="50%"
+                cy="50%"
+                outerRadius={80}
+                innerRadius={50}
+                fill="#8884d8"
+                isAnimationActive={true}
+                animationDuration={1300}
+                label={name === 'Phase' ? (props) => renderCustomLabel(props, totalProjects) : undefined}
+                labelLine={false}
+              >
+                {data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+              </Pie>
+              <Tooltip />
             </PieChart>
+          </div>
+          <div className="ml-1 mt-14">
+            <CustomLegend data={data} />
+          </div>
         </div>
-    );    
+      </div>
+    );
+
+    const renderCustomLabel = ({ cx, cy }, total) => (
+      <text x={cx} y={cy} fill="#333" fontSize="42" fontWeight="bold" textAnchor="middle" dominantBaseline="central">
+        {total}
+      </text>
+    );
 
     return (
         <>
           <Navbar />
-          <div className={`transition-opacity duration-2000 mt-4 p-4 ${isFadingIn ? 'opacity-100' : 'opacity-0'}`}>
-            <div className="flex flex-wrap justify-around items-stretch">
-              {/* Stat Boxes */}
-              <div className="flex-1 rounded shadow p-4 m-2 text-center flex flex-col justify-center">
-                <div className="text-gray-500 text-md font-semibold">{t('total_projects')}</div>
-                <div className="text-3xl font-bold">{projects.length}</div>
+          <div className={`transition-opacity duration-2000 mt-4 ${isFadingIn ? 'opacity-100' : 'opacity-0'}`}>
+            {/* Flex container for all content */}
+            <div className="flex flex-col md:flex-row justify-around items-stretch">
+              <div className="flex flex-row flex-wrap justify-around md:flex-nowrap md:w-1/2 lg:w-2/5 xl:w-1/3">
+                <div className="flex-1 min-w-0 rounded shadow p-4 m-2 flex flex-col justify-center items-center">
+                  <div className="text-gray-500 text-md font-semibold">{t('active_projects')}</div>
+                  <div className="text-3xl font-bold">{getActiveProjectsCount()}</div>
+                </div>
+                <div className="flex-1 min-w-0 rounded shadow p-4 m-2 flex flex-col justify-center items-center">
+                  <div className="text-gray-500 text-md font-semibold">{t('total_budget')}</div>
+                  <div className="text-3xl font-bold">{`$${totalBudget.toLocaleString()}`}</div>
+                </div>
+                <div className="flex-1 min-w-0 rounded shadow p-4 m-2 flex flex-col justify-center items-center">
+                  <div className="text-gray-500 text-md font-semibold">{t('total_expenditure')}</div>
+                  <div className="text-3xl font-bold">{`$${totalExpenditure.toLocaleString()}`}</div>
+                </div>
               </div>
-              <div className="flex-1 rounded shadow p-4 m-2 text-center flex flex-col justify-center">
-                <div className="text-gray-500 text-md font-semibold">{t('total_budget')}</div>
-                <div className="text-3xl font-bold">{`$${totalBudget.toLocaleString()}`}</div>
+              <div className="flex flex-wrap justify-around">
+                {renderPieChart(dataByPhaseSorted, 'Phase')}
+                {renderPieChart(dataByLocation, 'Region')}
+                {renderPieChart(dataByComplexitySorted, 'Complexity')}
               </div>
-              <div className="flex-1 rounded shadow p-4 m-2 text-center flex flex-col justify-center">
-                <div className="text-gray-500 text-md font-semibold">{t('total_expenditure')}</div>
-                <div className="text-3xl font-bold">{`$${totalExpenditure.toLocaleString()}`}</div>
-              </div>
-              {/* Pie Charts */}
-              {renderPieChart(dataByPhase, t('phase'))}
-              {renderPieChart(dataByLocation, t('location'))}
-              {renderPieChart(dataByComplexity, t('complexity'))}
             </div>
             <div className="mt-8 px-5">
               {/* Header "Active Projects" */}
