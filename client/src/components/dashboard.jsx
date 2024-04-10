@@ -12,6 +12,7 @@ export default function Dashboard() {
     const { language } = useLanguage();
     const phaseOrder = ["Funnel", "Review & Evaluation", "Business Case Development", "In Implementation", "Closed"];
     const complexityOrder = ["low", "medium", "high"];
+    const [photos, setPhotos] = useState({});
     const [chartKey, setChartKey] = useState(Date.now());
     const intl = useIntl();
     const t = (id) => intl.formatMessage({ id });
@@ -37,6 +38,42 @@ export default function Dashboard() {
       };
       fetchProjects();
     }, [language]);
+
+    useEffect(() => {
+      const fetchPhoto = async (resourceId) => {
+        try {
+            const response = await axios.get(`http://localhost:5001/api/resources/photo/${resourceId}`);
+            // Assuming the endpoint returns a base64 string directly
+            const base64Filename = response.data; // If the response structure is different, adjust this line accordingly
+            const decodedFilename = atob(base64Filename); // Use atob for Base64 decoding
+            return `http://localhost:5001/uploads/${decodedFilename}`;
+        } catch (error) {
+            console.error(`Error fetching photo for resource ID ${resourceId}:`, error);
+            return 'https://via.placeholder.com/150'; // Placeholder photo URL
+        }
+      };    
+  
+      const fetchActiveProjectsAndPhotos = async () => {
+          try {
+              const response = await axios.get('http://localhost:5001/api/projects/getActiveProjects');
+              const activeProjects = response.data;
+              setProjects(activeProjects);
+  
+              const photoPromises = activeProjects.flatMap(project => [
+                  fetchPhoto(project.business_owner).then(photoUrl => ({ [project.business_owner]: photoUrl })),
+                  fetchPhoto(project.project_manager).then(photoUrl => ({ [project.project_manager]: photoUrl }))
+              ]);
+  
+              const photosArray = await Promise.all(photoPromises);
+              const photosObj = photosArray.reduce((acc, current) => ({ ...acc, ...current }), {});
+              setPhotos(photosObj);
+          } catch (error) {
+              console.error('Error fetching active projects and photos:', error);
+          }
+      };
+  
+      fetchActiveProjectsAndPhotos();
+    }, []); // Runs once on component mount  
 
     const getActiveProjectsCount = () => {
       return projects.filter(project => project.phase === "In Implementation").length;
@@ -195,8 +232,12 @@ export default function Dashboard() {
                         <tr key={index} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
                           <td className="px-5 py-2 border-b border-gray-200">{project.name}</td>
                           <td className="px-5 py-2 border-b border-gray-200">{project.status}</td>
-                          <td className="px-5 py-2 border-b border-gray-200">{project.business_owner}</td>
-                          <td className="px-5 py-2 border-b border-gray-200">{project.project_manager}</td>
+                          <td className="px-5 py-2 border-b border-gray-200 text-sm">
+                              <img src={photos[project.business_owner] || 'https://via.placeholder.com/150'} alt="Business Owner" className="h-7 w-7 rounded-full" />
+                          </td>
+                          <td className="px-5 py-2 border-b border-gray-200 text-sm">
+                              <img src={photos[project.project_manager] || 'https://via.placeholder.com/150'} alt="Project Manager" className="h-7 w-7 rounded-full" />
+                          </td>
                           <td className="px-5 py-2 border-b border-gray-200">
                             {`${formatDate(project.phase_start)} - ${formatDate(project.phase_end)}`}
                           </td>

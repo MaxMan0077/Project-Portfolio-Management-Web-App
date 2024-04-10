@@ -73,33 +73,26 @@ router.get('/getall', async (req, res) => {
     }
 });
 
-// GET route to fetch and return a resource's photo
+// GET route to fetch and return a resource's photo as a Base64 string
 router.get('/photo/:id', async (req, res) => {
     const { id } = req.params;
     try {
         const [rows] = await db.promise().query('SELECT photo FROM resource WHERE idresource = ?', [id]);
         if (rows.length > 0 && rows[0].photo) {
-            // Decode the Base64-encoded filename
-            const filename = Buffer.from(rows[0].photo, 'base64').toString('utf-8');
-            const photoPath = path.join(__dirname, '..', 'uploads', filename);
-
-            // Check if the file exists before sending it
-            if (fs.existsSync(photoPath)) {
-                res.sendFile(photoPath);
-            } else {
-                // If the file does not exist, send a placeholder or 404 with the ID
-                res.status(404).send(`Photo not found for resource ID: ${id}`);
-            }
+            // Convert BLOB to Base64 string
+            const photoBase64 = Buffer.from(rows[0].photo).toString('base64');
+            // Send Base64 encoded string to client
+            res.send(photoBase64);
         } else {
             // If no photo found or resource does not exist, send a placeholder or 404 with the ID
             res.status(404).send(`No photo found for resource ID: ${id}`);
         }
     } catch (err) {
         console.error('Error fetching resource photo:', err);
-        // Include the ID in the error message sent to the client
         res.status(500).send(`Error fetching resource photo for ID: ${id}`);
     }
 });
+
 
 // PUT route to update an existing resource
 router.put('/update/:id', async (req, res) => {
