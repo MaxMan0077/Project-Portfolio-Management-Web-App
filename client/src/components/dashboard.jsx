@@ -14,6 +14,7 @@ export default function Dashboard() {
     const complexityOrder = ["low", "medium", "high"];
     const [photos, setPhotos] = useState({});
     const [names, setNames] = useState({});
+    const [ragStatuses, setRagStatuses] = useState({});
     const [chartKey, setChartKey] = useState(Date.now());
     const intl = useIntl();
     const t = (id) => intl.formatMessage({ id });
@@ -65,36 +66,55 @@ export default function Dashboard() {
           return 'Unknown'; // Fallback name
         }
       };
-        
+      
+      const fetchLatestRAGStatus = async (projectId) => {
+        try {
+          const response = await axios.get(`http://localhost:5001/api/reports/latestRAGStatus/${projectId}`);
+          // Accessing the RAG status directly from the response.data
+          const { cost_rag, scope_rag, time_rag } = response.data;
+          console.log(`RAG Statuses for project ID ${projectId}:`, { cost_rag, scope_rag, time_rag });
+          return { cost_rag, scope_rag, time_rag }; // Returns the RAG status for the project
+        } catch (error) {
+          console.error(`Error fetching latest RAG status for project ID ${projectId}:`, error);
+          return { scope_rag: 'unknown', time_rag: 'unknown', cost_rag: 'unknown' }; // Default values in case of error
+        }
+      };      
+    
       const fetchActiveProjectsAndResources = async () => {
         try {
           const response = await axios.get('http://localhost:5001/api/projects/getActiveProjects');
           const activeProjects = response.data;
+          console.log('Active projects:', activeProjects); 
           setProjects(activeProjects);
     
-          // Fetching photos
-          const photoPromises = activeProjects.flatMap(project => [
-              fetchPhoto(project.business_owner).then(photoUrl => ({ [project.business_owner]: photoUrl })),
-              fetchPhoto(project.project_manager).then(photoUrl => ({ [project.project_manager]: photoUrl }))
+          // Combine all promises from photos, names, and RAG statuses
+          const combinedPromises = activeProjects.flatMap(project => [
+            fetchPhoto(project.business_owner).then(photoUrl => ({ ['photo_' + project.business_owner]: photoUrl })),
+            fetchPhoto(project.project_manager).then(photoUrl => ({ ['photo_' + project.project_manager]: photoUrl })),
+            fetchNames(project.business_owner).then(name => ({ ['name_' + project.business_owner]: name })),
+            fetchNames(project.project_manager).then(name => ({ ['name_' + project.project_manager]: name })),
+            fetchLatestRAGStatus(project.idproject).then(ragStatus => ({ ['rag_' + project.idproject]: ragStatus })) // Here is the change
           ]);
     
-          // Fetching names
-          const namePromises = activeProjects.flatMap(project => [
-              fetchNames(project.business_owner).then(name => ({ [project.business_owner]: name })),
-              fetchNames(project.project_manager).then(name => ({ [project.project_manager]: name }))
-          ]);
+          const combinedResults = await Promise.all(combinedPromises);
     
-          // Resolve all promises
-          const photosArray = await Promise.all(photoPromises);
-          const namesArray = await Promise.all(namePromises);
+          // Process combined results
+          let photosObj = {}, namesObj = {}, ragStatusesObj = {};
+          combinedResults.forEach(result => {
+            const key = Object.keys(result)[0];
+            if (key.startsWith('photo_')) {
+              photosObj[key] = result[key];
+            } else if (key.startsWith('name_')) {
+              namesObj[key] = result[key];
+            } else if (key.startsWith('rag_')) {
+              ragStatusesObj[key] = result[key];
+            }
+          });
     
-          // Combine results into objects
-          const photosObj = photosArray.reduce((acc, current) => ({ ...acc, ...current }), {});
-          const namesObj = namesArray.reduce((acc, current) => ({ ...acc, ...current }), {});
-    
-          // Update states
+          // Update state
           setPhotos(photosObj);
           setNames(namesObj);
+          setRagStatuses(ragStatusesObj); // Assumes you have a state hook like this
         } catch (error) {
           console.error('Error fetching active projects and resources:', error);
         }
@@ -247,42 +267,63 @@ export default function Dashboard() {
                       <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('project_manager')}</th>
                       <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('phase_timeline')}</th>
                       {/* Placeholder Columns */}
-                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">R1</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">R2</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">R3</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider text-center">Scope</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider text-center">Time</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider text-center">Cost</th>
                       {/* Budget Column */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('budget_approved')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {getProjectsByPhase("In Implementation").length > 0 ? (
-                      getProjectsByPhase("In Implementation").map((project, index) => (
-                        <tr key={index} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
-                          <td className="px-5 py-2 border-b border-gray-200">{project.name}</td>
-                          <td className="px-5 py-2 border-b border-gray-200">{project.status}</td>
-                          <td className="px-5 py-2 border-b border-gray-200">
-                            <div className="flex items-center">
-                              <img src={photos[project.business_owner] || 'https://via.placeholder.com/150'} alt="Business Owner" className="h-7 w-7 rounded-full" />
-                              <span className="ml-3">{names[project.business_owner] || 'N/A'}</span>
-                            </div>
-                          </td>
-                          <td className="px-5 py-2 border-b border-gray-200">
-                            <div className="flex items-center">
-                              <img src={photos[project.project_manager] || 'https://via.placeholder.com/150'} alt="Project Manager" className="h-7 w-7 rounded-full" />
-                              <span className="ml-3">{names[project.project_manager] || 'N/A'}</span>
-                            </div>
-                          </td>
-                          <td className="px-5 py-2 border-b border-gray-200">
-                            {`${formatDate(project.phase_start)} - ${formatDate(project.phase_end)}`}
-                          </td>
-                          {/* Placeholder Columns */}
-                          <td className="px-5 py-2 border-b border-gray-200"></td>
-                          <td className="px-5 py-2 border-b border-gray-200"></td>
-                          <td className="px-5 py-2 border-b border-gray-200"></td>
-                          {/* Budget Column */}
-                          <td className="px-5 py-2 border-b border-gray-200">{formatBudget(project.budget_approved)}</td>
-                        </tr>
-                      ))
+                      getProjectsByPhase("In Implementation").map((project, index) => {
+                        const rag = ragStatuses[`rag_${project.idproject}`] || {};
+                        console.log(`RAG Status for Project ID ${project.idproject}:`, rag);
+
+                        return (
+                          <tr key={index} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
+                            <td className="px-5 py-2 border-b border-gray-200">{project.name}</td>
+                            <td className="px-5 py-2 border-b border-gray-200">{project.status}</td>
+                            <td className="px-5 py-2 border-b border-gray-200">
+                              <div className="flex items-center">
+                                <img src={photos[`photo_${project.business_owner}`] || 'https://via.placeholder.com/150'} alt="Business Owner" className="h-7 w-7 rounded-full" />
+                                <span className="ml-3">{names[`name_${project.business_owner}`] || 'N/A'}</span>
+                              </div>
+                            </td>
+                            <td className="px-5 py-2 border-b border-gray-200">
+                              <div className="flex items-center">
+                                <img src={photos[`photo_${project.project_manager}`] || 'https://via.placeholder.com/150'} alt="Project Manager" className="h-7 w-7 rounded-full" />
+                                <span className="ml-3">{names[`name_${project.project_manager}`] || 'N/A'}</span>
+                              </div>
+                            </td>
+                            <td className="px-5 py-2 border-b border-gray-200">
+                              {`${formatDate(project.phase_start)} - ${formatDate(project.phase_end)}`}
+                            </td>
+                            <td className="px-5 py-2 border-b border-gray-200 text-center">
+                              <span className={`inline-block w-4 h-4 rounded-full ${
+                                rag.scope_rag === 'Red' ? 'bg-red-500' : 
+                                rag.scope_rag === 'Amber' ? 'bg-yellow-500' : 
+                                rag.scope_rag === 'Green' ? 'bg-green-500' : 
+                                'bg-gray-500'}`} />
+                            </td>
+                            <td className="px-5 py-2 border-b border-gray-200 text-center">
+                              <span className={`inline-block w-4 h-4 rounded-full ${
+                                rag.time_rag === 'Red' ? 'bg-red-500' : 
+                                rag.time_rag === 'Amber' ? 'bg-yellow-500' : 
+                                rag.time_rag === 'Green' ? 'bg-green-500' : 
+                                'bg-gray-500'}`} />
+                            </td>
+                            <td className="px-5 py-2 border-b border-gray-200 text-center">
+                              <span className={`inline-block w-4 h-4 rounded-full ${
+                                rag.cost_rag === 'Red' ? 'bg-red-500' : 
+                                rag.cost_rag === 'Amber' ? 'bg-yellow-500' : 
+                                rag.cost_rag === 'Green' ? 'bg-green-500' : 
+                                'bg-gray-500'}`} />
+                            </td>
+                            <td className="px-5 py-2 border-b border-gray-200">{formatBudget(project.budget_approved)}</td>
+                          </tr>
+                        );
+                      })
                     ) : (
                       <tr>
                         <td colSpan="9" className="text-center px-5 py-5 border-b border-gray-200 text-lg font-bold">{t('no_projects_in_phase')}</td>

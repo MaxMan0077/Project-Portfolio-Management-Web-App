@@ -33,6 +33,32 @@ router.post('/:projectId', async (req, res) => {
     res.status(500).json({ message: 'Error creating status report', error: err });
   }
 });
-  
+
+router.get('/latestRAGStatus/:projectId', async (req, res) => {
+  const projectId = req.params.projectId;
+
+  const query = `
+      SELECT sr.scope_rag, sr.time_rag, sr.cost_rag
+      FROM status_report sr
+      WHERE sr.project = ?
+      ORDER BY sr.code DESC
+      LIMIT 1;
+  `;
+
+  try {
+      const [results] = await db.promise().query(query, [projectId]);
+      // Send the latest RAG status if exists
+      if (results.length > 0) {
+          res.json(results[0]);
+      } else {
+          // Handle case where no status reports exist
+          res.status(404).send('No status reports found for project ID ' + projectId);
+      }
+  } catch (err) {
+      console.error('Error fetching latest RAG status:', err);
+      res.status(500).send('Error fetching latest RAG status');
+  }
+});
+
 
 module.exports = router;
