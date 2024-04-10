@@ -42,6 +42,26 @@ export default function Dashboard() {
       return projects.filter(project => project.phase === "In Implementation").length;
     }; 
 
+    const formatBudget = (budget) => {
+      let value = budget;
+      let suffix = '';
+    
+      // Determine the suffix and divide value accordingly
+      if (budget >= 1_000_000) {
+        value = budget / 1_000_000;
+        suffix = 'M';
+      } else if (budget >= 1000) {
+        value = budget / 1000;
+        suffix = 'K';
+      }
+    
+      // Format the number to have only three significant figures
+      let formattedValue = Number(value.toPrecision(3));
+    
+      // Return formatted string with suffix
+      return `$${formattedValue}${suffix}`;
+    };    
+
     // Function to transform data into chart format
     const generateChartData = (projects, key) => {
       const groupBy = projects.reduce((acc, project) => {
@@ -147,44 +167,50 @@ export default function Dashboard() {
                 {renderPieChart(dataByComplexitySorted, 'Complexity')}
               </div>
             </div>
-            <div className="mt-8 px-5">
+            <div className="mt-1 px-5">
               {/* Header "Active Projects" */}
               <div className="text-left mb-5">
                 <h2 className="text-3xl font-bold">{t('active_projects')}</h2>
               </div>
               <div style={{ maxHeight: 'calc(60px * 7)', overflowY: 'auto' }}>
                 <table className="min-w-full leading-normal w-full">
-                  <thead className="sticky top-0 text-white bg-blue-500">
+                  <thead className="sticky top-0 text-white bg-blue-500 text-left text-sm">
                     <tr>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t('project_name')}</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t('program')}</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t('status')}</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t('location')}</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t('business_owner')}</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t('project_manager')}</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t('budget_approved')}</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 uppercase tracking-wider">{t('phase_timeline')}</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('project_name')}</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('status')}</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('business_owner')}</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('project_manager')}</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('phase_timeline')}</th>
+                      {/* Placeholder Columns */}
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">R1</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">R2</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">R3</th>
+                      {/* Budget Column */}
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('budget_approved')}</th>
                     </tr>
                   </thead>
                   <tbody>
                     {getProjectsByPhase("In Implementation").length > 0 ? (
                       getProjectsByPhase("In Implementation").map((project, index) => (
                         <tr key={index} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
-                          <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.name}</td>
-                          <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.program}</td>
-                          <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.status}</td>
-                          <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.location}</td>
-                          <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.business_owner}</td>
-                          <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.project_manager}</td>
-                          <td className="px-5 py-2 border-b border-gray-200 text-sm">{`$${project.budget_approved.toLocaleString()}`}</td>
-                          <td className="px-5 py-2 border-b border-gray-200 text-sm">
+                          <td className="px-5 py-2 border-b border-gray-200">{project.name}</td>
+                          <td className="px-5 py-2 border-b border-gray-200">{project.status}</td>
+                          <td className="px-5 py-2 border-b border-gray-200">{project.business_owner}</td>
+                          <td className="px-5 py-2 border-b border-gray-200">{project.project_manager}</td>
+                          <td className="px-5 py-2 border-b border-gray-200">
                             {`${formatDate(project.phase_start)} - ${formatDate(project.phase_end)}`}
                           </td>
+                          {/* Placeholder Columns */}
+                          <td className="px-5 py-2 border-b border-gray-200"></td>
+                          <td className="px-5 py-2 border-b border-gray-200"></td>
+                          <td className="px-5 py-2 border-b border-gray-200"></td>
+                          {/* Budget Column */}
+                          <td className="px-5 py-2 border-b border-gray-200">{formatBudget(project.budget_approved)}</td>
                         </tr>
                       ))
                     ) : (
                       <tr>
-                        <td colSpan="8" className="text-center px-5 py-5 border-b border-gray-200 text-lg font-bold">{t('no_projects_in_phase')}</td>
+                        <td colSpan="9" className="text-center px-5 py-5 border-b border-gray-200 text-lg font-bold">{t('no_projects_in_phase')}</td>
                       </tr>
                     )}
                   </tbody>

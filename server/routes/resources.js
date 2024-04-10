@@ -87,16 +87,17 @@ router.get('/photo/:id', async (req, res) => {
             if (fs.existsSync(photoPath)) {
                 res.sendFile(photoPath);
             } else {
-                // If the file does not exist, send a placeholder or 404
-                res.status(404).send('Photo not found');
+                // If the file does not exist, send a placeholder or 404 with the ID
+                res.status(404).send(`Photo not found for resource ID: ${id}`);
             }
         } else {
-            // If no photo found or resource does not exist, send a placeholder or 404
-            res.status(404).send('Photo not found');
+            // If no photo found or resource does not exist, send a placeholder or 404 with the ID
+            res.status(404).send(`No photo found for resource ID: ${id}`);
         }
     } catch (err) {
         console.error('Error fetching resource photo:', err);
-        res.status(500).send('Error fetching resource photo');
+        // Include the ID in the error message sent to the client
+        res.status(500).send(`Error fetching resource photo for ID: ${id}`);
     }
 });
 

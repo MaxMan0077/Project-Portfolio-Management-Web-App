@@ -75,6 +75,19 @@ router.get('/getall', async (req, res) => {
     }
 });
 
+router.get('/getActiveProjects', async (req, res) => {
+    const query = `SELECT * FROM project WHERE phase = 'In Implementation'`;
+
+    // Execute the query
+    try {
+        const [projects] = await db.promise().query(query);
+        res.status(200).json(projects);
+    } catch (err) {
+        console.error('Error fetching active projects:', err);
+        res.status(500).send('Error fetching active projects');
+    }
+});
+
 router.get('/:projectId', async (req, res) => {
     const { projectId } = req.params; // Extract the project ID from the URL parameter
 
