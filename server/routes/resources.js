@@ -73,6 +73,26 @@ router.get('/getall', async (req, res) => {
     }
 });
 
+// GET route to fetch the first and last name of a resource by ID
+router.get('/resourceNames/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const [rows] = await db.promise().query(
+            'SELECT name_first, name_second FROM resource WHERE idresource = ?',
+            [id]
+        );
+        if (rows.length > 0) {
+            const { name_first, name_second } = rows[0];
+            res.json({ firstName: name_first, lastName: name_second });
+        } else {
+            res.status(404).send(`Resource with ID: ${id} not found`);
+        }
+    } catch (err) {
+        console.error(`Error fetching names for resource ID ${id}:`, err);
+        res.status(500).send(`Error fetching names for resource ID: ${id}`);
+    }
+});
+
 // GET route to fetch and return a resource's photo as a Base64 string
 router.get('/photo/:id', async (req, res) => {
     const { id } = req.params;

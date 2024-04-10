@@ -13,6 +13,7 @@ export default function Dashboard() {
     const phaseOrder = ["Funnel", "Review & Evaluation", "Business Case Development", "In Implementation", "Closed"];
     const complexityOrder = ["low", "medium", "high"];
     const [photos, setPhotos] = useState({});
+    const [names, setNames] = useState({});
     const [chartKey, setChartKey] = useState(Date.now());
     const intl = useIntl();
     const t = (id) => intl.formatMessage({ id });
@@ -52,28 +53,55 @@ export default function Dashboard() {
             return 'https://via.placeholder.com/150'; // Placeholder photo URL
         }
       };    
-  
-      const fetchActiveProjectsAndPhotos = async () => {
-          try {
-              const response = await axios.get('http://localhost:5001/api/projects/getActiveProjects');
-              const activeProjects = response.data;
-              setProjects(activeProjects);
-  
-              const photoPromises = activeProjects.flatMap(project => [
-                  fetchPhoto(project.business_owner).then(photoUrl => ({ [project.business_owner]: photoUrl })),
-                  fetchPhoto(project.project_manager).then(photoUrl => ({ [project.project_manager]: photoUrl }))
-              ]);
-  
-              const photosArray = await Promise.all(photoPromises);
-              const photosObj = photosArray.reduce((acc, current) => ({ ...acc, ...current }), {});
-              setPhotos(photosObj);
-          } catch (error) {
-              console.error('Error fetching active projects and photos:', error);
-          }
+
+      const fetchNames = async (resourceId) => {
+        try {
+          const response = await axios.get(`http://localhost:5001/api/resources/resourceNames/${resourceId}`);
+          // Assuming your endpoint sends back an object with first and last names
+          const { firstName, lastName } = response.data;
+          return `${firstName} ${lastName}`;
+        } catch (error) {
+          console.error(`Error fetching name for resource ID ${resourceId}:`, error);
+          return 'Unknown'; // Fallback name
+        }
       };
-  
-      fetchActiveProjectsAndPhotos();
-    }, []); // Runs once on component mount  
+        
+      const fetchActiveProjectsAndResources = async () => {
+        try {
+          const response = await axios.get('http://localhost:5001/api/projects/getActiveProjects');
+          const activeProjects = response.data;
+          setProjects(activeProjects);
+    
+          // Fetching photos
+          const photoPromises = activeProjects.flatMap(project => [
+              fetchPhoto(project.business_owner).then(photoUrl => ({ [project.business_owner]: photoUrl })),
+              fetchPhoto(project.project_manager).then(photoUrl => ({ [project.project_manager]: photoUrl }))
+          ]);
+    
+          // Fetching names
+          const namePromises = activeProjects.flatMap(project => [
+              fetchNames(project.business_owner).then(name => ({ [project.business_owner]: name })),
+              fetchNames(project.project_manager).then(name => ({ [project.project_manager]: name }))
+          ]);
+    
+          // Resolve all promises
+          const photosArray = await Promise.all(photoPromises);
+          const namesArray = await Promise.all(namePromises);
+    
+          // Combine results into objects
+          const photosObj = photosArray.reduce((acc, current) => ({ ...acc, ...current }), {});
+          const namesObj = namesArray.reduce((acc, current) => ({ ...acc, ...current }), {});
+    
+          // Update states
+          setPhotos(photosObj);
+          setNames(namesObj);
+        } catch (error) {
+          console.error('Error fetching active projects and resources:', error);
+        }
+      };
+    
+      fetchActiveProjectsAndResources();
+    }, []);
 
     const getActiveProjectsCount = () => {
       return projects.filter(project => project.phase === "In Implementation").length;
@@ -232,11 +260,17 @@ export default function Dashboard() {
                         <tr key={index} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
                           <td className="px-5 py-2 border-b border-gray-200">{project.name}</td>
                           <td className="px-5 py-2 border-b border-gray-200">{project.status}</td>
-                          <td className="px-5 py-2 border-b border-gray-200 text-sm">
+                          <td className="px-5 py-2 border-b border-gray-200">
+                            <div className="flex items-center">
                               <img src={photos[project.business_owner] || 'https://via.placeholder.com/150'} alt="Business Owner" className="h-7 w-7 rounded-full" />
+                              <span className="ml-3">{names[project.business_owner] || 'N/A'}</span>
+                            </div>
                           </td>
-                          <td className="px-5 py-2 border-b border-gray-200 text-sm">
+                          <td className="px-5 py-2 border-b border-gray-200">
+                            <div className="flex items-center">
                               <img src={photos[project.project_manager] || 'https://via.placeholder.com/150'} alt="Project Manager" className="h-7 w-7 rounded-full" />
+                              <span className="ml-3">{names[project.project_manager] || 'N/A'}</span>
+                            </div>
                           </td>
                           <td className="px-5 py-2 border-b border-gray-200">
                             {`${formatDate(project.phase_start)} - ${formatDate(project.phase_end)}`}
