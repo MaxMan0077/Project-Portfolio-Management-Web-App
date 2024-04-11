@@ -264,9 +264,9 @@ export default function Dashboard() {
                       <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('project_manager')}</th>
                       <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('phase_timeline')}</th>
                       {/* Placeholder Columns */}
-                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider text-center">Scope</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider text-center">Time</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider text-center">Cost</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider text-center">{t('scope')}</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider text-center">{t('time')}</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider text-center">{t('cost')}</th>
                       {/* Budget Column */}
                       <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('budget_approved')}</th>
                     </tr>
