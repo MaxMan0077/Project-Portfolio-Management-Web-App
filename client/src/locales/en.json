@@ -186,5 +186,9 @@
   "roadmap": "Roadmap",
   "open_user_menu": "open user menu",
   "logout": "Logout",
-  "select": "Select Resource"
+  "select": "Select Resource",
+  "Americas": "Americas",
+  "Europe": "Europe",
+  "Asia-Pacific": "Asia-Pacific",
+  "Middle-East & Africa": "Middle-East & Africa"
 }

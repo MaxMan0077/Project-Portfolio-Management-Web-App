@@ -75,6 +75,7 @@ router.get('/getall', async (req, res) => {
     }
 });
 
+// GET route to fetch all Active Projects
 router.get('/getActiveProjects', async (req, res) => {
     const query = `SELECT * FROM project WHERE phase = 'In Implementation'`;
 

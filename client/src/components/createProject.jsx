@@ -166,8 +166,10 @@ export default function CreateProject() {
                                 onChange={handleInputChange}
                             >
                                 <option value="">{t('select_location')}</option>
-                                <option value="1">{t('location_1')}</option>
-                                <option value="2">{t('location_2')}</option>
+                                <option value="Americas">{t('Americas')}</option>
+                                <option value="Europe">{t('Europe')}</option>
+                                <option value="Asia-Pacific ">{t('Asia-Pacific')}</option>
+                                <option value="Middle-East & Africa ">{t('Middle-East & Africa')}</option>
                             </select>
                         </div>
                         <div className="w-1/2 ml-2">
