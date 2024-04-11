@@ -239,9 +239,9 @@ export default function CreateProject() {
                                 onChange={handleInputChange}
                             >
                                 <option value="">{t('select_status')}</option>
-                                <option value="planning">{t('planning')}</option>
-                                <option value="active">{t('active')}</option>
-                                <option value="completed">{t('completed')}</option>
+                                <option value="Red">{t('Red')}</option>
+                                <option value="Amber">{t('Amber')}</option>
+                                <option value="Green">{t('Green')}</option>
                             </select>
                         </div>
                         <div className="w-1/2 ml-2">

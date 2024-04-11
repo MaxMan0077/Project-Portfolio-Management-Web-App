@@ -30,6 +30,7 @@ export default function Dashboard() {
         try {
           const response = await axios.get('http://localhost:5001/api/projects/getall');
           const fetchedProjects = response.data;
+          console.log(response);
           setProjects(fetchedProjects);
           setTotalExpenditure(fetchedProjects.reduce((acc, project) => acc + project.budget_approved, 0));
           setTotalProjects(fetchedProjects.length);
@@ -72,7 +73,6 @@ export default function Dashboard() {
           const response = await axios.get(`http://localhost:5001/api/reports/latestRAGStatus/${projectId}`);
           // Accessing the RAG status directly from the response.data
           const { cost_rag, scope_rag, time_rag } = response.data;
-          console.log(`RAG Statuses for project ID ${projectId}:`, { cost_rag, scope_rag, time_rag });
           return { cost_rag, scope_rag, time_rag }; // Returns the RAG status for the project
         } catch (error) {
           console.error(`Error fetching latest RAG status for project ID ${projectId}:`, error);
@@ -84,21 +84,19 @@ export default function Dashboard() {
         try {
           const response = await axios.get('http://localhost:5001/api/projects/getActiveProjects');
           const activeProjects = response.data;
-          console.log('Active projects:', activeProjects); 
-          setProjects(activeProjects);
-    
-          // Combine all promises from photos, names, and RAG statuses
-          const combinedPromises = activeProjects.flatMap(project => [
+      
+          // Only fetch additional details for active projects without overriding the projects state
+          const additionalDetailsPromises = activeProjects.flatMap(project => [
             fetchPhoto(project.business_owner).then(photoUrl => ({ ['photo_' + project.business_owner]: photoUrl })),
             fetchPhoto(project.project_manager).then(photoUrl => ({ ['photo_' + project.project_manager]: photoUrl })),
             fetchNames(project.business_owner).then(name => ({ ['name_' + project.business_owner]: name })),
             fetchNames(project.project_manager).then(name => ({ ['name_' + project.project_manager]: name })),
-            fetchLatestRAGStatus(project.idproject).then(ragStatus => ({ ['rag_' + project.idproject]: ragStatus })) // Here is the change
+            fetchLatestRAGStatus(project.idproject).then(ragStatus => ({ ['rag_' + project.idproject]: ragStatus }))
           ]);
-    
-          const combinedResults = await Promise.all(combinedPromises);
-    
-          // Process combined results
+      
+          const combinedResults = await Promise.all(additionalDetailsPromises);
+      
+          // Process combined results and update relevant states without modifying the projects state
           let photosObj = {}, namesObj = {}, ragStatusesObj = {};
           combinedResults.forEach(result => {
             const key = Object.keys(result)[0];
@@ -110,16 +108,15 @@ export default function Dashboard() {
               ragStatusesObj[key] = result[key];
             }
           });
-    
+      
           // Update state
           setPhotos(photosObj);
           setNames(namesObj);
-          setRagStatuses(ragStatusesObj); // Assumes you have a state hook like this
+          setRagStatuses(ragStatusesObj);
         } catch (error) {
-          console.error('Error fetching active projects and resources:', error);
+          console.error('Error fetching additional details for active projects:', error);
         }
-      };
-    
+      };      
       fetchActiveProjectsAndResources();
     }, []);
 
@@ -262,7 +259,7 @@ export default function Dashboard() {
                   <thead className="sticky top-0 text-white bg-blue-500 text-left text-sm">
                     <tr>
                       <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('project_name')}</th>
-                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('status')}</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider text-center">{t('status')}</th>
                       <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('business_owner')}</th>
                       <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('project_manager')}</th>
                       <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('phase_timeline')}</th>
@@ -278,12 +275,18 @@ export default function Dashboard() {
                     {getProjectsByPhase("In Implementation").length > 0 ? (
                       getProjectsByPhase("In Implementation").map((project, index) => {
                         const rag = ragStatuses[`rag_${project.idproject}`] || {};
-                        console.log(`RAG Status for Project ID ${project.idproject}:`, rag);
+                        const statusColor = {
+                          'Red': 'bg-red-500',
+                          'Amber': 'bg-yellow-500',
+                          'Green': 'bg-green-500'
+                        }[project.status] || 'bg-gray-500'; // Default color if status is unknown
 
                         return (
                           <tr key={index} className={`cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200`}>
                             <td className="px-5 py-2 border-b border-gray-200">{project.name}</td>
-                            <td className="px-5 py-2 border-b border-gray-200">{project.status}</td>
+                            <td className="px-5 py-2 border-b border-gray-200 text-center">
+                              <span className={`inline-block w-4 h-4 rounded-full ${statusColor}`} />
+                            </td>
                             <td className="px-5 py-2 border-b border-gray-200">
                               <div className="flex items-center">
                                 <img src={photos[`photo_${project.business_owner}`] || 'https://via.placeholder.com/150'} alt="Business Owner" className="h-7 w-7 rounded-full" />
