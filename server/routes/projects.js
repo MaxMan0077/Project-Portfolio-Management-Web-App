@@ -3,8 +3,10 @@ const db = require('../database');
 const router = express.Router();
 
 router.post('/add', async (req, res) => {
-    // Extract project data from the request
-    console.log(req.body);
+    // Log incoming request for debugging
+    console.log('Received project data:', req.body);
+
+    // Destructure and validate project data from the request
     const {
         name,
         program,
@@ -20,44 +22,31 @@ router.post('/add', async (req, res) => {
         phase_end
     } = req.body;
 
+    // Check for required fields - adjust according to your requirements
+    if (!name || !program || !location || !complexity || !description || !status || !phase) {
+        return res.status(400).json({ message: 'Missing required fields' });
+    }
+
     // SQL INSERT query to add a project to the database
     const query = `
         INSERT INTO project (
-            name,
-            program,
-            location,
-            complexity,
-            project_manager,
-            business_owner,
-            description,
-            status,
-            budget_approved,
-            phase,
-            phase_start,
-            phase_end
+            name, program, location, complexity, project_manager,
+            business_owner, description, status, budget_approved,
+            phase, phase_start, phase_end
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
     `;
 
     // Execute the query
     try {
         const [result] = await db.promise().query(query, [
-            name,
-            program,
-            location,
-            complexity,
-            project_manager,
-            business_owner,
-            description,
-            status,
-            budget_approved,
-            phase,
-            phase_start,
-            phase_end
+            name, program, location, complexity, project_manager,
+            business_owner, description, status, budget_approved,
+            phase, phase_start, phase_end
         ]);
         res.status(201).json({ projectId: result.insertId, message: 'Project created successfully' });
     } catch (err) {
-        console.error('Error adding new project:', err);
-        res.status(500).send('Error adding new project');
+        console.error('SQL Error adding new project:', err);
+        res.status(500).json({ message: 'Error adding new project', error: err.message });
     }
 });
 
