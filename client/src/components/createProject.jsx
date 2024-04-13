@@ -77,7 +77,7 @@ export default function CreateProject() {
         const formattedData = {
             name: formData.name,
             program: formData.program,
-            location: parseInt(formData.location),
+            location: formData.location, // Removed parseInt, keep location as string
             complexity: formData.complexity,
             project_manager: parseInt(formData.projectManager),
             business_owner: parseInt(formData.businessOwner),
@@ -111,7 +111,6 @@ export default function CreateProject() {
             // Optionally handle error (show error message)
         }
     };    
-    
 
     return (
         <>

@@ -30,18 +30,20 @@ export default function UserCreate() {
     const [formData, setFormData] = useState(initialUserFormData);
     const location = useLocation();
     const navigate = useNavigate();
-    const [formType, setFormType] = useState(location.state?.formType || 'user');
+    const [formType] = useState(location.state?.formType || 'user');
     const { formatMessage } = useIntl(); // useIntl hook to format messages
     const t = (id) => formatMessage({ id });
+    const [submitAttempted, setSubmitAttempted] = useState(false);
+
 
     useEffect(() => {
-        // Set initial form data based on formType when component mounts or when formType changes
-        setFormData(formType === 'user' ? initialUserFormData : initialResourceFormData);
+        // Deep copy the initial form data to reset properly on form type change
+        setFormData(formType === 'user' ? {...initialUserFormData} : {...initialResourceFormData});
     }, [formType]);
 
     const handleInputChange = (event) => {
         const { name, value, files } = event.target;
-        setFormData((prevFormData) => ({
+        setFormData(prevFormData => ({
             ...prevFormData,
             [name]: files ? files[0] : value
         }));
@@ -49,28 +51,48 @@ export default function UserCreate() {
 
     const handleSubmit = async (event) => {
         event.preventDefault();
-
+        setSubmitAttempted(true);
+    
+        // Define required fields for each form type
+        const requiredUserFields = ['name_first', 'name_second', 'username', 'password', 'office', 'department', 'user_type', 'photo'];
+        const requiredResourceFields = ['resourceFirstName', 'resourceSecondName', 'nativeTranslation', 'resourceOffice', 'resourceDepartment', 'role', 'type', 'photo'];
+    
+        // Determine which fields to check based on formType
+        const requiredFields = formType === 'user' ? requiredUserFields : requiredResourceFields;
+    
+        // Log formData to console before validation
+        console.log("Current formData:", formData);
+    
+        // Check if all required fields for the active form type are filled
+        if (requiredFields.some(field => !formData[field] || formData[field] === '')) {
+            console.error("All fields are required.");
+            return;
+        }
+    
         const endpoint = formType === 'user' ? 'http://localhost:5001/api/users/register' : 'http://localhost:5001/api/resources/add';
         const data = new FormData();
-        for (const [key, value] of Object.entries(formData)) {
-            data.append(key, value);
+    
+        for (const field of requiredFields) {
+            data.append(field, formData[field]);
+            // Log each field being appended to FormData
+            console.log(`Appending to FormData: ${field} =`, formData[field]);
         }
-
+    
         try {
             const response = await axios.post(endpoint, data);
-            console.log(response.data);
-            // Additional handling based on response
-            navigate('/user-overview', { state: { formType: formType }});
+            console.log('Submission Response:', response.data);
+            navigate('/user-overview', { state: { formType }});
         } catch (error) {
-            console.error('Error:', error);
-            // Error handling
+            console.error('Error during form submission:', error);
         }
-    };
+    };    
 
     const handleCancel = () => {
         // Ensure the correct formType is being passed back to UserOverview
         navigate('/user-overview', { state: { formType } });
     };
+
+    const inputClass = (key) => `shadow appearance-none border ${submitAttempted && !formData[key] ? 'border-red-500' : 'border-gray-300'} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`;
 
     return (
         <>
@@ -80,7 +102,7 @@ export default function UserCreate() {
                     <h2 className="text-2xl font-bold text-gray-700 mb-4">
                         {formType === 'user' ? t('create_user') : t('create_resource')}
                     </h2>
-
+    
                     {formType === 'user' ? (
                         // User Form Fields
                         <>
@@ -91,7 +113,7 @@ export default function UserCreate() {
                                         {t('first_name')}
                                     </label>
                                     <input
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        className={inputClass('name_first')}
                                         name="name_first"
                                         type="text"
                                         placeholder={t('first_name')}
@@ -104,7 +126,7 @@ export default function UserCreate() {
                                         {t('last_name')}
                                     </label>
                                     <input
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        className={inputClass('name_second')}
                                         name="name_second"
                                         type="text"
                                         placeholder={t('last_name')}
@@ -113,7 +135,6 @@ export default function UserCreate() {
                                     />
                                 </div>
                             </div>
-                            
                             {/* Username & Password */}
                             <div className="flex mb-4">
                                 <div className="w-1/2 mr-2">
@@ -121,7 +142,7 @@ export default function UserCreate() {
                                         {t('username')}
                                     </label>
                                     <input
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        className={inputClass('username')}
                                         name="username"
                                         type="text"
                                         placeholder={t('username')}
@@ -134,7 +155,7 @@ export default function UserCreate() {
                                         {t('password')}
                                     </label>
                                     <input
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        className={inputClass('password')}
                                         name="password"
                                         type="password"
                                         placeholder={t('password')}
@@ -151,7 +172,7 @@ export default function UserCreate() {
                                         {t('office')}
                                     </label>
                                     <input
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        className={inputClass('office')}
                                         name="office"
                                         type="text"
                                         placeholder={t('office')}
@@ -164,7 +185,7 @@ export default function UserCreate() {
                                         {t('department')}
                                     </label>
                                     <input
-                                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                        className={inputClass('department')}
                                         name="department"
                                         type="text"
                                         placeholder={t('department')}
@@ -180,7 +201,7 @@ export default function UserCreate() {
                                     {t('user_type')}
                                 </label>
                                 <select
-                                    className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    className={inputClass('user_type')}
                                     name="user_type"
                                     value={formData.user_type}
                                     onChange={handleInputChange}
@@ -199,7 +220,7 @@ export default function UserCreate() {
                                 <input
                                     type="file"
                                     name="photo"
-                                    className="shadow w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                    className={inputClass('photo')}
                                     onChange={handleInputChange}
                                 />
                             </div>
@@ -215,7 +236,7 @@ export default function UserCreate() {
                                 {t(field)}
                                 </label>
                                 <input
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                className={inputClass(field)}
                                 name={field}
                                 type="text"
                                 placeholder={t(`${field}_placeholder`)}
@@ -224,7 +245,7 @@ export default function UserCreate() {
                             </div>
                             ))}
                         </div>
-
+    
                         {/* Office & Department */}
                         <div className="flex mb-4">
                             {["resourceOffice", "resourceDepartment"].map((field, index) => (
@@ -233,7 +254,7 @@ export default function UserCreate() {
                                 {t(field)}
                                 </label>
                                 <input
-                                className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                className={inputClass(field)}
                                 name={field}
                                 type="text"
                                 placeholder={t(`${field}_placeholder`)}
@@ -242,7 +263,7 @@ export default function UserCreate() {
                             </div>
                             ))}
                         </div>
-
+    
                         {/* Role & Type */}
                         <div className="flex mb-4">
                             <div className="w-1/2 mr-2">
@@ -250,7 +271,7 @@ export default function UserCreate() {
                                 {t("role")}
                             </label>
                             <select
-                                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                className={inputClass('role')}
                                 name="role"
                                 onChange={handleInputChange}
                             >
@@ -265,7 +286,7 @@ export default function UserCreate() {
                                 {t("type")}
                             </label>
                             <select
-                                className="shadow border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                                className={inputClass('type')}
                                 name="type"
                                 onChange={handleInputChange}
                             >
@@ -276,20 +297,20 @@ export default function UserCreate() {
                             </select>
                             </div>
                         </div>
-
+    
                         {/* Photo Upload */}
                         <div className="mb-4">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="photo">
-                            {t("upload_photo")}
+                                {t('upload_photo')}
                             </label>
                             <input
-                            type="file"
-                            name="photo"
-                            className="shadow w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
-                            onChange={handleInputChange}
+                                type="file"
+                                name="photo"
+                                className={inputClass('photo')}
+                                onChange={handleInputChange}
                             />
                         </div>
-                        </div>
+                    </div>
                     )}
                     {/* Submit Button */}
                     <div className="flex items-center justify-between">
@@ -310,5 +331,5 @@ export default function UserCreate() {
                 </form>
             </div>
         </>
-    );
+    );    
 }
