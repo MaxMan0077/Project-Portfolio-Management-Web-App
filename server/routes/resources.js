@@ -113,7 +113,6 @@ router.get('/photo/:id', async (req, res) => {
     }
 });
 
-
 // PUT route to update an existing resource
 router.put('/update/:id', async (req, res) => {
     const { id } = req.params;

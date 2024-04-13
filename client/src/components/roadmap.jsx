@@ -64,69 +64,70 @@ const Roadmap = () => {
     };
   };
 
-  const yearRows = () => {
-    let yearRowsArray = [];
-    const startYear = today.getFullYear();
-    const startMonth = today.getMonth(); // January is 0
-  
-    // Calculate the number of months in each year displayed
-    let monthsInStartYear = 12 - startMonth;
-    let monthsInSecondYear = Math.min(12, timeSeries - monthsInStartYear);
-    let monthsInThirdYear = Math.max(timeSeries - monthsInStartYear - monthsInSecondYear, 0);
-  
-    // Push the year div for the first year
+// Updated yearRows function to apply the new styles
+const yearRows = () => {
+  let yearRowsArray = [];
+  const startYear = today.getFullYear();
+  const startMonth = today.getMonth(); // January is 0
+
+  // Calculate the number of months in each year displayed
+  let monthsInStartYear = 12 - startMonth;
+  let monthsInSecondYear = Math.min(12, timeSeries - monthsInStartYear);
+  let monthsInThirdYear = Math.max(timeSeries - monthsInStartYear - monthsInSecondYear, 0);
+
+  // Push the year div for the first year
+  yearRowsArray.push(
+    <motion.div
+      key="startYear"
+      className="text-center font-bold p-2 text-white bg-black border-r border-gray-300 sticky top-0"
+      style={{
+        gridColumnStart: 2,
+        gridColumnEnd: `span ${monthsInStartYear}`,
+      }}
+      variants={itemVariants}
+    >
+      {startYear}
+    </motion.div>
+  );
+
+  // Push the year div for the second year
+  if (monthsInSecondYear > 0) {
     yearRowsArray.push(
       <motion.div
-        key="startYear"
-        className="text-center font-bold p-2 bg-gray-400 border-r border-gray-300 sticky top-0"
+        key="secondYear"
+        className="text-center font-bold p-2 text-white bg-black border-r border-gray-300 sticky top-0"
         style={{
-          gridColumnStart: 2,
-          gridColumnEnd: `span ${monthsInStartYear}`,
+          gridColumnStart: monthsInStartYear + 2,
+          gridColumnEnd: `span ${monthsInSecondYear}`,
+          borderLeft: "2px solid white", // Set divider color to white
         }}
         variants={itemVariants}
       >
-        {startYear}
+        {startYear + 1}
       </motion.div>
     );
-  
-    // Push the year div for the second year
-    if (monthsInSecondYear > 0) {
-      yearRowsArray.push(
-        <motion.div
-          key="secondYear"
-          className="text-center font-bold p-2 bg-gray-400 border-r border-gray-300 sticky top-0"
-          style={{
-            gridColumnStart: monthsInStartYear + 2,
-            gridColumnEnd: `span ${monthsInSecondYear}`,
-            borderLeft: "2px solid black",
-          }}
-          variants={itemVariants}
-        >
-          {startYear + 1}
-        </motion.div>
-      );
-    }
-  
-    // Push the year div for the third year if there are remaining months
-    if (monthsInThirdYear > 0) {
-      yearRowsArray.push(
-        <motion.div
-          key="thirdYear"
-          className="text-center font-bold p-2 bg-gray-400 border-r border-gray-300 sticky top-0"
-          style={{
-            gridColumnStart: monthsInStartYear + monthsInSecondYear + 2,
-            gridColumnEnd: `span ${monthsInThirdYear}`,
-            borderLeft: "2px solid black",
-          }}
-          variants={itemVariants}
-        >
-          {startYear + 2}
-        </motion.div>
-      );
-    }
-  
-    return yearRowsArray;
-  };  
+  }
+
+  // Push the year div for the third year if there are remaining months
+  if (monthsInThirdYear > 0) {
+    yearRowsArray.push(
+      <motion.div
+        key="thirdYear"
+        className="text-center font-bold p-2 text-white bg-black border-r border-gray-300 sticky top-0"
+        style={{
+          gridColumnStart: monthsInStartYear + monthsInSecondYear + 2,
+          gridColumnEnd: `span ${monthsInThirdYear}`,
+          borderLeft: "2px solid white", // Set divider color to white
+        }}
+        variants={itemVariants}
+      >
+        {startYear + 2}
+      </motion.div>
+    );
+  }
+
+  return yearRowsArray;
+}; 
 
   const handleTimeSeriesChange = (event) => {
     setTimeSeries(Number(event.target.value));
@@ -149,8 +150,14 @@ const Roadmap = () => {
   };
 
   const exportPDF = () => {
-    const formattedDate = format(new Date(), 'yyyy-MM-dd');
-    const filename = `MyProjects Roadmap - ${formattedDate}.pdf`;
+    // Calculating the end date of the selected time period
+    const endDate = addMonths(today, timeSeries - 1); // Subtract 1 because months are 0 indexed
+  
+    // Formatting the start and end dates
+    const formattedStartDate = format(new Date(), 'dd MMM yy');
+    const formattedEndDate = format(endDate, 'dd MMM yy');
+  
+    const filename = `Roadmap ${formattedStartDate} - ${formattedEndDate}.pdf`;
   
     const input = document.getElementById('exportContent');
     html2canvas(input).then((canvas) => {
@@ -161,11 +168,17 @@ const Roadmap = () => {
       const imgProps = pdf.getImageProperties(imgData);
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+  
+      // Set font to bold before adding the title
+      pdf.setFont("helvetica", "bold");
+      pdf.setFontSize(15);
+      pdf.text(`Roadmap ${formattedStartDate} - ${formattedEndDate}`, pdfWidth / 2, 15, { align: 'center' });
+  
+      pdf.addImage(imgData, 'PNG', 0, 20, pdfWidth, pdfHeight); // Adjust y coordinate to push the image down
       pdf.save(filename);
     });
   };
-
+  
   return (
     <>
       <Navbar />
@@ -213,10 +226,11 @@ const Roadmap = () => {
           >
             {/* Projects header */}
             <motion.div
-              className="text-center font-bold p-2 bg-gray-200 border-r border-gray-300 sticky top-0"
+              className="text-left font-bold p-2 bg-gray-200 border-r border-gray-300 sticky top-0"
               style={{
                 gridColumn: "1",
-                gridRow: "1 / span 3",
+                gridRowStart: 3, // Set it to start on the last row of the header part
+                gridRowEnd: 4, // Ends on the fourth grid line, making it sit at the bottom of its grid cell
               }}
               variants={itemVariants}
             >
