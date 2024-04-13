@@ -36,14 +36,34 @@ const KanbanCard = ({ project, index }) => {
   const formatDate = (dateString) => {
     if (!dateString || dateString === 'NULL') return t('not_applicable');
     const date = new Date(dateString);
-    return date.toLocaleDateString('en-GB');
-  };
+    return date.toLocaleDateString('en-GB', {
+      day: '2-digit',
+      month: 'short',
+      year: '2-digit'
+    }).replace(/ /g, '-');
+  };  
 
   const formatBudget = (budget) => {
-    return budget ? `$${Number(budget).toFixed(2)}` : t('not_applicable');
+    return budget ? `Budget: $${Math.round(Number(budget))}` : t('not_applicable');
+  };  
+  
+  const locationColorMap = {
+    'Americas': '#FF5733', // Example color code for Americas
+    'Europe': '#3375FF', // Example color code for Europe
+    'Asia-Pacific': '#33FF57', // Example color code for Asia-Pacific
+    'Middle-East & Africa': '#FF33F6' // Example color code for Middle-East & Africa
   };
 
-  const hardcodedLastName = "Smith";
+  const colorStripStyle = {
+    height: '16px',
+    backgroundColor: locationColorMap[project.location] || '#DDD', // Fallback color if location is not in the map
+    width: '100%',
+    position: 'absolute',
+    top: '0',
+    left: '0',
+    borderTopLeftRadius: '8px', // Adjust to your card's border radius
+    borderTopRightRadius: '8px' // Adjust to your card's border radius
+  };
 
   const statusColor = {
     'Red': 'bg-red-500',
@@ -61,7 +81,7 @@ const KanbanCard = ({ project, index }) => {
           className="bg-white p-4 rounded-lg shadow mb-4 relative overflow-hidden"
         >
           {/* Color strip */}
-          <div className="h-3 w-full absolute top-0 left-0 bg-blue-500 rounded-t-lg"></div>
+          <div style={colorStripStyle}></div>
   
           {/* Content below the color strip */}
           <div className="mt-4">
@@ -81,8 +101,8 @@ const KanbanCard = ({ project, index }) => {
           </div>
   
           {/* RAG Status Indicator */}
-          <div className="absolute bottom-4 right-4">
-            <span className={`block w-6 h-6 rounded-full ${statusColor}`}></span>
+          <div className="absolute bottom-4 right-6">
+            <span className={`block w-7 h-7 rounded-full ${statusColor}`}></span>
           </div>
         </div>
       )}
