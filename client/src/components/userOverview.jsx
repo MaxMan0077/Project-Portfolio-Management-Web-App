@@ -27,6 +27,14 @@ export default function UserOverview() {
     const intl = useIntl();
     const t = (id) => intl.formatMessage({ id });
 
+    const officeMapping = {
+        '1': 'London',
+        '2': 'New York',
+        '3': 'Shanghai',
+        '4': 'Brisbane',
+        '5': 'Cape Town',
+    };
+
     const fetchUsers = async () => {
         try {
             const response = await axios.get('http://localhost:5001/api/users/getall');
@@ -214,7 +222,7 @@ export default function UserOverview() {
                                         <td className="px-5 py-2 border-b border-gray-200 text-sm">
                                             {`${user.name_first} ${user.name_second}`}
                                         </td>
-                                        <td className="px-5 py-2 border-b border-gray-200 text-sm">{user.office}</td>
+                                        <td className="px-5 py-2 border-b border-gray-200 text-sm">{officeMapping[user.office]}</td>
                                         <td className="px-5 py-2 border-b border-gray-200 text-sm">{user.department}</td>
                                         <td className="px-5 py-2 border-b border-gray-200 text-sm">{user.user_type}</td>
                                     </tr>
@@ -241,7 +249,7 @@ export default function UserOverview() {
                                             {`${resource.name_first} ${resource.name_second}`}
                                         </td>
                                         <td className="px-5 py-2 border-b border-gray-200 text-sm">{resource.department}</td>
-                                        <td className="px-5 py-2 border-b border-gray-200 text-sm">{resource.office}</td>
+                                        <td className="px-5 py-2 border-b border-gray-200 text-sm">{officeMapping[resource.office]}</td>
                                         <td className="px-5 py-2 border-b border-gray-200 text-sm">{resource.role}</td>
                                         <td className="px-5 py-2 border-b border-gray-200 text-sm">{resource.type}</td>
                                     </tr>

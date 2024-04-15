@@ -171,14 +171,19 @@ export default function UserCreate() {
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="office">
                                         {t('office')}
                                     </label>
-                                    <input
+                                    <select
                                         className={inputClass('office')}
                                         name="office"
-                                        type="text"
-                                        placeholder={t('office')}
                                         value={formData.office}
                                         onChange={handleInputChange}
-                                    />
+                                    >
+                                        <option value="">{t('select_office')}</option>
+                                        <option value="1">London</option>
+                                        <option value="2">New York</option>
+                                        <option value="3">Shanghai</option>
+                                        <option value="4">Brisbane</option>
+                                        <option value="5">Cape Town</option>
+                                    </select>
                                 </div>
                                 <div className="w-1/2 ml-2">
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="department">
@@ -248,20 +253,44 @@ export default function UserCreate() {
     
                         {/* Office & Department */}
                         <div className="flex mb-4">
-                            {["resourceOffice", "resourceDepartment"].map((field, index) => (
-                            <div className={`w-1/2 ${index === 0 ? "mr-2" : "ml-2"}`} key={field}>
-                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={field}>
-                                {t(field)}
-                                </label>
-                                <input
-                                className={inputClass(field)}
-                                name={field}
-                                type="text"
-                                placeholder={t(`${field}_placeholder`)}
-                                onChange={handleInputChange}
-                                />
-                            </div>
-                            ))}
+                            {["resourceOffice", "resourceDepartment"].map((field, index) => {
+                                if (field === "resourceOffice") {
+                                    return (
+                                        <div className={`w-1/2 ${index === 0 ? "mr-2" : "ml-2"}`} key={field}>
+                                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={field}>
+                                                {t(field)}
+                                            </label>
+                                            <select
+                                                className={inputClass(field)}
+                                                name={field}
+                                                onChange={handleInputChange}
+                                            >
+                                                <option value="">{t('select_office')}</option>
+                                                <option value="1">London</option>
+                                                <option value="2">New York</option>
+                                                <option value="3">Shanghai</option>
+                                                <option value="4">Brisbane</option>
+                                                <option value="5">Cape Town</option>
+                                            </select>
+                                        </div>
+                                    );
+                                } else {
+                                    return (
+                                        <div className={`w-1/2 ${index === 0 ? "mr-2" : "ml-2"}`} key={field}>
+                                            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={field}>
+                                                {t(field)}
+                                            </label>
+                                            <input
+                                                className={inputClass(field)}
+                                                name={field}
+                                                type="text"
+                                                placeholder={t(`${field}_placeholder`)}
+                                                onChange={handleInputChange}
+                                            />
+                                        </div>
+                                    );
+                                }
+                            })}
                         </div>
     
                         {/* Role & Type */}
