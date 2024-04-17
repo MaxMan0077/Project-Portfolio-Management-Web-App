@@ -7,6 +7,7 @@ const UserModal = ({ user, onClose, onSave, onDelete }) => {
     const { formatMessage } = useIntl();
     const filename = atob(userData.photo);
     const imageUrl = `http://localhost:5001/uploads/${filename}`;
+    const [fieldErrors, setFieldErrors] = useState({});
 
     const t = (id) => formatMessage({ id });
 
@@ -17,14 +18,38 @@ const UserModal = ({ user, onClose, onSave, onDelete }) => {
     const handleChange = (e) => {
         const { name, value } = e.target;
         setUserData(prevState => ({ ...prevState, [name]: value }));
+        // Also clear errors on change
+        if (fieldErrors[name]) {
+            const newErrors = { ...fieldErrors };
+            delete newErrors[name];
+            setFieldErrors(newErrors);
+        }
     };
 
-    const handleSaveClick = async () => {
-        if (!userData.iduser) {
-            console.error('User iduser is undefined');
-            return;
+    const validateFields = () => {
+        let errors = {};
+        if (!userData.name_first || /[^a-zA-Z- ]/.test(userData.name_first)) {
+            errors.name_first = "First name is required and must not contain numbers or special characters.";
         }
-        onSave(userData);
+        if (!userData.name_second || /[^a-zA-Z- ]/.test(userData.name_second)) {
+            errors.name_second = "Last name is required and must not contain numbers or special characters.";
+        }
+        if (!userData.office) errors.office = "Office is required.";
+        if (!userData.department) errors.department = "Department is required.";
+        if (!userData.user_type) errors.user_type = "User type is required.";
+        return errors;
+    };
+
+    const handleSaveClick = () => {
+        const errors = validateFields();
+        setFieldErrors(errors);
+        if (Object.keys(errors).length === 0 && userData.iduser) {
+            onSave(userData);
+        }
+    };
+
+    const inputClass = (field) => {
+        return `mt-1 block w-full px-3 py-2 bg-white border ${fieldErrors[field] ? 'border-red-500' : 'border-gray-300'} rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm`;
     };
 
     return (
@@ -32,12 +57,9 @@ const UserModal = ({ user, onClose, onSave, onDelete }) => {
             <div className="relative mx-auto p-5 border w-96 shadow-lg rounded-md bg-white">
                 <div className="flex justify-center mb-4">
                     {userData.photo ? (
-                        // Point the src attribute to the URL where the image is served
                         <img src={imageUrl} alt="User" className="h-24 w-24 object-cover rounded-full border-2 border-gray-300" />
                     ) : (
-                        <div className="rounded-full bg-gray-300 p-4">
-                            <PhotographIcon className="h-16 w-16 text-gray-600" />
-                        </div>
+                        <PhotographIcon className="h-16 w-16 text-gray-600" />
                     )}
                 </div>
                 <div className="mt-3 text-center">
@@ -48,14 +70,31 @@ const UserModal = ({ user, onClose, onSave, onDelete }) => {
                                 <label htmlFor={field} className="block text-sm font-bold text-gray-700">
                                     {t(field)}
                                 </label>
-                                <input
-                                    type="text"
-                                    name={field}
-                                    value={userData[field] || ''}
-                                    onChange={handleChange}
-                                    className="mt-1 block w-full px-3 py-2 bg-white border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm"
-                                    placeholder={t(`${field}_placeholder`)}
-                                />
+                                {field === 'office' ? (
+                                    <select
+                                        className={inputClass(field)}
+                                        name={field}
+                                        onChange={handleChange}
+                                        value={userData[field]}
+                                    >
+                                        <option value="">{t('select_office')}</option>
+                                        <option value="1">London</option>
+                                        <option value="2">New York</option>
+                                        <option value="3">Shanghai</option>
+                                        <option value="4">Brisbane</option>
+                                        <option value="5">Cape Town</option>
+                                    </select>
+                                ) : (
+                                    <input
+                                        type="text"
+                                        name={field}
+                                        value={userData[field] || ''}
+                                        onChange={handleChange}
+                                        className={inputClass(field)}
+                                        placeholder={t(`${field}_placeholder`)}
+                                    />
+                                )}
+                                {fieldErrors[field] && <p className="text-red-500 text-xs italic">{fieldErrors[field]}</p>}
                             </div>
                         ))}
                     </form>

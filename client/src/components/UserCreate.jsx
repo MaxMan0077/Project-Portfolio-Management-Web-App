@@ -118,7 +118,7 @@ export default function UserCreate() {
 
         // Remove any null entries (no errors)
         Object.keys(newErrors).forEach(key => {
-            if (newErrors[key] === null) delete newErrors[key];
+            if (newErrors[key] === null) delete newErrors[key];   
         });
     
         // Set error state
