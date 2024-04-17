@@ -55,42 +55,42 @@ export default function UserCreate() {
         setSubmitAttempted(true);
     
         const validateNameFirst = (name) => {
-            if (!name) return "First name is required";
-            if (/[^a-zA-Z\- ]/.test(name)) return "Name must not contain numbers or special characters";
-            if (name.length > 50) return "Name must be no more than 50 characters";
+            if (!name) return "*First name is required";
+            if (/[^a-zA-Z\- ]/.test(name)) return "*Name must not contain numbers or special characters";
+            if (name.length > 50) return "*Name must be no more than 50 characters";
             return null;
         };
 
         const validateNameSecond = (name) => {
-            if (!name) return "Surname is required";
-            if (/[^a-zA-Z\- ]/.test(name)) return "Name must not contain numbers or special characters";
-            if (name.length > 50) return "Name must be no more than 50 characters";
+            if (!name) return "*Surname is required";
+            if (/[^a-zA-Z\- ]/.test(name)) return "*Name must not contain numbers or special characters";
+            if (name.length > 50) return "*Name must be no more than 50 characters";
             return null;
         };
 
         const validateNameNative = (name) => {
-            if (!name) return "Surname is required";
-            if (/[^a-zA-Z\- ]/.test(name)) return "Name must not contain numbers or special characters";
-            if (name.length > 50) return "Name must be no more than 50 characters";
+            if (!name) return "*Surname is required";
+            if (/[^a-zA-Z\- ]/.test(name)) return "*Name must not contain numbers or special characters";
+            if (name.length > 50) return "*Name must be no more than 50 characters";
             return null;
         };
     
         const validateUsername = (username) => {
-            if (!username) return "Username is required";
-            if (!/^[a-zA-Z0-9]+$/.test(username)) return "Username must be alphanumeric";
+            if (!username) return "*Username is required";
+            if (!/^[a-zA-Z0-9]+$/.test(username)) return "*Username must be alphanumeric";
             return null;
         };
     
         const validatePassword = (password) => {
-            if (!password) return "Password is required";
-            if (/\s|_/.test(password)) return "Password must not contain spaces or underscores";
+            if (!password) return "*Password is required";
+            if (/\s|_/.test(password)) return "*Password must not contain spaces or underscores";
             if (!/[A-Z]/.test(password) || !/\d/.test(password) || password.length < 8) 
-                return "Password must contain at least one uppercase letter, one number, and be at least 8 characters long";
+                return "*Password must contain at least one uppercase letter, one number, and be at least 8 characters long";
             return null;
         };
     
         const validateGeneric = (value) => {
-            if (!value) return "Field is required";
+            if (!value) return "*Field is required";
             return null;
         };
     

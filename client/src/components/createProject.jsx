@@ -12,6 +12,7 @@ export default function CreateProject() {
     const [selectedResourceId, setSelectedResourceId] = useState('');
     const [selectedBusinessOwnerId, setSelectedBusinessOwnerId] = useState('');
     const [submitAttempted, setSubmitAttempted] = useState(false);
+    const [fieldErrors, setFieldErrors] = useState({});
     const [formData, setFormData] = useState({
         name: '',
         program: '',
@@ -62,28 +63,77 @@ export default function CreateProject() {
         event.preventDefault();
         setSubmitAttempted(true);
     
-        // Map formData keys from camelCase to snake_case
+        // Validation functions here
+        const validateName = (name) => {
+            if (!name) return "*Project name is required";
+            if (name.length > 45) return "*Project name must not be more than 45 characters";
+            return null;
+        };
+    
+        const validateInteger = (value) => {
+            if (!value) return "*This field is required";
+            if (!/^\d+$/.test(value)) return "*Must be an integer";
+            return null;
+        };
+    
+        const validateDates = (start, end) => {
+            if (!start || !end) return null; // We check for emptiness separately
+            const startDate = new Date(start);
+            const endDate = new Date(end);
+            if (startDate >= endDate) return "*Start date must be before the end date";
+            return null;
+        };
+    
+        const validateRequired = (value) => {
+            return value ? null : "*This field is required";
+        };
+    
+        // Individual field validations
+        let errors = {};
+        errors.name = validateName(formData.name);
+        errors.budgetApproved = validateInteger(formData.budgetApproved);
+        errors.phaseStart = validateRequired(formData.phaseStart);
+        errors.phaseEnd = validateRequired(formData.phaseEnd);
+        errors.program = validateRequired(formData.program);
+        errors.location = validateRequired(formData.location);
+        errors.complexity = validateRequired(formData.complexity);
+        errors.projectManager = validateRequired(formData.projectManager);
+        errors.businessOwner = validateRequired(formData.businessOwner);
+        errors.description = validateRequired(formData.description);
+        errors.status = validateRequired(formData.status);
+        errors.phase = validateRequired(formData.phase);
+    
+        const dateError = validateDates(formData.phaseStart, formData.phaseEnd);
+        if (dateError) {
+            errors.phaseStart = dateError;
+            errors.phaseEnd = dateError;
+        }
+    
+        // Filter out non-error entries
+        Object.keys(errors).forEach(key => errors[key] === null && delete errors[key]);
+    
+        setFieldErrors(errors);
+    
+        if (Object.keys(errors).length > 0) {
+            console.error("Form validation errors:", errors);
+            return; // Prevent form submission if there are errors
+        }
+    
+        // If all validations pass, map formData to snake_case keys for backend
         const mappedData = {
             name: formData.name,
             program: formData.program,
             location: formData.location,
             complexity: formData.complexity,
-            project_manager: formData.projectManager, // Change to snake_case
-            business_owner: formData.businessOwner,   // Change to snake_case
+            project_manager: formData.projectManager,
+            business_owner: formData.businessOwner,
             description: formData.description,
             status: formData.status,
-            budget_approved: formData.budgetApproved, // Change to snake_case
+            budget_approved: formData.budgetApproved,
             phase: formData.phase,
-            phase_start: formData.phaseStart,         // Change to snake_case
-            phase_end: formData.phaseEnd              // Change to snake_case
+            phase_start: formData.phaseStart,
+            phase_end: formData.phaseEnd
         };
-    
-        // Ensure all fields are filled
-        const allFieldsFilled = Object.values(mappedData).every(x => x !== '');
-        if (!allFieldsFilled) {
-            console.error("Please fill all fields.");
-            return;
-        }
     
         console.log('Submitting mappedData:', mappedData); // Log mappedData for debugging
     
@@ -125,6 +175,7 @@ export default function CreateProject() {
                                 value={formData.name}
                                 onChange={handleInputChange}
                             />
+                            {fieldErrors.name && <p className="text-red-500 text-xs italic">{fieldErrors.name}</p>}
                         </div>
                         <div className="w-1/2 ml-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="program">
@@ -141,6 +192,7 @@ export default function CreateProject() {
                                 <option value="internal">{t('internal')}</option>
                                 <option value="external">{t('external')}</option>
                             </select>
+                            {fieldErrors.program && <p className="text-red-500 text-xs italic">{fieldErrors.program}</p>}
                         </div>
                     </div>
 
@@ -162,6 +214,7 @@ export default function CreateProject() {
                                 <option value="Asia-Pacific">{t('Asia-Pacific')}</option>
                                 <option value="Middle-East & Africa">{t('Middle-East & Africa')}</option>
                             </select>
+                            {fieldErrors.location && <p className="text-red-500 text-xs italic">{fieldErrors.location}</p>}
                         </div>
                         <div className="w-1/2 ml-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="complexity">
@@ -179,6 +232,7 @@ export default function CreateProject() {
                                 <option value="medium">{t('medium')}</option>
                                 <option value="high">{t('high')}</option>
                             </select>
+                            {fieldErrors.complexity && <p className="text-red-500 text-xs italic">{fieldErrors.complexity}</p>}
                         </div>
                     </div>
 
@@ -193,6 +247,7 @@ export default function CreateProject() {
                                 selectedResourceId={selectedResourceId}
                                 isValid={!submitAttempted || selectedResourceId}
                             />
+                            {fieldErrors.projectManager && <p className="text-red-500 text-xs italic">{fieldErrors.projectManager}</p>}
                         </div>
                         <div className="w-1/2 ml-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="businessOwner">
@@ -204,6 +259,7 @@ export default function CreateProject() {
                                 selectedResourceId={selectedBusinessOwnerId}
                                 isValid={!submitAttempted || selectedBusinessOwnerId}
                             />
+                            {fieldErrors.businessOwner && <p className="text-red-500 text-xs italic">{fieldErrors.businessOwner}</p>}
                         </div>
                     </div>
 
@@ -219,6 +275,7 @@ export default function CreateProject() {
                             value={formData.description}
                             onChange={handleInputChange}
                         />
+                        {fieldErrors.description && <p className="text-red-500 text-xs italic">{fieldErrors.description}</p>}
                     </div>
 
                     <div className="flex mb-4">
@@ -238,6 +295,7 @@ export default function CreateProject() {
                                 <option value="Amber">{t('Amber')}</option>
                                 <option value="Green">{t('Green')}</option>
                             </select>
+                            {fieldErrors.status && <p className="text-red-500 text-xs italic">{fieldErrors.status}</p>}
                         </div>
                         <div className="w-1/2 ml-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="budgetApproved">
@@ -252,6 +310,7 @@ export default function CreateProject() {
                                 value={formData.budgetApproved}
                                 onChange={handleInputChange}
                             />
+                            {fieldErrors.budgetApproved && <p className="text-red-500 text-xs italic">{fieldErrors.budgetApproved}</p>}
                         </div>
                     </div>
 
@@ -274,6 +333,7 @@ export default function CreateProject() {
                                 <option value="In Implementation">{t('in_implementation')}</option>
                                 <option value="Closed">{t('closed')}</option>
                             </select>
+                            {fieldErrors.phase && <p className="text-red-500 text-xs italic">{fieldErrors.phase}</p>}
                         </div>
                         <div className="w-1/3 mx-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phaseStart">
@@ -287,6 +347,7 @@ export default function CreateProject() {
                                 value={formData.phaseStart}
                                 onChange={handleInputChange}
                             />
+                            {fieldErrors.phaseStart && <p className="text-red-500 text-xs italic">{fieldErrors.phaseStart}</p>}
                         </div>
                         <div className="w-1/3 ml-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phaseEnd">
@@ -300,6 +361,7 @@ export default function CreateProject() {
                                 value={formData.phaseEnd}
                                 onChange={handleInputChange}
                             />
+                            {fieldErrors.phaseEnd && <p className="text-red-500 text-xs italic">{fieldErrors.phaseEnd}</p>}
                         </div>
                     </div>
 
