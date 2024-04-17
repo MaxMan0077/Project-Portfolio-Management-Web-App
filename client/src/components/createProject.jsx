@@ -299,7 +299,7 @@ export default function CreateProject() {
                         </div>
                         <div className="w-1/2 ml-2">
                             <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="budgetApproved">
-                                {t('budget_approved')}
+                                {t('budget_approved')} ($)
                             </label>
                             <input
                                 className={inputClass('budgetApproved')}

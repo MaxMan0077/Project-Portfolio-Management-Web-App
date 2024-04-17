@@ -98,8 +98,6 @@ router.get('/getall', async (req, res) => {
     }
 });
 
-
-
 // PUT route to update an existing user
 router.put('/update/:iduser', async (req, res) => {
     const { iduser } = req.params;

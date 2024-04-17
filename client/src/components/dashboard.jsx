@@ -21,7 +21,7 @@ export default function Dashboard() {
     const [totalProjects, setTotalProjects] = useState(0);
 
     // Hardcoded total budget
-    const totalBudget = 100000; // Example figure
+    const totalBudget = 10000000;
     const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A4A4A4'];
 
     useEffect(() => {

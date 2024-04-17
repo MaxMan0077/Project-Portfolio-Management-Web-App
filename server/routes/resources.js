@@ -119,11 +119,18 @@ router.put('/update/:id', async (req, res) => {
     const { name_first, name_second, name_native, office, department, role, type } = req.body;
 
     try {
-        // Assume db.promise().query() to fetch existing resource, including photo
-        const [existingResource] = await db.promise().query('SELECT photo FROM resource WHERE idresource = ?', [id]);
-        const currentPhoto = existingResource[0].photo;
+        // Fetch existing resource to retrieve current photo if new one isn't uploaded
+        const [results] = await db.promise().query('SELECT photo FROM resource WHERE idresource = ?', [id]);
+        const existingPhoto = results[0].photo;
 
-        const photo = req.file ? req.file.path : currentPhoto; // Use existing photo if no new file
+        // Determine if a new file has been uploaded
+        let photoToUpdate = existingPhoto; // Default to existing photo
+        if (req.file) {
+            // If there's a new file, convert its path or content to binary, assuming it's been saved as a file
+            // This might need adjustment depending on how your file handling setup works
+            const fileData = fs.readFileSync(req.file.path);
+            photoToUpdate = fileData;
+        }
 
         const query = `
             UPDATE resource
@@ -137,7 +144,7 @@ router.put('/update/:id', async (req, res) => {
                 photo = ?
             WHERE idresource = ?
         `;
-        await db.promise().query(query, [name_first, name_second, name_native, office, department, role, type, photo, id]);
+        await db.promise().query(query, [name_first, name_second, name_native, office, department, role, type, photoToUpdate, id]);
         res.json({ message: 'Resource updated successfully' });
     } catch (err) {
         console.error('Error updating resource:', err);
