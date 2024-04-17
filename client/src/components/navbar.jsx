@@ -4,11 +4,11 @@ import { FaHome, FaUsers, FaTasks, FaTrello,} from 'react-icons/fa';
 import { FaChartBar } from "react-icons/fa6";
 import { motion, AnimatePresence } from 'framer-motion';
 import { useIntl } from 'react-intl';
-import { useLanguage } from '../LanguageContext'; // Ensure this path is correct
+import { useLanguage } from '../LanguageContext';
 
 const SettingsModal = ({ isOpen, onClose }) => {
-  const intl = useIntl(); // Directly use useIntl hook
-  const { language, toggleLanguage } = useLanguage(); // Assumed useLanguage is correctly implemented
+  const intl = useIntl();
+  const { language, toggleLanguage } = useLanguage();
 
   const handleLanguageChange = (event) => {
     const newLang = event.target.value === 'English' ? 'en' : 'ua';
