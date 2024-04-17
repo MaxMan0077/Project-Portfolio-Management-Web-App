@@ -85,7 +85,7 @@ const KanbanCard = ({ project, index }) => {
   
           {/* Content below the color strip */}
           <div className="mt-4">
-            <h3 className="font-bold text-xl mb-2">{project.name}</h3>
+            <h3 className="font-bold text-l mb-2">{project.name}</h3>
             <p>{formatBudget(project.budget_approved)}</p>
             <p>{formatDate(project.phase_end)}</p>
           </div>
