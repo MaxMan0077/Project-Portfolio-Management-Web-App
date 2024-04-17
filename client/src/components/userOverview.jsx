@@ -103,9 +103,11 @@ export default function UserOverview() {
     };
 
     const handleSaveUser = async (updatedUserData) => {
+        console.log("Sending updated user data to backend:", updatedUserData); // Log the data being sent
+    
         try {
             const response = await axios.put(`http://localhost:5001/api/users/update/${updatedUserData.iduser}`, updatedUserData);
-            console.log(response.data);
+            console.log("Server response:", response.data); // Log the server response
             setIsModalOpen(false); // Close the modal
             fetchUsers(); // Refresh the user list
             showNotification("User saved successfully!"); // Show success notification
@@ -114,7 +116,6 @@ export default function UserOverview() {
             showNotification("Failed to save user."); // Show error notification
         }
     };
-    
     
     const handleDeleteUser = async (userId) => {
         try {

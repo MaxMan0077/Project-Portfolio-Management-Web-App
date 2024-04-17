@@ -110,6 +110,9 @@ router.put('/update/:iduser', async (req, res) => {
     }
 
     try {
+        // Decode base64 photo to binary buffer if photo is provided
+        const photoBuffer = photo ? Buffer.from(photo, 'base64') : null;
+
         const query = `
             UPDATE user
             SET
@@ -121,7 +124,8 @@ router.put('/update/:iduser', async (req, res) => {
                 photo = ?
             WHERE iduser = ?
         `;
-        await db.promise().query(query, [name_first, name_second, office, department, user_type, photo, iduser]);
+        // Pass the binary photo buffer to the database
+        await db.promise().query(query, [name_first, name_second, office, department, user_type, photoBuffer, iduser]);
         res.json({ message: 'User updated successfully' });
     } catch (err) {
         console.error('Error updating user:', err);
