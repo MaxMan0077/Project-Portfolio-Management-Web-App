@@ -18,8 +18,6 @@ const storage = multer.diskStorage({
   
   const upload = multer({ storage: storage });
 
-// Assuming the multer configuration is the same as above and already defined in your file
-
 // POST route to add a new resource
 router.post('/add', upload.single('photo'), async (req, res) => {
     console.log('req.body:', req.body);

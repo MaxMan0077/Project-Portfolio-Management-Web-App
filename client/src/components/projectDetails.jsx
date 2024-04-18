@@ -102,35 +102,42 @@ const ProjectDetails = () => {
     
     // Construct the payload with only edited fields
     const payload = {};
-  
-    if (editFormData.businessOwner && editFormData.businessOwner !== project.business_owner) {
-      payload.business_owner = editFormData.businessOwner;
-    }
-    if (editFormData.projectManager && editFormData.projectManager !== project.project_manager) {
-      payload.project_manager = editFormData.projectManager;
-    }
-    if (editFormData.phase && editFormData.phase !== project.phase) {
-      payload.phase = editFormData.phase;
-    }
-    if (editFormData.budget && editFormData.budget.toString() !== project.budget_approved.toString()) {
-      payload.budget_approved = parseFloat(editFormData.budget);
-    }
+
+    // Simplify the comparison logic: if the value is different from the initial, add it to the payload
+    const fieldsToUpdate = [
+      { key: 'businessOwner', value: editFormData.businessOwner, initial: project.business_owner },
+      { key: 'projectManager', value: editFormData.projectManager, initial: project.project_manager },
+      { key: 'phase', value: editFormData.phase, initial: project.phase },
+      { key: 'budget_approved', value: parseFloat(editFormData.budget), initial: parseFloat(project.budget_approved) },
+      { key: 'location', value: editFormData.location, initial: project.location },
+      { key: 'description', value: editFormData.description, initial: project.description }
+    ];
+
+    fieldsToUpdate.forEach(field => {
+      if (field.value.toString() !== field.initial.toString()) {
+        payload[field.key] = field.value;
+      }
+    });
+
+    // Dates need special handling to format properly
     if (editFormData.phaseStart && editFormData.phaseStart !== project.phase_start.split('T')[0]) {
-      const phaseStartDate = new Date(editFormData.phaseStart);
-      payload.phase_start = `${phaseStartDate.getFullYear()}-${(phaseStartDate.getMonth() + 1).toString().padStart(2, '0')}-${phaseStartDate.getDate().toString().padStart(2, '0')} 00:00:00`;
+        const phaseStartDate = new Date(editFormData.phaseStart);
+        payload.phase_start = `${phaseStartDate.getFullYear()}-${(phaseStartDate.getMonth() + 1).toString().padStart(2, '0')}-${phaseStartDate.getDate().toString().padStart(2, '0')} 00:00:00`;
     }
     if (editFormData.phaseEnd && editFormData.phaseEnd !== project.phase_end.split('T')[0]) {
-      const phaseEndDate = new Date(editFormData.phaseEnd);
-      payload.phase_end = `${phaseEndDate.getFullYear()}-${(phaseEndDate.getMonth() + 1).toString().padStart(2, '0')}-${phaseEndDate.getDate().toString().padStart(2, '0')} 00:00:00`;
+        const phaseEndDate = new Date(editFormData.phaseEnd);
+        payload.phase_end = `${phaseEndDate.getFullYear()}-${(phaseEndDate.getMonth() + 1).toString().padStart(2, '0')}-${phaseEndDate.getDate().toString().padStart(2, '0')} 00:00:00`;
     }
-  
+
+    console.log("Sending payload to update project:", payload);
+
     try {
-      const response = await axios.put(`http://localhost:5001/api/projects/update/${projectId}`, payload);
-      console.log('Project updated successfully:', response.data);
-      setIsEditModalOpen(false);
-      fetchProjectDetails(); // Refetch the project details to update UI
+        const response = await axios.put(`http://localhost:5001/api/projects/update/${projectId}`, payload);
+        console.log('Project updated successfully:', response.data);
+        setIsEditModalOpen(false);
+        fetchProjectDetails(); // Refetch the project details to update UI
     } catch (error) {
-      console.error("There was an error updating the project details:", error);
+        console.error("There was an error updating the project details:", error);
     }
   };
 
@@ -284,7 +291,7 @@ const ProjectDetails = () => {
           </table>
         </div>
         {isEditModalOpen && (
-          <div className="fixed z-10 inset-0 overflow-y-auto mt-32">
+          <div className="fixed z-10 inset-0 overflow-y-auto mt-10">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               <form onSubmit={handleEditProjectSubmit} className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
