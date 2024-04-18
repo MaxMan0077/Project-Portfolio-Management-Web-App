@@ -144,7 +144,7 @@ export default function Login() {
                         <input className={`border p-2 ${error ? 'border-red-500' : ''}`} type="password" name="password" value={credentials.password} onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}/>
                     </div>
                     {error && <div className="text-red-500 text-center">{error}</div>} {/* Display error message */}
-                    <button className="w-full py-3 mt-8 bg-indigo-600 hover:bg-indigo-500 relative">{t('login')}</button>
+                    <button className="w-full py-3 mt-8 text-white bg-indigo-600 hover:bg-indigo-500 relative">{t('login')}</button>
                     <p className="flex items-center mt-2 relative"><input type="checkbox" className="mr-2"/>{t('rememberMe')}</p>
                 </form>
             </div>
