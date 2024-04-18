@@ -22,70 +22,45 @@ const ProjectDetails = () => {
     phase: '',
     budget: '',
     phaseStart: '',
-    phaseEnd: ''
-  });
- 
-  useEffect(() => {
-    const fetchProjectDetails = async () => {
-      try {
-        const response = await axios.get(`http://localhost:5001/api/projects/${projectId}`);
-        console.log(response);
-        if (response.data) {
-          setProject(response.data);
-          setEditFormData({
-            businessOwner: response.data.business_owner || '',
-            projectManager: response.data.project_manager || '',
-            phase: response.data.phase || '',
-            budget: response.data.budget_approved.toString(), // Convert to string for the input field
-            phaseStart: response.data.phase_start.split('T')[0], // Assuming it's in ISO format
-            phaseEnd: response.data.phase_end.split('T')[0], // Assuming it's in ISO format
-          });
-  
-          // Fetch names for the business owner and project manager
-          if (response.data.business_owner) {
-            fetchResourceName(response.data.business_owner, setBusinessOwnerName);
-          }
-          if (response.data.project_manager) {
-            fetchResourceName(response.data.project_manager, setProjectManagerName);
-          }
-        } else {
-          throw new Error('No project data received');
-        }
-      } catch (error) {
-        console.error("There was an error fetching the project details:", error);
-      }
-    };
-  
-    const fetchResourceName = async (resourceId, setName) => {
-      try {
-        const nameResponse = await axios.get(`http://localhost:5001/api/resources/resourceNames/${resourceId}`);
-        setName(`${nameResponse.data.firstName} ${nameResponse.data.lastName}`);
-      } catch (error) {
-        console.error(`Error fetching name for resource ID ${resourceId}:`, error);
-        setName('Unavailable');
-      }
-    };
-  
-    fetchProjectDetails();
-    fetchStatusReports();
-  }, [projectId]); // Ensure useEffect is only re-run when projectId changes
-  
+    phaseEnd: '',
+    location: '', // Added for location
+    description: '' // Added for description
+  });  
 
   const fetchProjectDetails = async () => {
     try {
       const response = await axios.get(`http://localhost:5001/api/projects/${projectId}`);
-      setProject(response.data);
-      // Populate edit form with the current project details
-      setEditFormData({
-        businessOwner: response.data.business_owner,
-        projectManager: response.data.project_manager,
-        phase: response.data.phase,
-        budget: response.data.budget_approved.toString(), // Convert to string for the input field
-        phaseStart: response.data.phase_start.split('T')[0], // Assuming it's in ISO format
-        phaseEnd: response.data.phase_end.split('T')[0], // Assuming it's in ISO format
-      });
+      if (response.data) {
+        setProject(response.data);
+        setEditFormData({
+          businessOwner: response.data.business_owner || '',
+          projectManager: response.data.project_manager || '',
+          phase: response.data.phase || '',
+          budget: response.data.budget_approved.toString(),
+          phaseStart: response.data.phase_start.split('T')[0],
+          phaseEnd: response.data.phase_end.split('T')[0],
+          location: response.data.location || '',
+          description: response.data.description || ''
+        });
+
+        // Fetch names for business owner and project manager
+        fetchResourceName(response.data.business_owner, setBusinessOwnerName);
+        fetchResourceName(response.data.project_manager, setProjectManagerName);
+      } else {
+        throw new Error('No project data received');
+      }
     } catch (error) {
       console.error("There was an error fetching the project details:", error);
+    }
+  };
+
+  const fetchResourceName = async (resourceId, setName) => {
+    try {
+      const nameResponse = await axios.get(`http://localhost:5001/api/resources/resourceNames/${resourceId}`);
+      setName(`${nameResponse.data.firstName} ${nameResponse.data.lastName}`);
+    } catch (error) {
+      console.error(`Error fetching name for resource ID ${resourceId}:`, error);
+      setName('Unavailable');
     }
   };
   
@@ -100,6 +75,11 @@ const ProjectDetails = () => {
       console.error("There was an error fetching the status reports:", error);
     }
   };
+  
+  useEffect(() => {  
+    fetchProjectDetails();
+    fetchStatusReports();
+  }, [projectId]); // Ensure useEffect is only re-run when projectId changes
 
   if (!project) {
     return <div className="text-center mt-5">Loading project details...</div>;
@@ -323,6 +303,22 @@ const ProjectDetails = () => {
                         {t('project_manager')}
                       </label>
                       <input type="text" id="projectManager" name="projectManager" value={editFormData.projectManager} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="location">
+                        {t('location')}
+                      </label>
+                      <select
+                        id="location"
+                        name="location"
+                        value={editFormData.location}
+                        onChange={handleInputChange}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      >
+                        <option value="">{t('select_location')}</option>
+                        <option value="Americas">{t('Americas')}</option>
+                        <option value="Europe">{t('Europe')}</option>
+                        <option value="Asia-Pacific">{t('Asia-Pacific')}</option>
+                        <option value="Middle-East & Africa">{t('Middle-East & Africa')}</option>
+                      </select>
                       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phase">
                         {t('phase')}
                       </label>
@@ -344,7 +340,17 @@ const ProjectDetails = () => {
                         {t('budget_approved')}
                       </label>
                       <input type="number" id="budget" name="budget" value={editFormData.budget} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-      
+                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+                        {t('project_description')}
+                      </label>
+                      <textarea
+                        id="description"
+                        name="description"
+                        value={editFormData.description}
+                        onChange={handleInputChange}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        rows="4"
+                      ></textarea>
                       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phaseStart">
                         {t('phase_start_date')}
                       </label>
