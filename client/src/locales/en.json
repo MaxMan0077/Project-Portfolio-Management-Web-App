@@ -149,7 +149,7 @@
   "scope": "Scope",
   "time": "Time",
   "cost": "Cost",
-  "percentage": "Percentage",
+  "percentage": "% Complete",
   "revised_start": "Revised Start",
   "revised_end": "Revised End",
   "no_status_reports": "No status reports for this project yet.",
