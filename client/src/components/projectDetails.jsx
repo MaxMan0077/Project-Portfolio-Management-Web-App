@@ -14,6 +14,8 @@ const ProjectDetails = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const handleOpenEditModal = () => setIsEditModalOpen(true);
   const handleCloseEditModal = () => setIsEditModalOpen(false);
+  const [projectManagerName, setProjectManagerName] = useState('');
+  const [businessOwnerName, setBusinessOwnerName] = useState('');
   const [editFormData, setEditFormData] = useState({
     businessOwner: '',
     projectManager: '',
@@ -23,11 +25,11 @@ const ProjectDetails = () => {
     phaseEnd: ''
   });
  
-
   useEffect(() => {
     const fetchProjectDetails = async () => {
       try {
         const response = await axios.get(`http://localhost:5001/api/projects/${projectId}`);
+        console.log(response);
         if (response.data) {
           setProject(response.data);
           setEditFormData({
@@ -38,6 +40,14 @@ const ProjectDetails = () => {
             phaseStart: response.data.phase_start.split('T')[0], // Assuming it's in ISO format
             phaseEnd: response.data.phase_end.split('T')[0], // Assuming it's in ISO format
           });
+  
+          // Fetch names for the business owner and project manager
+          if (response.data.business_owner) {
+            fetchResourceName(response.data.business_owner, setBusinessOwnerName);
+          }
+          if (response.data.project_manager) {
+            fetchResourceName(response.data.project_manager, setProjectManagerName);
+          }
         } else {
           throw new Error('No project data received');
         }
@@ -46,9 +56,19 @@ const ProjectDetails = () => {
       }
     };
   
+    const fetchResourceName = async (resourceId, setName) => {
+      try {
+        const nameResponse = await axios.get(`http://localhost:5001/api/resources/resourceNames/${resourceId}`);
+        setName(`${nameResponse.data.firstName} ${nameResponse.data.lastName}`);
+      } catch (error) {
+        console.error(`Error fetching name for resource ID ${resourceId}:`, error);
+        setName('Unavailable');
+      }
+    };
+  
     fetchProjectDetails();
     fetchStatusReports();
-  }, [projectId]);
+  }, [projectId]); // Ensure useEffect is only re-run when projectId changes
   
 
   const fetchProjectDetails = async () => {
@@ -143,7 +163,13 @@ const ProjectDetails = () => {
         console.error('Error deleting project:', error);
         // Optionally, handle the error by showing an error message to the user
     }
-};
+  };
+
+  const formatDate = (dateString) => {
+    if (!dateString) return ''; // Return empty if no date is provided
+    const date = new Date(dateString);
+    return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
+  };
 
   const handleCreateStatusReportClick = () => {
     navigate(`/project/${projectId}/create-status-report`);
@@ -176,7 +202,7 @@ const ProjectDetails = () => {
   return (
     <>
       <Navbar />
-      <div className="container mx-auto p-5">
+      <div className="container mx-auto pt-5">
         <div className="mb-4 flex justify-between">
           <button onClick={handleBackClick} className="px-4 py-2 text-white bg-blue-500 rounded">
             {t('back')}
@@ -188,25 +214,25 @@ const ProjectDetails = () => {
         <div className="text-center mb-10">
           <h1 className="text-5xl font-bold">{project.name}</h1>
         </div>
-        <div className="flex justify-between items-center gap-4 mb-10">
-          <div className="info-item bg-gray-200 p-4 rounded shadow flex-grow">
-            <strong>{t('business_owner')}:</strong> {project.business_owner}
-          </div>
-          <div className="info-item bg-gray-200 p-4 rounded shadow flex-grow">
-            <strong>{t('project_manager')}:</strong> {project.project_manager}
-          </div>
-          <div className="info-item bg-gray-200 p-4 rounded shadow flex-grow">
-            <strong>{t('phase')}:</strong> {t(project.phase)}
-          </div>
-          <div className="info-item bg-gray-200 p-4 rounded shadow flex-grow">
-            <strong>{t('budget_approved')}:</strong> ${project.budget_approved}
-          </div>
-          <div className="info-item bg-gray-200 p-4 rounded shadow flex-grow">
-            <strong>{t('phase_start_date')}:</strong> {project.phase_start.split('T')[0]}
-          </div>
-          <div className="info-item bg-gray-200 p-4 rounded shadow flex-grow">
-            <strong>{t('phase_end_date')}:</strong> {project.phase_end.split('T')[0]}
-          </div>
+        <div className="flex justify-between items-start gap-4 mb-3 flex-wrap">
+          {[
+            { label: t('phase'), value: t(project.phase) },
+            { label: t('budget_approved'), value: `$${project.budget_approved}` },
+            { label: t('location'), value: project.location },
+            { label: t('project_manager'), value: projectManagerName },
+            { label: t('business_owner'), value: businessOwnerName },
+            { label: t('phase_start_date'), value: formatDate(project.phase_start) },
+            { label: t('phase_end_date'), value: formatDate(project.phase_end) }
+          ].map((item, index) => (
+            <div key={index} className="info-item bg-gray-200 p-4 rounded shadow flex-grow">
+              <div className="font-bold mb-1">{item.label}:</div>
+              <div>{item.value}</div>
+            </div>
+          ))}
+        </div>
+        <div className="bg-gray-200 p-2 rounded shadow mb-10">
+          <h3 className="text-lg font-bold mb-2">{t('project_description')}:</h3>
+          <p>{project.description}</p>
         </div>
         <div className="flex justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">{t('status_reports')}</h2>
@@ -278,7 +304,7 @@ const ProjectDetails = () => {
           </table>
         </div>
         {isEditModalOpen && (
-          <div className="fixed z-10 inset-0 overflow-y-auto">
+          <div className="fixed z-10 inset-0 overflow-y-auto mt-32">
           <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
             <div className="inline-block align-bottom bg-white rounded-lg text-left overflow-hidden shadow-xl transform transition-all sm:my-8 sm:align-middle sm:max-w-lg sm:w-full">
               <form onSubmit={handleEditProjectSubmit} className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -297,12 +323,23 @@ const ProjectDetails = () => {
                         {t('project_manager')}
                       </label>
                       <input type="text" id="projectManager" name="projectManager" value={editFormData.projectManager} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-      
                       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phase">
                         {t('phase')}
                       </label>
-                      <input type="text" id="phase" name="phase" value={editFormData.phase} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-      
+                      <select
+                        id="phase"
+                        name="phase"
+                        value={editFormData.phase}
+                        onChange={handleInputChange}
+                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                      >
+                        <option value="">{t('select_phase')}</option>
+                        <option value="Funnel">{t('funnel')}</option>
+                        <option value="Review & Evaluation">{t('review_evaluation')}</option>
+                        <option value="Business Case Development">{t('business_case_development')}</option>
+                        <option value="In Implementation">{t('in_implementation')}</option>
+                        <option value="Closed">{t('closed')}</option>
+                      </select>
                       <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="budget">
                         {t('budget_approved')}
                       </label>
