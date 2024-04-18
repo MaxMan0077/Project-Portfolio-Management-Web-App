@@ -88,6 +88,11 @@ export default function UserCreate() {
                 return "*Password must contain at least one uppercase letter, one number, and be at least 8 characters long";
             return null;
         };
+
+        const validateNativeTranslation = (name) => {
+            if (name && /\d/.test(name)) return "*Native translation must not contain numbers";
+            return null;
+        };
     
         const validateGeneric = (value) => {
             if (!value) return "*Field is required";
@@ -108,7 +113,7 @@ export default function UserCreate() {
         } else {
             newErrors.resourceFirstName = validateNameFirst(formData.resourceFirstName);
             newErrors.resourceSecondName = validateNameSecond(formData.resourceSecondName);
-            newErrors.nativeTranslation = validateNameNative(formData.nativeTranslation);
+            newErrors.nativeTranslation = validateNativeTranslation(formData.nativeTranslation);
             newErrors.resourceOffice = validateGeneric(formData.resourceOffice);
             newErrors.resourceDepartment = validateGeneric(formData.resourceDepartment);
             newErrors.role = validateGeneric(formData.role);
@@ -190,13 +195,13 @@ export default function UserCreate() {
                                 </div>
                                 <div className="w-1/2 ml-2">
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="name_second">
-                                        {t('last_name')}
+                                        {t('surname')}
                                     </label>
                                     <input
                                         className={inputClass('name_second')}
                                         name="name_second"
                                         type="text"
-                                        placeholder={t('last_name')}
+                                        placeholder={t('surname')}
                                         value={formData.name_second}
                                         onChange={handleInputChange}
                                     />
@@ -260,14 +265,20 @@ export default function UserCreate() {
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="department">
                                         {t('department')}
                                     </label>
-                                    <input
+                                    <select
                                         className={inputClass('department')}
                                         name="department"
-                                        type="text"
-                                        placeholder={t('department')}
                                         value={formData.department}
                                         onChange={handleInputChange}
-                                    />
+                                    >
+                                        <option value="">{t('department')}</option>
+                                        <option value="Information Technology">{t('Information Technology')}</option>
+                                        <option value="Development">{t('Development')}</option>
+                                        <option value="Human Resources">{t('Human Resources')}</option>
+                                        <option value="Change Management">{t('Change Management')}</option>
+                                        <option value="Front Office">{t('Front Office')}</option>
+                                        <option value="Back Office">{t('Back Office')}</option>
+                                    </select>
                                     {fieldErrors.department && <span className="text-red-500 text-xs italic">{fieldErrors.department}</span>}
                                 </div>
                             </div>
@@ -307,18 +318,18 @@ export default function UserCreate() {
                     ) : (
                         // Resource Form Fields
                         <div>
-                        {/* First Name, Second Name, and Native Translation */}
+                        {/* First Name, Second Name (Surname), and Native Translation */}
                         <div className="flex mb-4">
                             {["resourceFirstName", "resourceSecondName", "nativeTranslation"].map((field, index) => (
                                 <div className={`w-1/3 ${index !== 1 ? "mr-2" : "mx-2"}`} key={field}>
                                     <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor={field}>
-                                        {t(field)}
+                                        {field === "resourceSecondName" ? t('surname') : t(field)}
                                     </label>
                                     <input
                                         className={inputClass(field)}
                                         name={field}
                                         type="text"
-                                        placeholder={t(`${field}_placeholder`)}
+                                        placeholder={field === "resourceSecondName" ? t('surname') : t(`${field}_placeholder`)}
                                         onChange={handleInputChange}
                                         value={formData[field]}
                                     />
@@ -326,7 +337,7 @@ export default function UserCreate() {
                                 </div>
                             ))}
                         </div>
-    
+
                         {/* Office & Department */}
                         <div className="flex mb-4">
                             {["resourceOffice", "resourceDepartment"].map((field, index) => (
@@ -341,28 +352,34 @@ export default function UserCreate() {
                                             onChange={handleInputChange}
                                             value={formData[field]}
                                         >
-                                            <option value="">{t('office')}</option>
-                                            <option value="1">London</option>
-                                            <option value="2">New York</option>
-                                            <option value="3">Shanghai</option>
-                                            <option value="4">Brisbane</option>
-                                            <option value="5">Cape Town</option>
+                                            <option value="">{t('select_office')}</option>
+                                            <option value="1">{t('London')}</option>
+                                            <option value="2">{t('New York')}</option>
+                                            <option value="3">{t('Shanghai')}</option>
+                                            <option value="4">{t('Brisbane')}</option>
+                                            <option value="5">{t('Cape Town')}</option>
                                         </select>
                                     ) : (
-                                        <input
+                                        <select
                                             className={inputClass(field)}
                                             name={field}
-                                            type="text"
-                                            placeholder={t(`${field}_placeholder`)}
                                             onChange={handleInputChange}
                                             value={formData[field]}
-                                        />
+                                        >
+                                            <option value="">{t('department')}</option>
+                                            <option value="Information Technology">{t('Information Technology')}</option>
+                                            <option value="Development">{t('Development')}</option>
+                                            <option value="Human Resources">{t('Human Resources')}</option>
+                                            <option value="Change Management">{t('Change Management')}</option>
+                                            <option value="Front Office">{t('Front Office')}</option>
+                                            <option value="Back Office">{t('Back Office')}</option>
+                                        </select>
                                     )}
                                     {fieldErrors[field] && <span className="text-red-500 text-xs italic">{fieldErrors[field]}</span>}
                                 </div>
                             ))}
                         </div>
-    
+
                         {/* Role & Type */}
                         <div className="flex mb-4">
                             <div className="w-1/2 mr-2">
