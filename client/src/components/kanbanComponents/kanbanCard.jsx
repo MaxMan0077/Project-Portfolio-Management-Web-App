@@ -48,10 +48,10 @@ const KanbanCard = ({ project, index }) => {
   };  
   
   const locationColorMap = {
-    'Americas': '#FF5733', // Example color code for Americas
-    'Europe': '#3375FF', // Example color code for Europe
-    'Asia-Pacific': '#33FF57', // Example color code for Asia-Pacific
-    'Middle-East & Africa': '#FF33F6' // Example color code for Middle-East & Africa
+    'Americas': '#9E0B00', // Example color code for Americas
+    'Europe': '#9DB0AC', // Example color code for Europe
+    'Asia-Pacific': '#F99B21', // Example color code for Asia-Pacific
+    'Middle-East & Africa': '#C69C02' // Example color code for Middle-East & Africa
   };
 
   const colorStripStyle = {
