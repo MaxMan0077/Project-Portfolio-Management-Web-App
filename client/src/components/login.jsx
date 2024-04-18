@@ -10,6 +10,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 export default function Login() {
     const navigate = useNavigate();
     const [credentials, setCredentials] = useState({ username: '', password: '' });
+    const [error, setError] = useState(''); // State to store login error message
     const [isFadingOut, setIsFadingOut] = useState(false);
     const translations = {
         en: 'My Projects',
@@ -22,7 +23,7 @@ export default function Login() {
     };
     const [currentTranslation, setCurrentTranslation] = useState(translations.en);
     const [opacityClass, setOpacityClass] = useState('opacity-100'); 
-    const { toggleLanguage } = useLanguage(); // Destructure toggleLanguage directly
+    const {language, toggleLanguage } = useLanguage();
     const intl = useIntl();
     const t = id => intl.formatMessage({ id });
     const [showDropdown, setShowDropdown] = useState(false);
@@ -74,9 +75,11 @@ export default function Login() {
                 fadeToDashboard();
             } else {
                 console.log("Login failed: ", response.data.message);
+                setError('Wrong username or password'); // Set error message
             }
         } catch (error) {
             console.error('Login error:', error);
+            setError('Wrong username or password'); // Set error message for any server error
         }
     };    
 
@@ -108,9 +111,12 @@ export default function Login() {
                                     }}
                                     className="absolute right-0 mt-10 w-40 rounded-md shadow-lg bg-white ring-1 ring-black ring-opacity-5 z-50"
                                 >
-                                    {['en', 'uk'].map((lang, index) => (
+                                    {[
+                                        { code: 'en', label: 'English' },
+                                        { code: 'ua', label: 'Українська' } // Adjusted code to 'ua' for consistency with your settings modal
+                                    ].map((lang) => (
                                         <motion.div
-                                            key={lang}
+                                            key={lang.code}
                                             variants={{
                                                 hidden: { y: -20, opacity: 0 },
                                                 visible: {
@@ -120,9 +126,9 @@ export default function Login() {
                                                 }
                                             }}
                                             className="p-2 hover:bg-gray-100 cursor-pointer"
-                                            onClick={() => { handleLanguageChange(lang); setShowDropdown(false); }}
+                                            onClick={() => { handleLanguageChange(lang.code); setShowDropdown(false); }}
                                         >
-                                            {lang === 'en' ? 'English' : 'Українська'}
+                                            {lang.label}
                                         </motion.div>
                                     ))}
                                 </motion.div>
@@ -131,12 +137,13 @@ export default function Login() {
                     </div>
                     <div className="flex flex-col mb-4 mt-8 relative">
                         <label>{t('username')}</label>
-                        <input className="border p-2" type="text" name="username" value={credentials.username} onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}/>
+                        <input className={`border p-2 ${error ? 'border-red-500' : ''}`} type="text" name="username" value={credentials.username} onChange={(e) => setCredentials({ ...credentials, username: e.target.value })}/>
                     </div>
                     <div className="flex flex-col relative">
                         <label>{t('password')}</label>
-                        <input className="border p-2" type="password" name="password" value={credentials.password} onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}/>
+                        <input className={`border p-2 ${error ? 'border-red-500' : ''}`} type="password" name="password" value={credentials.password} onChange={(e) => setCredentials({ ...credentials, password: e.target.value })}/>
                     </div>
+                    {error && <div className="text-red-500 text-center">{error}</div>} {/* Display error message */}
                     <button className="w-full py-3 mt-8 bg-indigo-600 hover:bg-indigo-500 relative">{t('login')}</button>
                     <p className="flex items-center mt-2 relative"><input type="checkbox" className="mr-2"/>{t('rememberMe')}</p>
                 </form>
