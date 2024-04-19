@@ -180,40 +180,51 @@ export default function Dashboard() {
         {data.map((entry, index) => (
           <div key={index} className="flex items-center mb-1">
             <div className="w-3 h-3 mr-2" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-            <div className="text-sm">{entry.name}</div>
+            <div className="text-sm">{t(entry.name)}</div>
           </div>
         ))}
       </div>
-    );
+    );    
+
+    const renderCustomTooltip = ({ active, payload }) => {
+      if (active && payload && payload.length) {
+          return (
+              <div className="custom-tooltip bg-white p-2 shadow rounded">
+                  <p className="label">{`${t(payload[0].name)}: ${payload[0].value}`}</p>
+              </div>
+          );
+      }
+      return null;
+    };
           
     const renderPieChart = (data, name) => (
       <div className="p-4" style={{ width: "420px" }}>
-        <div className="bg-white rounded shadow flex p-4 justify-start items-center">
-          <div>
-            <h3 className="font-bold text-xl mb-4 text-center">{name}</h3>
-            <PieChart key={chartKey} width={200} height={200}>
-              <Pie
-                dataKey="value"
-                data={data}
-                cx="50%"
-                cy="50%"
-                outerRadius={80}
-                innerRadius={50}
-                fill="#8884d8"
-                isAnimationActive={true}
-                animationDuration={1300}
-                label={name === 'Phase' ? (props) => renderCustomLabel(props, totalProjects) : undefined}
-                labelLine={false}
-              >
-                {data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
-              </Pie>
-              <Tooltip />
-            </PieChart>
+          <div className="bg-white rounded shadow flex p-4 justify-start items-center">
+              <div>
+                  <h3 className="font-bold text-xl mb-4 text-center">{t(name)}</h3>
+                  <PieChart key={chartKey} width={200} height={200}>
+                      <Pie
+                          dataKey="value"
+                          data={data}
+                          cx="50%"
+                          cy="50%"
+                          outerRadius={80}
+                          innerRadius={50}
+                          fill="#8884d8"
+                          isAnimationActive={true}
+                          animationDuration={1300}
+                          label={name === 'Phase' ? (props) => renderCustomLabel(props, totalProjects) : undefined}
+                          labelLine={false}
+                      >
+                          {data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                      </Pie>
+                      <Tooltip content={renderCustomTooltip} />
+                  </PieChart>
+              </div>
+              <div className="ml-1 mt-14">
+                  <CustomLegend data={data} />
+              </div>
           </div>
-          <div className="ml-1 mt-14">
-            <CustomLegend data={data} />
-          </div>
-        </div>
       </div>
     );
 
