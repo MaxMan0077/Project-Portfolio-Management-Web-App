@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import {useParams, useNavigate} from 'react-router-dom';
 import axios from 'axios';
 import Navbar from './navbar';
+import Dropdown from './dropdown';
 import { useIntl } from 'react-intl';
 
 const ProjectDetails = () => {
@@ -16,6 +17,10 @@ const ProjectDetails = () => {
   const handleCloseEditModal = () => setIsEditModalOpen(false);
   const [projectManagerName, setProjectManagerName] = useState('');
   const [businessOwnerName, setBusinessOwnerName] = useState('');
+  const [resources, setResources] = useState([]);
+  const [selectedBusinessOwner, setSelectedBusinessOwner] = useState('');
+  const [selectedProjectManager, setSelectedProjectManager] = useState('');
+  const [errors, setErrors] = useState({});
   const [editFormData, setEditFormData] = useState({
     businessOwner: '',
     projectManager: '',
@@ -42,6 +47,10 @@ const ProjectDetails = () => {
           location: response.data.location || '',
           description: response.data.description || ''
         });
+
+        // Set selected IDs for Dropdowns
+        setSelectedBusinessOwner(response.data.business_owner);
+        setSelectedProjectManager(response.data.project_manager);
 
         // Fetch names for business owner and project manager
         fetchResourceName(response.data.business_owner, setBusinessOwnerName);
@@ -79,7 +88,22 @@ const ProjectDetails = () => {
   useEffect(() => {  
     fetchProjectDetails();
     fetchStatusReports();
+    setSelectedBusinessOwner(project?.business_owner);
+    setSelectedProjectManager(project?.project_manager);
   }, [projectId]); // Ensure useEffect is only re-run when projectId changes
+
+  useEffect(() => {
+    const fetchResources = async () => {
+      try {
+        const response = await axios.get('http://localhost:5001/api/resources/getall');
+        setResources(response.data);
+      } catch (error) {
+        console.error("There was an error fetching resources:", error);
+      }
+    };
+
+    fetchResources();
+  }, []);
 
   if (!project) {
     return <div className="text-center mt-5">Loading project details...</div>;
@@ -97,49 +121,88 @@ const ProjectDetails = () => {
     }));
   };
 
+  const handleResourceSelect = (resourceId, type) => {
+    if (type === 'businessOwner') {
+      setSelectedBusinessOwner(resourceId);
+    } else if (type === 'projectManager') {
+      setSelectedProjectManager(resourceId);
+    }
+  };  
+
+  const validateForm = () => {
+    let newErrors = {};
+    // Fields must not be empty
+    if (!selectedBusinessOwner) newErrors.businessOwner = 'Business owner is required';
+    if (!selectedProjectManager) newErrors.projectManager = 'Project manager is required';
+    if (!editFormData.phase) newErrors.phase = 'Phase is required';
+    if (!editFormData.budget) newErrors.budget = 'Budget is required';
+    if (!editFormData.phaseStart) newErrors.phaseStart = 'Phase start date is required';
+    if (!editFormData.phaseEnd) newErrors.phaseEnd = 'Phase end date is required';
+    if (!editFormData.location) newErrors.location = 'Location is required';
+    if (!editFormData.description) newErrors.description = 'Description is required';
+
+    // Budget must not be negative
+    if (parseFloat(editFormData.budget) < 0) newErrors.budget = 'Budget cannot be negative';
+
+    // Phase end date must not be before phase start date
+    const startDate = new Date(editFormData.phaseStart);
+    const endDate = new Date(editFormData.phaseEnd);
+    if (endDate < startDate) newErrors.phaseEnd = 'Phase end date cannot be before phase start date';
+
+    setErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleEditProjectSubmit = async (event) => {
     event.preventDefault();
+  
+    // Validate form fields before submission
+    if (!validateForm()) {
+      console.error("Validation failed, form submission is halted.");
+      return; // Stop submission since validation failed
+    }
     
     // Construct the payload with only edited fields
     const payload = {};
-
-    // Simplify the comparison logic: if the value is different from the initial, add it to the payload
+  
+    // Use selectedBusinessOwner and selectedProjectManager from state
     const fieldsToUpdate = [
-      { key: 'businessOwner', value: editFormData.businessOwner, initial: project.business_owner },
-      { key: 'projectManager', value: editFormData.projectManager, initial: project.project_manager },
+      { key: 'business_owner', value: selectedBusinessOwner, initial: project.business_owner },
+      { key: 'project_manager', value: selectedProjectManager, initial: project.project_manager },
       { key: 'phase', value: editFormData.phase, initial: project.phase },
       { key: 'budget_approved', value: parseFloat(editFormData.budget), initial: parseFloat(project.budget_approved) },
       { key: 'location', value: editFormData.location, initial: project.location },
       { key: 'description', value: editFormData.description, initial: project.description }
     ];
-
+  
     fieldsToUpdate.forEach(field => {
       if (field.value.toString() !== field.initial.toString()) {
         payload[field.key] = field.value;
       }
     });
-
-    // Dates need special handling to format properly
+  
+    // Handle dates separately to ensure correct formatting
     if (editFormData.phaseStart && editFormData.phaseStart !== project.phase_start.split('T')[0]) {
-        const phaseStartDate = new Date(editFormData.phaseStart);
-        payload.phase_start = `${phaseStartDate.getFullYear()}-${(phaseStartDate.getMonth() + 1).toString().padStart(2, '0')}-${phaseStartDate.getDate().toString().padStart(2, '0')} 00:00:00`;
+      const phaseStartDate = new Date(editFormData.phaseStart);
+      payload.phase_start = `${phaseStartDate.getFullYear()}-${(phaseStartDate.getMonth() + 1).toString().padStart(2, '0')}-${phaseStartDate.getDate().toString().padStart(2, '0')} 00:00:00`;
     }
     if (editFormData.phaseEnd && editFormData.phaseEnd !== project.phase_end.split('T')[0]) {
-        const phaseEndDate = new Date(editFormData.phaseEnd);
-        payload.phase_end = `${phaseEndDate.getFullYear()}-${(phaseEndDate.getMonth() + 1).toString().padStart(2, '0')}-${phaseEndDate.getDate().toString().padStart(2, '0')} 00:00:00`;
+      const phaseEndDate = new Date(editFormData.phaseEnd);
+      payload.phase_end = `${phaseEndDate.getFullYear()}-${(phaseEndDate.getMonth() + 1).toString().padStart(2, '0')}-${phaseEndDate.getDate().toString().padStart(2, '0')} 00:00:00`;
     }
-
+  
     console.log("Sending payload to update project:", payload);
-
+  
     try {
-        const response = await axios.put(`http://localhost:5001/api/projects/update/${projectId}`, payload);
-        console.log('Project updated successfully:', response.data);
-        setIsEditModalOpen(false);
-        fetchProjectDetails(); // Refetch the project details to update UI
+      const response = await axios.put(`http://localhost:5001/api/projects/update/${projectId}`, payload);
+      console.log('Project updated successfully:', response.data);
+      setIsEditModalOpen(false);
+      fetchProjectDetails(); // Refetch the project details to update UI
     } catch (error) {
-        console.error("There was an error updating the project details:", error);
+      console.error("There was an error updating the project details:", error);
+      setErrors({ form: 'Failed to update project. Please try again.' });
     }
-  };
+  };  
 
   const handleDeleteProject = async () => {
     try {
@@ -185,6 +248,8 @@ const ProjectDetails = () => {
       />
     );
   };
+
+  const inputClass = (key) => `shadow appearance-none border ${errors[key] ? 'border-red-500' : 'border-gray-300'} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`;
 
   return (
     <>
@@ -301,16 +366,27 @@ const ProjectDetails = () => {
                       {t('edit_project')}
                     </h3>
                     <div className="mt-2">
-                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="businessOwner">
+                      <label className="block text-gray-700 text-sm font-bold mb-2 mt-2" htmlFor="businessOwner">
                         {t('business_owner')}
                       </label>
-                      <input type="text" id="businessOwner" name="businessOwner" value={editFormData.businessOwner} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-      
-                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="projectManager">
+                      <Dropdown
+                        resources={resources}
+                        selectedResourceId={selectedBusinessOwner}
+                        onSelect={setSelectedBusinessOwner}
+                        isValid={!errors.businessOwner}
+                      />
+                      {errors.businessOwner && <p className="text-red-500 text-xs italic">{errors.businessOwner}</p>}      
+                      <label className="block text-gray-700 text-sm font-bold mb-2 mt-2" htmlFor="projectManager">
                         {t('project_manager')}
                       </label>
-                      <input type="text" id="projectManager" name="projectManager" value={editFormData.projectManager} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="location">
+                      <Dropdown
+                        resources={resources}
+                        selectedResourceId={selectedProjectManager}
+                        onSelect={setSelectedProjectManager}
+                        isValid={!errors.projectManager}
+                      />
+                      {errors.projectManager && <p className="text-red-500 text-xs italic">{errors.projectManager}</p>}
+                      <label className="block text-gray-700 text-sm font-bold mb-2 mt-2" htmlFor="location">
                         {t('location')}
                       </label>
                       <select
@@ -318,7 +394,7 @@ const ProjectDetails = () => {
                         name="location"
                         value={editFormData.location}
                         onChange={handleInputChange}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className={inputClass('location')}
                       >
                         <option value="">{t('select_location')}</option>
                         <option value="Americas">{t('Americas')}</option>
@@ -326,7 +402,9 @@ const ProjectDetails = () => {
                         <option value="Asia-Pacific">{t('Asia-Pacific')}</option>
                         <option value="Middle-East & Africa">{t('Middle-East & Africa')}</option>
                       </select>
-                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phase">
+                      {errors.location && <p className="text-red-500 text-xs italic">{errors.location}</p>}
+
+                      <label className="block text-gray-700 text-sm font-bold mb-2 mt-2" htmlFor="phase">
                         {t('phase')}
                       </label>
                       <select
@@ -334,7 +412,7 @@ const ProjectDetails = () => {
                         name="phase"
                         value={editFormData.phase}
                         onChange={handleInputChange}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className={inputClass('phase')}
                       >
                         <option value="">{t('select_phase')}</option>
                         <option value="Funnel">{t('funnel')}</option>
@@ -343,11 +421,22 @@ const ProjectDetails = () => {
                         <option value="In Implementation">{t('in_implementation')}</option>
                         <option value="Closed">{t('closed')}</option>
                       </select>
-                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="budget">
+                      {errors.phase && <p className="text-red-500 text-xs italic">{errors.phase}</p>}
+
+                      <label className="block text-gray-700 text-sm font-bold mb-2 mt-2" htmlFor="budget">
                         {t('budget_approved')}
                       </label>
-                      <input type="number" id="budget" name="budget" value={editFormData.budget} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="description">
+                      <input
+                        type="number"
+                        id="budget"
+                        name="budget"
+                        value={editFormData.budget}
+                        onChange={handleInputChange}
+                        className={inputClass('budget')}
+                      />
+                      {errors.budget && <p className="text-red-500 text-xs italic">{errors.budget}</p>}
+
+                      <label className="block text-gray-700 text-sm font-bold mb-2 mt-2" htmlFor="description">
                         {t('project_description')}
                       </label>
                       <textarea
@@ -355,46 +444,58 @@ const ProjectDetails = () => {
                         name="description"
                         value={editFormData.description}
                         onChange={handleInputChange}
-                        className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline"
+                        className={inputClass('description')}
                         rows="4"
                       ></textarea>
-                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phaseStart">
+                      {errors.description && <p className="text-red-500 text-xs italic">{errors.description}</p>}
+
+                      <label className="block text-gray-700 text-sm font-bold mb-2 mt-2" htmlFor="phaseStart">
                         {t('phase_start_date')}
                       </label>
-                      <input type="date" id="phaseStart" name="phaseStart" value={editFormData.phaseStart} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
-      
-                      <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="phaseEnd">
+                      <input
+                        type="date"
+                        id="phaseStart"
+                        name="phaseStart"
+                        value={editFormData.phaseStart}
+                        onChange={handleInputChange}
+                        className={inputClass('phaseStart')}
+                      />
+                      {errors.phaseStart && <p className="text-red-500 text-xs italic">{errors.phaseStart}</p>}
+
+                      <label className="block text-gray-700 text-sm font-bold mb-2 mt-2" htmlFor="phaseEnd">
                         {t('phase_end_date')}
                       </label>
-                      <input type="date" id="phaseEnd" name="phaseEnd" value={editFormData.phaseEnd} onChange={handleInputChange} className="shadow appearance-none border rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline" />
+                      <input
+                        type="date"
+                        id="phaseEnd"
+                        name="phaseEnd"
+                        value={editFormData.phaseEnd}
+                        onChange={handleInputChange}
+                        className={inputClass('phaseEnd')}
+                      />
+                      {errors.phaseEnd && <p className="text-red-500 text-xs italic">{errors.phaseEnd}</p>}
                     </div>
                   </div>
                 </div>
-                <div className="bg-gray-50 px-4 py-3 sm:px-6 sm:flex sm:justify-between">
-                  <div>
-                    <button
-                      type="submit"
-                      className="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:mr-3 sm:text-sm">
-                      {t('save')}
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setIsEditModalOpen(false)}
-                      className="inline-flex justify-center rounded-md border border-gray-300 shadow-sm px-4 py-2 bg-white text-base font-medium text-gray-700 hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 sm:text-sm">
-                      {t('cancel')}
-                    </button>
-                  </div>
-                  <div>
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.preventDefault(); // Prevent form submission
-                        handleDeleteProject();
-                      }}
-                      className="inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-red-600 text-base font-medium text-white hover:bg-red-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-red-500 sm:text-sm">
-                      {t('delete')}
-                    </button>
-                  </div>
+                <div className="bg-gray-50 pl-4 py-3 sm:flex sm:flex-row-reverse">
+                  {/* Save Button */}
+                  <button
+                    type="submit"
+                    className="w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
+                    {t('save')}
+                  </button>
+
+                  {/* Cancel Button */}
+                  <button
+                    type="button"
+                    onClick={() => setIsEditModalOpen(false)}
+                    className="mt-3 w-full inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-blue-600 hover:text-blue-800 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                    style={{ textDecoration: 'none' }}
+                    onMouseOver={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                    onMouseOut={(e) => e.currentTarget.style.textDecoration = 'none'}
+                  >
+                    {t('cancel')}
+                  </button>
                 </div>
               </form>
             </div>

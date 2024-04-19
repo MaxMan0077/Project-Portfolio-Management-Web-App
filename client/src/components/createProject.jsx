@@ -305,7 +305,7 @@ export default function CreateProject() {
                                 className={inputClass('budgetApproved')}
                                 id="budgetApproved"
                                 name="budgetApproved"
-                                type="text"
+                                type="number"
                                 placeholder={t('budget_approved_placeholder')}
                                 value={formData.budgetApproved}
                                 onChange={handleInputChange}
