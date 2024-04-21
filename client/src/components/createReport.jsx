@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, {useState, useEffect } from 'react';
 import axios from 'axios';
 import { useParams, useNavigate } from 'react-router-dom';
 import Navbar from './navbar';
@@ -16,10 +16,25 @@ const CreateStatusReportForm = () => {
     revisedStart: '',
     revisedEnd: '',
   });
+  const [projectName, setProjectName] = useState('');
   const [errors, setErrors] = useState({});
 
   const { projectId } = useParams();
   const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchProjectName = async () => {
+      try {
+        const response = await axios.get(`http://localhost:5001/api/projects/name/${projectId}`);
+        console.log(response);
+        setProjectName(response.data.projectName);
+      } catch (error) {
+        console.error('Error fetching project name:', error);
+      }
+    };
+
+    fetchProjectName();
+  }, [projectId]); 
 
   const handleInputChange = (event) => {
     const { name, value } = event.target;
@@ -55,7 +70,7 @@ const CreateStatusReportForm = () => {
   
     // Check the date field
     if (!statusReport.date) {
-      newErrors.date = 'Date is required.';
+      newErrors.date = '*Date is required.';
     }
   
     // Check RAG status fields
@@ -63,26 +78,26 @@ const CreateStatusReportForm = () => {
       if (!statusReport[field]) {
         let fieldName = field.replace('Rag', ' RAG'); // Prepare field name for display
         fieldName = fieldName.charAt(0).toUpperCase() + fieldName.slice(1);
-        newErrors[field] = `${fieldName} is required.`;
+        newErrors[field] = `*${fieldName} is required.`;
       }
     });
   
     // Check the percentage field
     if (!statusReport.percentage) {
-      newErrors.percentage = 'Percentage Complete is required.';
+      newErrors.percentage = '*Percentage Complete is required.';
     } else if (isNaN(statusReport.percentage) || parseInt(statusReport.percentage) < 0 || parseInt(statusReport.percentage) > 100) {
-      newErrors.percentage = 'Percentage must be a number between 0 and 100.';
+      newErrors.percentage = '*Percentage must be a number between 0 and 100.';
     }
   
     // Check the start and end dates for not being empty and validation
     if (!statusReport.revisedStart) {
-      newErrors.revisedStart = 'Start date is required.';
+      newErrors.revisedStart = '*Start date is required.';
     }
   
     if (!statusReport.revisedEnd) {
-      newErrors.revisedEnd = 'End date is required.';
+      newErrors.revisedEnd = '*End date is required.';
     } else if (statusReport.revisedStart && new Date(statusReport.revisedStart) >= new Date(statusReport.revisedEnd)) {
-      newErrors.revisedEnd = 'End date must be after the start date.';
+      newErrors.revisedEnd = '*End date must be after the start date.';
     }
   
     return newErrors;
@@ -100,22 +115,24 @@ const CreateStatusReportForm = () => {
       <Navbar />
       <div className="container mx-auto p-8">
         <form onSubmit={handleSubmit} className="bg-white shadow-md rounded px-8 pt-6 pb-8 mb-4">
-          <h2 className="text-2xl font-bold text-gray-700 mb-4">{t('create_status_report_for_project')} {projectId}</h2>
+          <h2 className="text-2xl font-bold text-gray-700 mb-4">{t('create_status_report_for_project')} - {projectName || projectId}</h2>
           
           {/* Date Field */}
-          <div className="mb-4">
-            <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="date">
-              {t('date')}
-            </label>
-            <input
-              className={inputClass('date')}
-              id="date"
-              name="date"
-              type="date"
-              value={statusReport.date}
-              onChange={handleInputChange}
-            />
-            {errors.date && <p className="text-red-500 text-xs italic">{errors.date}</p>}
+          <div className="flex mb-4">
+            <div style={{ width: 'calc(33.666667% - 1rem)' }}>
+              <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="date">
+                {t('date')}
+              </label>
+              <input
+                className={inputClass('date')}
+                id="date"
+                name="date"
+                type="date"
+                value={statusReport.date}
+                onChange={handleInputChange}
+              />
+              {errors.date && <p className="text-red-500 text-xs italic">{errors.date}</p>}
+            </div>
           </div>
 
           {/* RAG Status Fields */}

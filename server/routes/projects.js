@@ -97,12 +97,29 @@ router.get('/:projectId', async (req, res) => {
     }
 });
 
+router.get('/name/:projectId', async (req, res) => {
+    const { projectId } = req.params;
+
+    try {
+        const query = 'SELECT name FROM project WHERE idproject = ?';
+        const [rows] = await db.promise().query(query, [projectId]);
+
+        if (rows.length > 0) {
+            res.json({ projectName: rows[0].name });
+        } else {
+            res.status(404).send('Project not found');
+        }
+    } catch (error) {
+        console.error('Error fetching project name:', error);
+        res.status(500).send('Error fetching project name');
+    }
+});
+
 // Update project details
 router.put('/update/:projectId', async (req, res) => {
     const { projectId } = req.params;
     const updateData = req.body;
 
-    // Start building the SQL query dynamically
     let query = 'UPDATE project SET ';
     let queryParams = [];
     for (let field in updateData) {
@@ -111,7 +128,7 @@ router.put('/update/:projectId', async (req, res) => {
             queryParams.push(updateData[field]);
         }
     }
-    query = query.slice(0, -2); // Remove the last comma and space
+    query = query.slice(0, -2);
     query += ' WHERE idproject = ?';
     queryParams.push(projectId);
 
