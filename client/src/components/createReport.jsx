@@ -84,9 +84,11 @@ const CreateStatusReportForm = () => {
   
     // Check the percentage field
     if (!statusReport.percentage) {
-      newErrors.percentage = '*Percentage Complete is required.';
+      newErrors.percentage = 'Percentage Complete is required.';
+    } else if (/^0[0-9].*$/.test(statusReport.percentage)) {
+      newErrors.percentage = '*Percentage cannot start with zero.';
     } else if (isNaN(statusReport.percentage) || parseInt(statusReport.percentage) < 0 || parseInt(statusReport.percentage) > 100) {
-      newErrors.percentage = '*Percentage must be a number between 0 and 100.';
+      newErrors.percentage = 'Percentage must be a number between 0 and 100.';
     }
   
     // Check the start and end dates for not being empty and validation
