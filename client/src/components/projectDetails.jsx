@@ -204,17 +204,6 @@ const ProjectDetails = () => {
     }
   };  
 
-  const handleDeleteProject = async () => {
-    try {
-        await axios.delete(`http://localhost:5001/api/projects/delete/${projectId}`);
-        console.log('Project deleted successfully');
-        navigate('/projects-overview');
-    } catch (error) {
-        console.error('Error deleting project:', error);
-        // Optionally, handle the error by showing an error message to the user
-    }
-  };
-
   const formatDate = (dateString) => {
     if (!dateString) return ''; // Return empty if no date is provided
     const date = new Date(dateString);
