@@ -90,7 +90,7 @@ export default function UserOverview() {
     };
 
     const handleBackClick = () => {
-        navigate(-1);
+        navigate('/dashboard');
     };
 
     const handleCreateClick = () => {

@@ -110,7 +110,7 @@ const ProjectDetails = () => {
   }
 
   const handleBackClick = () => {
-    navigate(-1);
+    navigate('/projects-overview');
   };
 
   const handleInputChange = (event) => {
@@ -120,14 +120,6 @@ const ProjectDetails = () => {
       [name]: value
     }));
   };
-
-  const handleResourceSelect = (resourceId, type) => {
-    if (type === 'businessOwner') {
-      setSelectedBusinessOwner(resourceId);
-    } else if (type === 'projectManager') {
-      setSelectedProjectManager(resourceId);
-    }
-  };  
 
   const validateForm = () => {
     let newErrors = {};

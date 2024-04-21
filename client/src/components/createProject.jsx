@@ -152,6 +152,10 @@ export default function CreateProject() {
         }
     };      
 
+    const handleCancel = () => {
+        navigate('/projects-overview');
+    };    
+
     const inputClass = (field) => `shadow appearance-none border ${!formData[field] && submitAttempted ? 'border-red-500' : 'border-gray-300'} rounded w-full py-2 px-3 text-gray-700 leading-tight focus:outline-none focus:shadow-outline`;
 
     return (
@@ -365,11 +369,23 @@ export default function CreateProject() {
                         </div>
                     </div>
 
-                    <div className="flex items-center justify-between">
+                    <div className="bg-gray-50 px-4 pt-3 sm:flex sm:justify-end">
+                        {/* Cancel Button */}
+                        <button
+                            type="button"
+                            onClick={handleCancel} // Replace with your actual method for handling the cancel action
+                            className="mr-3 inline-flex justify-center px-4 py-2 text-base font-medium text-blue-600 hover:text-blue-800 focus:outline-none sm:text-sm"
+                            style={{ textDecoration: 'none' }}
+                            onMouseOver={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                            onMouseOut={(e) => e.currentTarget.style.textDecoration = 'none'}
+                        >
+                            {t('cancel')}
+                        </button>
+
+                        {/* Submit Button */}
                         <button
                             type="submit"
-                            className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded"
-                        >
+                            className="w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:w-auto sm:text-sm">
                             {t('create_project')}
                         </button>
                     </div>

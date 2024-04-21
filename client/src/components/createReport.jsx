@@ -223,19 +223,23 @@ const CreateStatusReportForm = () => {
               {errors.revisedEnd && <p className="text-red-500 text-xs italic">{errors.revisedEnd}</p>}
             </div>
           </div>
-
           {/* Submit and Cancel Buttons */}
-          <div className="flex items-center justify-between mt-4">
+          <div className="bg-gray-50 px-4 pt-3 sm:flex sm:flex-row-reverse">
+            {/* Submit Button */}
             <button
               type="submit"
-              className="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
-            >
+              className="w-auto inline-flex justify-center rounded-md border border-transparent shadow-sm px-4 py-2 bg-blue-600 text-base font-medium text-white hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-blue-500 sm:ml-3 sm:w-auto sm:text-sm">
               {t('save')}
             </button>
+
+            {/* Cancel Button */}
             <button
               type="button"
               onClick={handleCancel}
-              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded focus:outline-none focus:shadow-outline"
+              className="mt-3 w-full inline-flex justify-center rounded-md border border-transparent px-4 py-2 text-base font-medium text-blue-600 hover:text-blue-800 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+              style={{ textDecoration: 'none' }}
+              onMouseOver={(e) => e.currentTarget.style.textDecoration = 'underline'}
+              onMouseOut={(e) => e.currentTarget.style.textDecoration = 'none'}
             >
               {t('cancel')}
             </button>
