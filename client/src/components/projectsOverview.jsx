@@ -174,7 +174,7 @@ const ProjectsOverview = () => {
             <Navbar />
             <div className="container mx-auto py-8">
                 <div className="flex justify-between items-center mb-4">
-                    <button onClick={handleBackClick} className="py-2 px-4 bg-gray-300 hover:bg-gray-400 text-black font-bold rounded">
+                    <button onClick={handleBackClick} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
                         {t("back")}
                     </button>
                     <div className="flex items-center gap-2">
@@ -276,14 +276,14 @@ const ProjectsOverview = () => {
                             <thead className={`sticky top-0 text-white ${headerColors[phaseIndex % headerColors.length]} text-left text-sm`}>
                                     <tr>
                                         <th style={{ width: '25%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('project_name')}</th>
-                                        <th style={{ width: '2%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('status')}</th>
+                                        <th style={{ width: '1%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('status')}</th>
                                         <th style={{ width: '15%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('business_owner')}</th>
                                         <th style={{ width: '15%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('project_manager')}</th>
                                         <th style={{ width: '19%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('phase_timeline')}</th>
-                                        <th style={{ width: '2%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('scope')}</th>
-                                        <th style={{ width: '2%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('time')}</th>
-                                        <th style={{ width: '2%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('cost')}</th>
-                                        <th style={{ width: '17%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('budget_approved')} USD($)</th>
+                                        <th style={{ width: '1%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('scope')}</th>
+                                        <th style={{ width: '1%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('time')}</th>
+                                        <th style={{ width: '1%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('cost')}</th>
+                                        <th style={{ width: '21%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('budget_approved')} USD($)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
