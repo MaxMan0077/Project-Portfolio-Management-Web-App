@@ -148,14 +148,8 @@ const ProjectsOverview = () => {
     };
 
     const formatBudget = (budget) => {
-        if (budget >= 1000000) {
-            return `$${(budget / 1000000).toFixed(1)}M`;
-        } else if (budget >= 1000) {
-            return `$${(budget / 1000).toFixed(1)}K`;
-        } else {
-            return `$${budget}`;
-        }
-    };
+        return budget.toLocaleString(); // This will use the browser's default locale to format the number
+    };    
 
     const getRAGColor = (rag) => {
         switch (rag) {
@@ -282,14 +276,14 @@ const ProjectsOverview = () => {
                             <thead className={`sticky top-0 text-white ${headerColors[phaseIndex % headerColors.length]} text-left text-sm`}>
                                     <tr>
                                         <th style={{ width: '25%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('project_name')}</th>
-                                        <th style={{ width: '5%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('status')}</th>
+                                        <th style={{ width: '3%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('status')}</th>
                                         <th style={{ width: '15%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('business_owner')}</th>
                                         <th style={{ width: '15%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('project_manager')}</th>
                                         <th style={{ width: '15%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('phase_timeline')}</th>
                                         <th style={{ width: '3%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('scope')}</th>
                                         <th style={{ width: '3%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('time')}</th>
                                         <th style={{ width: '3%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('cost')}</th>
-                                        <th style={{ width: '15%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('budget_approved')}</th>
+                                        <th style={{ width: '17%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('budget_approved')} USD($)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
