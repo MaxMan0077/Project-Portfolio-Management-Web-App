@@ -20,6 +20,7 @@ const ProjectDetails = () => {
   const [resources, setResources] = useState([]);
   const [selectedBusinessOwner, setSelectedBusinessOwner] = useState('');
   const [selectedProjectManager, setSelectedProjectManager] = useState('');
+  const [selectedStatus, setSelectedStatus] = useState('');
   const [errors, setErrors] = useState({});
   const [editFormData, setEditFormData] = useState({
     businessOwner: '',
@@ -28,9 +29,11 @@ const ProjectDetails = () => {
     budget: '',
     phaseStart: '',
     phaseEnd: '',
-    location: '', // Added for location
-    description: '' // Added for description
-  });  
+    location: '',
+    description: '',
+    status: ''
+  });
+  
 
   const fetchProjectDetails = async () => {
     try {
@@ -105,6 +108,16 @@ const ProjectDetails = () => {
     fetchResources();
   }, []);
 
+  useEffect(() => {
+    if (project) {
+      setSelectedStatus(project.status || '');
+      setEditFormData(prev => ({
+        ...prev,
+        status: project.status || ''
+      }));
+    }
+  }, [project]);
+
   if (!project) {
     return <div className="text-center mt-5">Loading project details...</div>;
   }
@@ -132,6 +145,7 @@ const ProjectDetails = () => {
     if (!editFormData.phaseEnd) newErrors.phaseEnd = 'Phase end date is required';
     if (!editFormData.location) newErrors.location = 'Location is required';
     if (!editFormData.description) newErrors.description = 'Description is required';
+    if (!selectedStatus) newErrors.status = 'Status is required';
 
     // Budget must not be negative
     if (parseFloat(editFormData.budget) < 0) newErrors.budget = 'Budget cannot be negative';
@@ -164,7 +178,8 @@ const ProjectDetails = () => {
       { key: 'phase', value: editFormData.phase, initial: project.phase },
       { key: 'budget_approved', value: parseFloat(editFormData.budget), initial: parseFloat(project.budget_approved) },
       { key: 'location', value: editFormData.location, initial: project.location },
-      { key: 'description', value: editFormData.description, initial: project.description }
+      { key: 'description', value: editFormData.description, initial: project.description },
+      { key: 'status', value: selectedStatus, initial: project.status }
     ];
   
     fieldsToUpdate.forEach(field => {
@@ -201,6 +216,18 @@ const ProjectDetails = () => {
     const date = new Date(dateString);
     return `${date.getDate().toString().padStart(2, '0')}/${(date.getMonth() + 1).toString().padStart(2, '0')}/${date.getFullYear()}`;
   };
+
+  const StatusCircle = ({ status }) => {
+    const statusColor = {
+      Red: 'bg-red-500',
+      Amber: 'bg-yellow-500',
+      Green: 'bg-green-500'
+    }[status] || 'bg-gray-300';
+  
+    return (
+      <div className={`w-6 h-6 rounded-full ${statusColor}`} title={status}></div>
+    );
+  };  
 
   const handleCreateStatusReportClick = () => {
     navigate(`/project/${projectId}/create-status-report`);
@@ -247,7 +274,7 @@ const ProjectDetails = () => {
         <div className="text-center mb-10">
           <h1 className="text-5xl font-bold">{project.name}</h1>
         </div>
-        <div className="flex justify-between items-start gap-4 mb-3 flex-wrap">
+        <div className="flex justify-between items-start gap-2 mb-3 flex-wrap">
           {[
             { label: t('phase'), value: t(project.phase) },
             { label: t('budget_approved'), value: `$${project.budget_approved}` },
@@ -255,7 +282,8 @@ const ProjectDetails = () => {
             { label: t('project_manager'), value: projectManagerName },
             { label: t('business_owner'), value: businessOwnerName },
             { label: t('phase_start_date'), value: formatDate(project.phase_start) },
-            { label: t('phase_end_date'), value: formatDate(project.phase_end) }
+            { label: t('phase_end_date'), value: formatDate(project.phase_end) },
+            { label: t('status'), value: <StatusCircle status={project.status} /> }
           ].map((item, index) => (
             <div key={index} className="info-item bg-gray-200 p-4 rounded shadow flex-grow">
               <div className="font-bold mb-1">{item.label}:</div>
@@ -403,6 +431,23 @@ const ProjectDetails = () => {
                         <option value="Closed">{t('closed')}</option>
                       </select>
                       {errors.phase && <p className="text-red-500 text-xs italic">{errors.phase}</p>}
+
+                      <label className="block text-gray-700 text-sm font-bold mb-2 mt-2" htmlFor="status">
+                        {t('status')}
+                      </label>
+                      <select
+                        id="status"
+                        name="status"
+                        value={selectedStatus}
+                        onChange={(e) => setSelectedStatus(e.target.value)}
+                        className={inputClass('status')}
+                      >
+                        <option value="">{t('select_status')}</option>
+                        <option value="Red">{t('Red')}</option>
+                        <option value="Amber">{t('Amber')}</option>
+                        <option value="Green">{t('Green')}</option>
+                      </select>
+                      {errors.status && <p className="text-red-500 text-xs italic">{errors.status}</p>}
 
                       <label className="block text-gray-700 text-sm font-bold mb-2 mt-2" htmlFor="budget">
                         {t('budget_approved')}

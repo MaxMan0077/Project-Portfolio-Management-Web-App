@@ -24,7 +24,7 @@ export default function Dashboard() {
     const totalBudget = 10000000;
     const PHASE_COLORS = ['#FCDA0D', '#F99B21', '#FF4B3D', '#9DB0AC', '#000000'];
     const REGION_COLORS = ['#9DB0AC', '#C69C02', '#F99B21', '#9E0B00'];
-    const COMPLEXITY_COLORS = ['#00CC25', '#F8B800', '#E52800'];
+    const COMPLEXITY_COLORS = ['#00B51B', '#F8B800', '#E52800'];
 
 
     useEffect(() => {
