@@ -22,7 +22,10 @@ export default function Dashboard() {
 
     // Hardcoded total budget
     const totalBudget = 10000000;
-    const COLORS = ['#0088FE', '#00C49F', '#FFBB28', '#FF8042', '#A4A4A4'];
+    const PHASE_COLORS = ['#FCDA0D', '#F99B21', '#FF4B3D', '#9DB0AC', '#000000'];
+    const REGION_COLORS = ['#9DB0AC', '#C69C02', '#F99B21', '#9E0B00'];
+    const COMPLEXITY_COLORS = ['#00CC25', '#F8B800', '#E52800'];
+
 
     useEffect(() => {
       setIsFadingIn(true);
@@ -175,16 +178,16 @@ export default function Dashboard() {
     const dataByComplexitySorted = sortData(generateChartData(projects, 'complexity'), complexityOrder);
 
 
-    const CustomLegend = ({ data }) => (
+    const CustomLegend = ({ data, colors }) => (
       <div className="legend flex flex-col justify-center">
-        {data.map((entry, index) => (
-          <div key={index} className="flex items-center mb-1">
-            <div className="w-3 h-3 mr-2" style={{ backgroundColor: COLORS[index % COLORS.length] }}></div>
-            <div className="text-sm">{t(entry.name)}</div>
-          </div>
-        ))}
+          {data.map((entry, index) => (
+              <div key={index} className="flex items-center mb-1">
+                  <div className="w-3 h-3 mr-2" style={{ backgroundColor: colors[index % colors.length] }}></div>
+                  <div className="text-sm">{t(entry.name)}</div>
+              </div>
+          ))}
       </div>
-    );    
+  );    
 
     const renderCustomTooltip = ({ active, payload }) => {
       if (active && payload && payload.length) {
@@ -197,7 +200,7 @@ export default function Dashboard() {
       return null;
     };
           
-    const renderPieChart = (data, name) => (
+    const renderPieChart = (data, name, colors) => (
       <div className="p-4" style={{ width: "420px" }}>
           <div className="bg-white rounded shadow flex p-4 justify-start items-center">
               <div>
@@ -216,17 +219,17 @@ export default function Dashboard() {
                           label={name === 'Phase' ? (props) => renderCustomLabel(props, totalProjects) : undefined}
                           labelLine={false}
                       >
-                          {data.map((entry, index) => <Cell key={`cell-${index}`} fill={COLORS[index % COLORS.length]} />)}
+                          {data.map((entry, index) => <Cell key={`cell-${index}`} fill={colors[index % colors.length]} />)}
                       </Pie>
                       <Tooltip content={renderCustomTooltip} />
                   </PieChart>
               </div>
               <div className="ml-1 mt-14">
-                  <CustomLegend data={data} />
+                  <CustomLegend data={data} colors={colors} />
               </div>
           </div>
       </div>
-    );
+    );  
 
     const renderCustomLabel = ({ cx, cy }, total) => (
       <text x={cx} y={cy} fill="#333" fontSize="42" fontWeight="bold" textAnchor="middle" dominantBaseline="central">
@@ -255,9 +258,9 @@ export default function Dashboard() {
                 </div>
               </div>
               <div className="flex flex-wrap justify-around">
-                {renderPieChart(dataByPhaseSorted, 'Phase')}
-                {renderPieChart(dataByLocation, 'Region')}
-                {renderPieChart(dataByComplexitySorted, 'Complexity')}
+                {renderPieChart(dataByPhaseSorted, 'Phase', PHASE_COLORS)}
+                {renderPieChart(dataByLocation, 'Region', REGION_COLORS)}
+                {renderPieChart(dataByComplexitySorted, 'Complexity', COMPLEXITY_COLORS)}
               </div>
             </div>
             <div className="mt-1 px-5">
