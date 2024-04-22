@@ -52,10 +52,10 @@ const KanbanCard = ({ project, index }) => {
   };  
   
   const locationColorMap = {
-    'Americas': '#9E0B00', // Example color code for Americas
-    'Europe': '#9DB0AC', // Example color code for Europe
-    'Asia-Pacific': '#F99B21', // Example color code for Asia-Pacific
-    'Middle-East & Africa': '#C69C02' // Example color code for Middle-East & Africa
+    'Americas': '#9E0B00',
+    'Europe': '#9DB0AC',
+    'Asia-Pacific': '#F99B21',
+    'Middle-East & Africa': '#C69C02'
   };
 
   const colorStripStyle = {
@@ -65,8 +65,8 @@ const KanbanCard = ({ project, index }) => {
     position: 'absolute',
     top: '0',
     left: '0',
-    borderTopLeftRadius: '8px', // Adjust to your card's border radius
-    borderTopRightRadius: '8px' // Adjust to your card's border radius
+    borderTopLeftRadius: '8px',
+    borderTopRightRadius: '8px'
   };
 
   const statusColor = {
@@ -92,10 +92,10 @@ const KanbanCard = ({ project, index }) => {
             <h3 
               className="font-bold text-base mb-2" 
               style={{
-                wordBreak: 'keep-all', // Keeps words from breaking
-                overflowWrap: 'break-word', // Allows long words to break and wrap to the next line
-                maxWidth: 'calc(100% - 5rem)', // Adjust the 5rem based on the size of your right-side content + desired padding
-                marginRight: '4rem' // Ensure there's space for the business owner's photo
+                wordBreak: 'keep-all',
+                overflowWrap: 'break-word',
+                maxWidth: 'calc(100% - 5rem)',
+                marginRight: '4rem'
               }}
             >
               {project.name}
