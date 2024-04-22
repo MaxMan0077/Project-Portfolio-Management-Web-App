@@ -175,12 +175,6 @@ export default function UserOverview() {
             <Navbar />
             <div className="container mx-auto p-8">
                 <div className="flex justify-between items-center mb-4">
-                    <button
-                        onClick={handleBackClick}
-                        className="py-2 px-4 bg-gray-300 hover:bg-gray-400 text-black font-bold rounded"
-                    >
-                        {t('back')}
-                    </button>
                     <label htmlFor="toggleSearch" className="flex items-center cursor-pointer">
                         <div className="relative">
                             <input id="toggleSearch" type="checkbox" className="sr-only" onChange={toggleSearchType} checked={!isSearchingUsers} />
