@@ -44,7 +44,11 @@ const KanbanCard = ({ project, index }) => {
   };  
 
   const formatBudget = (budget) => {
-    return budget ? `Budget: $${Math.round(Number(budget))}` : t('not_applicable');
+    // Check for zero or equivalent values like "0", "", null, or undefined
+    if (Number(budget) === 0) {
+      return 'Budget USD: 0';
+    }
+    return budget ? `Budget USD: ${Math.round(Number(budget)).toLocaleString()}` : t('not_applicable');
   };  
   
   const locationColorMap = {
@@ -82,16 +86,26 @@ const KanbanCard = ({ project, index }) => {
         >
           {/* Color strip */}
           <div style={colorStripStyle}></div>
-  
+
           {/* Content below the color strip */}
-          <div className="mt-4">
-            <h3 className="font-bold text-l mb-2">{project.name}</h3>
+          <div className="mt-7">
+            <h3 
+              className="font-bold text-base mb-2" 
+              style={{
+                wordBreak: 'keep-all', // Keeps words from breaking
+                overflowWrap: 'break-word', // Allows long words to break and wrap to the next line
+                maxWidth: 'calc(100% - 5rem)', // Adjust the 5rem based on the size of your right-side content + desired padding
+                marginRight: '4rem' // Ensure there's space for the business owner's photo
+              }}
+            >
+              {project.name}
+            </h3>
             <p>{formatBudget(project.budget_approved)}</p>
             <p>{formatDate(project.phase_end)}</p>
           </div>
-  
+
           {/* Photo of the Project Manager and first name */}
-          <div className="absolute top-0 right-0 mt-1.5 mr-2 flex items-center">
+          <div className="absolute top-1 right-0 mr-2 flex items-center">
             <span className="mr-2.5 font-semibold">{businessOwnerName}</span>
             <img
               src={photoUrl}
@@ -99,7 +113,7 @@ const KanbanCard = ({ project, index }) => {
               className="w-16 h-16 rounded-full border-2 border-white shadow"
             />
           </div>
-  
+
           {/* RAG Status Indicator */}
           <div className="absolute bottom-4 right-6">
             <span className={`block w-7 h-7 rounded-full ${statusColor}`}></span>
