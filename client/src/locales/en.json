@@ -199,5 +199,8 @@
   "Phase": "Phase",
   "Region": "Region",
   "Complexity": "Complexity",
-  "search": "Search"
+  "search": "Search",
+  "are_sure": "Are you sure you want to delete this project?",
+  "confirm_delete": "Confirm Deletion",
+  "clear_filters": "Clear Filters"
 }

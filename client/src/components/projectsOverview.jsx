@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react';
 import axios from 'axios';
 import { useNavigate } from 'react-router-dom';
 import Navbar from './navbar';
+import Dropdown from './dropdown';
 import { useIntl } from 'react-intl';
 
 
@@ -15,6 +16,9 @@ const ProjectsOverview = () => {
     const [ragStatuses, setRagStatuses] = useState({});
     const [searchTerm, setSearchTerm] = useState('');
     const [isFilterVisible, setIsFilterVisible] = useState(false);
+    const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+    const [selectedProjectId, setSelectedProjectId] = useState(null);
+    const [allResources, setAllResources] = useState([]);
     // Initialize state for each filter
     const [locationFilter, setLocationFilter] = useState('');
     const [statusFilter, setStatusFilter] = useState('');
@@ -22,6 +26,8 @@ const ProjectsOverview = () => {
     const [businessOwnerFilter, setBusinessOwnerFilter] = useState('');
     const [programFilter, setProgramFilter] = useState('');
     const headerColors = ['bg-yellow-400', 'bg-amber-500', 'bg-red-500', 'bg-gray-400', 'bg-gray-950'];
+    const locations = ["Americas", "Europe", "Asia-Pacific", "Middle-East & Africa"];
+    const statusOptions = ["Red", "Amber", "Green"];
    
     const fetchPhoto = async (resourceId) => {
         try {
@@ -99,7 +105,20 @@ const ProjectsOverview = () => {
 
     useEffect(() => {
         fetchProjectsAndDetails(); // This function will utilize the above-defined functions.
-      }, []);
+    }, []);
+    
+    useEffect(() => {
+        const fetchResources = async () => {
+          try {
+            const response = await axios.get('http://localhost:5001/api/resources/getall');
+            setAllResources(response.data);
+          } catch (error) {
+            console.error("There was an error fetching resources:", error);
+          }
+        };
+      
+        fetchResources();
+    }, []);
 
     const handleBackClick = () => {
         navigate('/dashboard');
@@ -117,30 +136,65 @@ const ProjectsOverview = () => {
         setSearchTerm(e.target.value);
     };
 
-    const handleDeleteProject = async (projectId) => {
-        try {
-            await axios.delete(`http://localhost:5001/api/projects/delete/${projectId}`);
-            setProjects(prevProjects => prevProjects.filter(project => project.idproject !== projectId));
-        } catch (error) {
-            console.error('Error deleting project:', error);
-        }
+    const handleDeleteProject = (projectId, event) => {
+        event.stopPropagation(); // Stop the event from bubbling up to higher-level components
+        setSelectedProjectId(projectId);
+        setIsDeleteModalOpen(true);
     };
 
-    // Simplified filteredProjects to only filter by project name
-    const filteredProjects = projects.filter(project => 
-        project.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
+    const confirmDeleteProject = async () => {
+        if (selectedProjectId) {
+            try {
+                await axios.delete(`http://localhost:5001/api/projects/delete/${selectedProjectId}`);
+                setProjects(prevProjects => prevProjects.filter(project => project.idproject !== selectedProjectId));
+                setIsDeleteModalOpen(false); // Close the modal on successful deletion
+            } catch (error) {
+                console.error('Error deleting project:', error);
+            }
+        }
+    };    
+
+    const DeleteConfirmationModal = () => {
+        if (!isDeleteModalOpen) return null;
+    
+        return (
+            <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+                <div className="bg-white p-4 rounded-lg shadow-xl">
+                    <h4 className="font-semibold text-lg">{t("confirm_delete")}</h4>
+                    <p className="my-4">{t("are_sure")}</p>
+                    <div className="flex justify-end space-x-4">
+                        <button 
+                            onClick={() => setIsDeleteModalOpen(false)}
+                            className="mt-3 w-full inline-flex justify-center px-4 py-2 text-base font-medium text-blue-600 hover:text-blue-800 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+                            style={{ textDecoration: 'none' }}
+                            onMouseOver={(e) => e.currentTarget.style.textDecoration = 'underline'}
+                            onMouseOut={(e) => e.currentTarget.style.textDecoration = 'none'}
+                        >
+                            {t("cancel")}
+                        </button>
+                        <button 
+                            onClick={confirmDeleteProject}
+                            className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                        >
+                            {t("delete")}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    };     
+
+    const filteredProjects = projects.filter(project =>
+        project.name.toLowerCase().includes(searchTerm.toLowerCase()) &&
+        (!locationFilter || project.location === locationFilter) &&
+        (!statusFilter || project.status === statusFilter) &&
+        (!projectManagerFilter || project.project_manager === projectManagerFilter) &&
+        (!businessOwnerFilter || project.business_owner === businessOwnerFilter)
+    );        
 
     const getProjectsByPhase = (phase) => {
-        // Apply additional filters if they are set
-        return filteredProjects.filter(project => {
-            return project.phase.toLowerCase() === phase.toLowerCase() &&
-                (locationFilter ? project.location === locationFilter : true) &&
-                (statusFilter ? project.status === statusFilter : true) &&
-                (projectManagerFilter ? project.project_manager.includes(projectManagerFilter) : true) &&
-                (businessOwnerFilter ? project.business_owner.includes(businessOwnerFilter) : true);
-        });
-    };
+        return filteredProjects.filter(project => project.phase.toLowerCase() === phase.toLowerCase());
+    };    
 
     const formatDate = (dateString) => {
         const options = { day: '2-digit', month: 'short', year: 'numeric' };
@@ -172,6 +226,7 @@ const ProjectsOverview = () => {
     return (
             <>
             <Navbar />
+            <DeleteConfirmationModal />
             <div className="py-8 px-5">
                 <div className="flex justify-between items-center mb-4 px-4 lg:px-8">
                 <button onClick={handleBackClick} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
@@ -195,73 +250,76 @@ const ProjectsOverview = () => {
                 </div>
                 {isFilterVisible && (
                     <div className="bg-white p-4 mb-4 shadow rounded">
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
-                            <div>
+                        <div className="flex flex-wrap justify-center gap-4">
+                            <div className="w-1/5">
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="locationFilter">
                                     {t("location")}
                                 </label>
-                                <input
-                                    type="text"
+                                <select
                                     id="locationFilter"
-                                    placeholder={t("location")}
+                                    className="border py-3 rounded w-full"  // Increased vertical padding
                                     value={locationFilter}
                                     onChange={(e) => setLocationFilter(e.target.value)}
-                                    className="border p-2 rounded w-full"
-                                />
+                                >
+                                    <option value="">{t("select_location")}</option>
+                                    {locations.map(location => (
+                                        <option key={location} value={location}>{location}</option>
+                                    ))}
+                                </select>
                             </div>
-                            <div>
-                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="programFilter">
-                                    {t("program")}
-                                </label>
-                                <input
-                                    type="text"
-                                    id="programFilter"
-                                    placeholder={t("program")}
-                                    value={programFilter}
-                                    onChange={(e) => setProgramFilter(e.target.value)}
-                                    className="border p-2 rounded w-full"
-                                />
-                            </div>
-                            <div>
+
+                            <div className="w-1/5">
                                 <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="statusFilter">
                                     {t("status")}
                                 </label>
                                 <select
                                     id="statusFilter"
-                                    className="border p-2 rounded w-full"
+                                    className="border py-3 rounded w-full"  // Increased vertical padding
                                     value={statusFilter}
                                     onChange={(e) => setStatusFilter(e.target.value)}
                                 >
                                     <option value="">{t("select_status")}</option>
-                                    {/* Dynamically generated options */}
+                                    {statusOptions.map(option => (
+                                        <option key={option} value={option}>{option}</option>
+                                    ))}
                                 </select>
                             </div>
-                            <div>
-                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="projectManagerFilter">
-                                    {t("project_manager")}
-                                </label>
-                                <input
-                                    type="text"
-                                    id="projectManagerFilter"
-                                    placeholder={t("project_manager")}
-                                    value={projectManagerFilter}
-                                    onChange={(e) => setProjectManagerFilter(e.target.value)}
-                                    className="border p-2 rounded w-full"
-                                />
-                            </div>
-                            <div>
-                                <label className="block text-gray-700 text-sm font-bold mb-2" htmlFor="businessOwnerFilter">
+
+                            <div className="w-1/5">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
                                     {t("business_owner")}
                                 </label>
-                                <input
-                                    type="text"
-                                    id="businessOwnerFilter"
-                                    placeholder={t("business_owner")}
-                                    value={businessOwnerFilter}
-                                    onChange={(e) => setBusinessOwnerFilter(e.target.value)}
-                                    className="border p-2 rounded w-full"
+                                <Dropdown
+                                    resources={allResources}
+                                    selectedResourceId={businessOwnerFilter}
+                                    onSelect={setBusinessOwnerFilter}
+                                    isValid={true}
                                 />
                             </div>
+                            <div className="w-1/5">
+                                <label className="block text-gray-700 text-sm font-bold mb-2">
+                                    {t("project_manager")}
+                                </label>
+                                <Dropdown
+                                    resources={allResources}
+                                    selectedResourceId={projectManagerFilter}
+                                    onSelect={setProjectManagerFilter}
+                                    isValid={true}
+                                />
+                            </div>
+                        </div>
+                        <div className="flex justify-center mt-4">
+                            <button
+                                onClick={() => {
+                                    setLocationFilter('');
+                                    setStatusFilter('');
+                                    setProjectManagerFilter('');
+                                    setBusinessOwnerFilter('');
+                                }}
+                                className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+                            >
+                                {t("clear_filters")}
+                            </button>
                         </div>
                     </div>
                 )}
@@ -329,7 +387,7 @@ const ProjectsOverview = () => {
                                                     <td className="pl-16 pr-5 py-2 border-b border-gray-200 text-sm flex justify-between items-center" style={{paddingBottom: 'calc(0.5rem + 3px)'}}>
                                                         {formatBudget(project.budget_approved)}
                                                         <button 
-                                                            onClick={(e) => { e.stopPropagation(); handleDeleteProject(project.idproject); }} 
+                                                            onClick={(e) => handleDeleteProject(project.idproject, e)}
                                                             className="delete-btn ml-4 text-red-500 hover:text-red-700 opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out"
                                                         >
                                                             <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
