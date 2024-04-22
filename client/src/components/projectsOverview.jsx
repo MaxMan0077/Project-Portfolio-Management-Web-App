@@ -340,7 +340,7 @@ const ProjectsOverview = () => {
                                         <th className="px-4 py-1.5 border-b-2 border-gray-200 tracking-wider" style={{ width: '3%', maxWidth: '3%' }}>{t('scope')}</th>
                                         <th className="px-4 py-1.5 border-b-2 border-gray-200 tracking-wider" style={{ width: '3%', maxWidth: '3%' }}>{t('time')}</th>
                                         <th className="px-4 py-1.5 border-b-2 border-gray-200 tracking-wider" style={{ width: '3%', maxWidth: '3%' }}>{t('cost')}</th>
-                                        <th className="px-16 py-1.5 border-b-2 border-gray-200 tracking-wider" style={{ width: '11%', maxWidth: '11%' }}>{t('budget')} USD($)</th>
+                                        <th className="px-16 py-1.5 border-b-2 border-gray-200 tracking-wider" style={{ width: '11%', maxWidth: '11%' }}>{t('budget')} USD</th>
                                     </tr>
                                 </thead>
                                 <tbody>

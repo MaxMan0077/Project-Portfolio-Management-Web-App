@@ -282,7 +282,7 @@ export default function Dashboard() {
                       <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider text-center">{t('time')}</th>
                       <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider text-center">{t('cost')}</th>
                       {/* Budget Column */}
-                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('budget_approved')}</th>
+                      <th className="px-5 py-3 border-b-2 border-gray-200 tracking-wider">{t('budget')} USD</th>
                     </tr>
                   </thead>
                   <tbody>
