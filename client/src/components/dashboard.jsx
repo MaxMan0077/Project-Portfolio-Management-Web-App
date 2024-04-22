@@ -268,7 +268,7 @@ export default function Dashboard() {
               <div className="text-left mb-5">
                 <h2 className="text-3xl font-bold">{t('active_projects')}</h2>
               </div>
-              <div style={{ maxHeight: 'calc(60px * 7)', overflowY: 'auto' }}>
+              <div style={{ maxHeight: 'calc(60px * 8)', overflowY: 'auto' }}>
                 <table className="min-w-full leading-normal w-full">
                   <thead className="sticky top-0 text-white bg-blue-500 text-left text-sm">
                     <tr>
