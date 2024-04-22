@@ -369,7 +369,7 @@ export default function CreateProject() {
                         </div>
                     </div>
 
-                    <div className="bg-gray-50 px-4 pt-3 sm:flex sm:justify-end">
+                    <div className="px-4 pt-3 sm:flex sm:justify-end">
                         {/* Cancel Button */}
                         <button
                             type="button"

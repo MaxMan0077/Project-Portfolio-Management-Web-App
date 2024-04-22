@@ -458,7 +458,7 @@ const ProjectDetails = () => {
                     </div>
                   </div>
                 </div>
-                <div className="bg-gray-50 pl-4 py-3 sm:flex sm:flex-row-reverse">
+                <div className="pl-4 py-3 sm:flex sm:flex-row-reverse">
                   {/* Save Button */}
                   <button
                     type="submit"

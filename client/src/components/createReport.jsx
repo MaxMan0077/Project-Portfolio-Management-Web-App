@@ -243,7 +243,7 @@ const CreateStatusReportForm = () => {
             </div>
           </div>
           {/* Submit and Cancel Buttons */}
-          <div className="bg-gray-50 px-4 pt-3 sm:flex sm:flex-row-reverse">
+          <div className="px-4 pt-3 sm:flex sm:flex-row-reverse">
             {/* Submit Button */}
             <button
               type="submit"
