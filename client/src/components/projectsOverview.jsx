@@ -170,30 +170,29 @@ const ProjectsOverview = () => {
     ];
 
     return (
-        <>
+            <>
             <Navbar />
-            <div className="container mx-auto py-8">
-                <div className="flex justify-between items-center mb-4">
-                    <button onClick={handleBackClick} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
-                        {t("back")}
-                    </button>
-                    <div className="flex items-center gap-2">
-                        <input
-                            type="text"
-                            placeholder={t("search_by_project_name")}
-                            value={searchTerm}
-                            onChange={handleSearchChange}
-                            className="border p-2 w-96"
-                        />
-                        <button onClick={() => setIsFilterVisible(!isFilterVisible)} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
-                            {t("filters")}
-                        </button>
-                    </div>
-                    <button onClick={handleCreateProjectClick} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
-                        {t("create_project")}
+            <div className="py-8 px-5">
+                <div className="flex justify-between items-center mb-4 px-4 lg:px-8">
+                <button onClick={handleBackClick} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
+                    {t("back")}
+                </button>
+                <div className="flex items-center gap-2">
+                    <input
+                    type="text"
+                    placeholder={t("search_by_project_name")}
+                    value={searchTerm}
+                    onChange={handleSearchChange}
+                    className="border p-2 w-96"
+                    />
+                    <button onClick={() => setIsFilterVisible(!isFilterVisible)} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
+                    {t("filters")}
                     </button>
                 </div>
-        
+                <button onClick={handleCreateProjectClick} className="py-2 px-4 bg-blue-500 hover:bg-blue-700 text-white font-bold rounded">
+                    {t("create_project")}
+                </button>
+                </div>
                 {isFilterVisible && (
                     <div className="bg-white p-4 mb-4 shadow rounded">
                         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4">
@@ -272,18 +271,18 @@ const ProjectsOverview = () => {
                     <div key={phase} className="mb-8 w-full">
                         <h2 className="text-xl font-bold mb-3">{t(phase)}</h2>
                         <div className="overflow-y-auto max-h-[calc(6*4.5rem)]">
-                        <table className="min-w-full leading-normal w-full">
+                        <table className="min-w-full leading-normal w-full table-fixed">
                             <thead className={`sticky top-0 text-white ${headerColors[phaseIndex % headerColors.length]} text-left text-sm`}>
                                     <tr>
-                                        <th style={{ width: '25%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('project_name')}</th>
-                                        <th style={{ width: '1%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('status')}</th>
-                                        <th style={{ width: '15%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('business_owner')}</th>
-                                        <th style={{ width: '15%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('project_manager')}</th>
-                                        <th style={{ width: '19%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('phase_timeline')}</th>
-                                        <th style={{ width: '1%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('scope')}</th>
-                                        <th style={{ width: '1%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('time')}</th>
-                                        <th style={{ width: '1%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider text-center">{t('cost')}</th>
-                                        <th style={{ width: '21%' }} className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider">{t('budget_approved')} USD($)</th>
+                                        <th className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider" style={{ width: '20%', maxWidth: '28%', minWidth: '28% !important' }}>{t('project_name')}</th>
+                                        <th className="px-3 py-1.5 border-b-2 border-gray-200 tracking-wider" style={{ width: '3%', maxWidth: '3%' }}>{t('status')}</th>
+                                        <th className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider" style={{ width: '15%', maxWidth: '15%' }}>{t('business_owner')}</th>
+                                        <th className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider" style={{ width: '15%', maxWidth: '15%' }}>{t('project_manager')}</th>
+                                        <th className="px-5 py-1.5 border-b-2 border-gray-200 tracking-wider" style={{ width: '12%', maxWidth: '12%' }}>{t('phase_timeline')}</th>
+                                        <th className="px-4 py-1.5 border-b-2 border-gray-200 tracking-wider" style={{ width: '3%', maxWidth: '3%' }}>{t('scope')}</th>
+                                        <th className="px-4 py-1.5 border-b-2 border-gray-200 tracking-wider" style={{ width: '3%', maxWidth: '3%' }}>{t('time')}</th>
+                                        <th className="px-4 py-1.5 border-b-2 border-gray-200 tracking-wider" style={{ width: '3%', maxWidth: '3%' }}>{t('cost')}</th>
+                                        <th className="px-16 py-1.5 border-b-2 border-gray-200 tracking-wider" style={{ width: '11%', maxWidth: '11%' }}>{t('budget')} USD($)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -295,9 +294,13 @@ const ProjectsOverview = () => {
                                                     onClick={() => handleRowClick(project.idproject)}
                                                     className={`group cursor-pointer transition duration-300 ease-in-out ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'} hover:bg-gray-200 relative`} 
                                                 >
-                                                    <td className="px-5 py-2 border-b border-gray-200 text-sm">{project.name}</td>
+                                                    <td className="px-5 py-2 border-b border-gray-200 text-sm truncate" style={{ maxWidth: '28%' }}>
+                                                        <div className="whitespace-nowrap overflow-hidden text-ellipsis" title={project.name}>
+                                                            {project.name}
+                                                        </div>
+                                                    </td>
                                                     <td className="px-5 py-2 border-b border-gray-200 text-sm text-center">
-                                                        <span className={`inline-block w-4 h-4 rounded-full ${getRAGColor(project.status)}`} />
+                                                    <span className={`inline-block w-4 h-4 rounded-full ${getRAGColor(project.status)}`} />
                                                     </td>
                                                     <td className="px-5 py-2 border-b border-gray-200 text-sm">
                                                         <div className="flex items-center">
@@ -306,16 +309,16 @@ const ProjectsOverview = () => {
                                                         </div>
                                                     </td>
                                                     <td className="px-5 py-2 border-b border-gray-200 text-sm">
-                                                        <div className="flex items-center">
-                                                            <img src={photos[`photo_${project.project_manager}`] || 'https://via.placeholder.com/150'} alt="Project Manager" className="h-7 w-7 rounded-full" />
-                                                            <span className="ml-3">{names[`name_${project.project_manager}`] || 'N/A'}</span>
-                                                        </div>
+                                                    <div className="flex items-center">
+                                                        <img src={photos[`photo_${project.project_manager}`] || 'https://via.placeholder.com/150'} alt="Project Manager" className="h-7 w-7 rounded-full" />
+                                                        <span className="ml-3">{names[`name_${project.project_manager}`] || 'N/A'}</span>
+                                                    </div>
                                                     </td>
                                                     <td className="px-5 py-2 border-b border-gray-200 text-sm">
                                                         {`${formatDate(project.phase_start)} - ${formatDate(project.phase_end)}`}
                                                     </td>
                                                     <td className="px-5 py-2 border-b border-gray-200 text-sm text-center">
-                                                        <span className={`inline-block w-4 h-4 rounded-full ${getRAGColor(rag.scope_rag)}`} />
+                                                    <span className={`inline-block w-4 h-4 rounded-full ${getRAGColor(rag.scope_rag)}`} />
                                                     </td>
                                                     <td className="px-5 py-2 border-b border-gray-200 text-sm text-center">
                                                         <span className={`inline-block w-4 h-4 rounded-full ${getRAGColor(rag.time_rag)}`} />
@@ -323,7 +326,7 @@ const ProjectsOverview = () => {
                                                     <td className="px-5 py-2 border-b border-gray-200 text-sm text-center">
                                                         <span className={`inline-block w-4 h-4 rounded-full ${getRAGColor(rag.cost_rag)}`} />
                                                     </td>
-                                                    <td className="px-5 py-2 border-b border-gray-200 text-sm flex justify-between items-center" style={{paddingBottom: 'calc(0.5rem + 3px)'}}>
+                                                    <td className="pl-16 pr-5 py-2 border-b border-gray-200 text-sm flex justify-between items-center" style={{paddingBottom: 'calc(0.5rem + 3px)'}}>
                                                         {formatBudget(project.budget_approved)}
                                                         <button 
                                                             onClick={(e) => { e.stopPropagation(); handleDeleteProject(project.idproject); }} 

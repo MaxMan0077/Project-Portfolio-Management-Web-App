@@ -66,7 +66,7 @@ export default function CreateProject() {
         // Validation functions here
         const validateName = (name) => {
             if (!name) return "*Project name is required";
-            if (name.length > 45) return "*Project name must not be more than 45 characters";
+            if (name.length > 45) return "*Project name must not be more than 35 characters";
             return null;
         };
     
@@ -178,6 +178,7 @@ export default function CreateProject() {
                                 placeholder={t('project_name_placeholder')}
                                 value={formData.name}
                                 onChange={handleInputChange}
+                                maxLength={40}
                             />
                             {fieldErrors.name && <p className="text-red-500 text-xs italic">{fieldErrors.name}</p>}
                         </div>
