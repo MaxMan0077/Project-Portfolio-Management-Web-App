@@ -41,7 +41,7 @@ router.get('/latestRAGStatus/:projectId', async (req, res) => {
       SELECT sr.scope_rag, sr.time_rag, sr.cost_rag
       FROM status_report sr
       WHERE sr.project = ?
-      ORDER BY sr.code DESC
+      ORDER BY sr.date DESC
       LIMIT 1;
   `;
 
