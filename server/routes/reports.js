@@ -60,5 +60,21 @@ router.get('/latestRAGStatus/:projectId', async (req, res) => {
   }
 });
 
+// Route to delete a status report
+router.delete('/delete/:reportId', async (req, res) => {
+  const reportId = req.params.reportId;
+
+  try {
+      const [result] = await db.promise().query('DELETE FROM status_report WHERE code = ?', [reportId]);
+      if (result.affectedRows > 0) {
+          res.json({ message: 'Status report deleted successfully' });
+      } else {
+          res.status(404).send('Status report not found');
+      }
+  } catch (error) {
+      console.error('Error deleting status report:', error);
+      res.status(500).send('Error deleting status report');
+  }
+});
 
 module.exports = router;

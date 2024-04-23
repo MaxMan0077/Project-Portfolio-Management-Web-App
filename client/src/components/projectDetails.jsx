@@ -15,6 +15,8 @@ const ProjectDetails = () => {
   const [isEditModalOpen, setIsEditModalOpen] = useState(false);
   const handleOpenEditModal = () => setIsEditModalOpen(true);
   const handleCloseEditModal = () => setIsEditModalOpen(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [selectedProjectId, setSelectedProjectId] = useState(null);
   const [projectManagerName, setProjectManagerName] = useState('');
   const [businessOwnerName, setBusinessOwnerName] = useState('');
   const [resources, setResources] = useState([]);
@@ -79,9 +81,8 @@ const ProjectDetails = () => {
   const fetchStatusReports = async () => {
     try {
       const response = await axios.get(`http://localhost:5001/api/reports/status-reports/${projectId}`);
-      // Assuming the date is in a format that can be directly used for comparison
-      // Sort the reports by date in descending order
-      const sortedReports = response.data.sort((a, b) => new Date(b.date) - new Date(a.date));
+      console.log(response);
+      const sortedReports = response.data.sort((a, b) => new Date(b.date) - new Date(a.date));      // Sort the reports by date in descending order
       setStatusReports(sortedReports);
     } catch (error) {
       console.error("There was an error fetching the status reports:", error);
@@ -159,6 +160,54 @@ const ProjectDetails = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const handleDeleteReport = (reportCode, event) => {
+    console.log("Report Code: ", reportCode); // This should log the correct code
+    event.stopPropagation(); // Prevent event bubbling
+    setSelectedProjectId(reportCode); // Set the ID of the report to be deleted
+    setIsDeleteModalOpen(true); // Show the delete confirmation modal
+  };  
+  
+  const confirmDeleteReport = async () => {
+    if (selectedProjectId) {
+      try {
+        await axios.delete(`http://localhost:5001/api/reports/delete/${selectedProjectId}`);
+        setStatusReports(prevReports => prevReports.filter(report => report.code !== selectedProjectId));
+        setIsDeleteModalOpen(false);
+        console.log('Deletion successful for report code:', selectedProjectId);
+      } catch (error) {
+        console.error('Error deleting report:', error);
+      }
+    }
+  };  
+  
+  // Delete confirmation modal
+  const DeleteConfirmationModal = () => {
+    if (!isDeleteModalOpen) return null;
+    
+    return (
+      <div className="fixed inset-0 bg-black bg-opacity-50 z-50 flex justify-center items-center">
+        <div className="bg-white p-4 rounded-lg shadow-xl">
+          <h4 className="font-semibold text-lg">{t("confirm_delete")}</h4>
+          <p className="my-4">{t("are_sure2")}</p>
+          <div className="flex justify-end space-x-4">
+            <button 
+              onClick={() => setIsDeleteModalOpen(false)}
+              className="mt-3 w-full inline-flex justify-center px-4 py-2 text-base font-medium text-blue-600 hover:text-blue-800 focus:outline-none sm:mt-0 sm:ml-3 sm:w-auto sm:text-sm"
+            >
+              {t("cancel")}
+            </button>
+            <button 
+              onClick={confirmDeleteReport}
+              className="bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded"
+            >
+              {t("delete")}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
+  
   const handleEditProjectSubmit = async (event) => {
     event.preventDefault();
   
@@ -251,7 +300,7 @@ const ProjectDetails = () => {
   
     return (
       <div
-        className={`w-4 h-4 rounded-full ${bgColor}`}
+        className={`w-4 h-4 mx-auto rounded-full ${bgColor}`}
         title={status}
       />
     );
@@ -262,6 +311,7 @@ const ProjectDetails = () => {
   return (
     <>
       <Navbar />
+      <DeleteConfirmationModal />
       <div className="container mx-auto pt-5">
         <div className="mb-4 flex justify-between">
           <button onClick={handleBackClick} className="px-4 py-2 text-white bg-blue-500 rounded">
@@ -301,46 +351,46 @@ const ProjectDetails = () => {
             {t('add')}
           </button>        </div>
         <div className="overflow-x-auto">
-          <table className="min-w-full leading-normal">
-            <thead>
-              <tr>
-                <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
-                  {t('date')}
-                </th>
-                <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
-                  {t('scope')}
-                </th>
-                <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
-                  {t('time')}
-                </th>
-                <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
-                  {t('cost')}
-                </th>
-                <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
-                  {t('percentage')}
-                </th>
-                <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
-                  {t('revised_start')}
-                </th>
-                <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
-                  {t('revised_end')}
-                </th>
-              </tr>
-            </thead>
-            <tbody>
+        <table className="min-w-full leading-normal">
+          <thead>
+            <tr>
+              <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                {t('date')}
+              </th>
+              <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-centre text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                {t('scope')}
+              </th>
+              <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-centre text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                {t('time')}
+              </th>
+              <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-centre text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                {t('cost')}
+              </th>
+              <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                {t('percentage')}
+              </th>
+              <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                {t('revised_start')}
+              </th>
+              <th className="px-5 py-3 border-b-2 border-gray-300 bg-gray-200 text-left text-xs font-semibold text-gray-800 uppercase tracking-wider">
+                {t('revised_end')}
+              </th>
+            </tr>
+          </thead>
+          <tbody>
             {statusReports.length > 0 ? (
               statusReports.map((report, index) => (
-                <tr key={report.code || index} className={`hover:bg-gray-200 ${index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}`}>
+                <tr key={report.code || index} className="group hover:bg-gray-200">
                   <td className="px-5 py-2 border-b border-gray-200 text-sm">
                     {new Date(report.date).toLocaleDateString()}
                   </td>
-                  <td className="px-5 py-2 border-b border-gray-200 text-center">
-                    <RagStatusCircle status={report.time_rag} />
-                  </td>
-                  <td className="px-5 py-2 border-b border-gray-200 text-center">
+                  <td className="px-5 py-2 border-b border-gray-200 text-sm text-center">
                     <RagStatusCircle status={report.scope_rag} />
                   </td>
-                  <td className="px-5 py-2 border-b border-gray-200 text-center">
+                  <td className="px-5 py-2 border-b border-gray-200 text-sm text-center">
+                    <RagStatusCircle status={report.time_rag} />
+                  </td>
+                  <td className="px-5 py-2 border-b border-gray-200 text-sm text-center">
                     <RagStatusCircle status={report.cost_rag} />
                   </td>
                   <td className="px-5 py-2 border-b border-gray-200 text-sm">
@@ -349,8 +399,13 @@ const ProjectDetails = () => {
                   <td className="px-5 py-2 border-b border-gray-200 text-sm">
                     {report.revised_start ? new Date(report.revised_start).toLocaleDateString() : ''}
                   </td>
-                  <td className="px-5 py-2 border-b border-gray-200 text-sm">
+                  <td className="px-5 py-2 border-b border-gray-200 text-sm flex justify-between items-center">
                     {report.revised_end ? new Date(report.revised_end).toLocaleDateString() : ''}
+                    <button onClick={(e) => { e.stopPropagation(); handleDeleteReport(report.code, e); }} className="opacity-0 group-hover:opacity-100 transition-opacity duration-300 ease-in-out">
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-red-500 hover:text-red-700" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                        <path strokeLinecap="round" strokeLinejoin="round" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+                      </svg>
+                    </button>
                   </td>
                 </tr>
               ))
@@ -361,8 +416,8 @@ const ProjectDetails = () => {
                 </td>
               </tr>
             )}
-            </tbody>
-          </table>
+          </tbody>
+        </table>
         </div>
         {isEditModalOpen && (
           <div className="fixed z-10 inset-0 overflow-y-auto mt-10">
