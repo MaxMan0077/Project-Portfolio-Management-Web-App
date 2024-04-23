@@ -192,16 +192,6 @@ const ProjectsOverview = () => {
         (!businessOwnerFilter || project.business_owner === businessOwnerFilter)
     );    
     
-    const areFiltersApplied = () => {
-        return (
-          searchTerm.trim() !== '' ||
-          locationFilter !== '' ||
-          statusFilter !== '' ||
-          projectManagerFilter !== '' ||
-          businessOwnerFilter !== ''
-        );
-    };
-
     const getProjectsByPhase = (phase) => {
         return filteredProjects.filter(project => project.phase.toLowerCase() === phase.toLowerCase());
     };    

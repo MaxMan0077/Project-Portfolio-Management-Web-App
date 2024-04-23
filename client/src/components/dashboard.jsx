@@ -24,7 +24,7 @@ export default function Dashboard() {
     const totalBudget = 10000000;
     const PHASE_COLORS = ['#FCDA0D', '#F99B21', '#FF4B3D', '#9DB0AC', '#000000'];
     const REGION_COLORS = ['#9DB0AC', '#C69C02', '#F99B21', '#9E0B00'];
-    const COMPLEXITY_COLORS = ['#00B51B', '#F8B800', '#E52800'];
+    const COMPLEXITY_COLORS = ['#D700D9', '#6F2962', '#182865'];
 
 
     useEffect(() => {
@@ -128,24 +128,8 @@ export default function Dashboard() {
     }; 
 
     const formatBudget = (budget) => {
-      let value = budget;
-      let suffix = '';
-    
-      // Determine the suffix and divide value accordingly
-      if (budget >= 1_000_000) {
-        value = budget / 1_000_000;
-        suffix = 'M';
-      } else if (budget >= 1000) {
-        value = budget / 1000;
-        suffix = 'K';
-      }
-    
-      // Format the number to have only three significant figures
-      let formattedValue = Number(value.toPrecision(3));
-    
-      // Return formatted string with suffix
-      return `$${formattedValue}${suffix}`;
-    };    
+      return budget.toLocaleString(); // This will use the browser's default locale to format the number
+    };      
 
     // Function to transform data into chart format
     const generateChartData = (projects, key) => {
