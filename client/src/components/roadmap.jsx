@@ -18,6 +18,11 @@ const Roadmap = () => {
   const { formatMessage } = useIntl();
   const t = (id) => formatMessage({ id });
 
+  const currentDate = new Date();
+  const currentYear = currentDate.getFullYear();
+  const currentMonthIndex = currentDate.getMonth(); // 0-indexed month
+  const currentDay = currentDate.getDate();
+
   useEffect(() => {
     const fetchProjects = async () => {
       try {
@@ -30,6 +35,25 @@ const Roadmap = () => {
     };
     fetchProjects();
   }, []);
+
+  const getCurrentDatePosition = () => {
+    if (selectedYear === currentYear) {
+      const daysInCurrentMonth = getDaysInMonth(currentDate);
+      const currentDayOffset = currentDay / daysInCurrentMonth * 100;
+      return currentMonthIndex + currentDayOffset / 100; // This will give us the fractional month index
+    }
+    return -1; // If not in the current year, return -1
+  };
+
+  const currentDatePosition = getCurrentDatePosition(); // Get the current date position for the red line
+
+  const isPhaseInYear = (start, end) => {
+    const yearStart = new Date(selectedYear, 0, 1);
+    const yearEnd = new Date(selectedYear + 1, 0, 0);
+    const phaseStart = parseISO(start);
+    const phaseEnd = parseISO(end);
+    return (phaseStart >= yearStart && phaseStart <= yearEnd) || (phaseEnd >= yearStart && phaseEnd <= yearEnd);
+  };
 
   // Function to calculate the start month offset for a project
   const getMonthOffset = (date) => {
@@ -85,9 +109,19 @@ const Roadmap = () => {
           </button>
         </div>
   
+        {/* Key for phase colors */}
+        <div className="flex justify-around mb-3 mt-6 px-20">
+          {Object.entries(phaseColors).map(([phase, color]) => (
+            <div key={phase} className="flex flex-col items-center"> {/* Adjusted margin here */}
+              <div className="text-sm font-bold">{phase}</div>
+              <div style={{ width: '250px', height: '20px', backgroundColor: color }}></div>
+            </div>
+          ))}
+        </div>
+  
         {/* Grid structure */}
         <div
-          className="grid grid-cols-13 border border-gray-300"
+          className="grid grid-cols-13 border border-gray-300 relative" // Added relative for positioning the current date line
           style={{ gridTemplateColumns: '200px repeat(12, 1fr)' }}
         >
           {/* Year header */}
@@ -99,7 +133,7 @@ const Roadmap = () => {
           </div>
   
           {/* Projects header with dark grey background */}
-          <div className="bg-gray-500 text-white text-center font-bold p-2 border-r border-gray-300">
+          <div className="bg-gray-500 text-white text-left font-bold p-2 border-r border-gray-300">
             Projects
           </div>
   
@@ -110,43 +144,61 @@ const Roadmap = () => {
             </div>
           ))}
   
+          {/* Vertical line for current date */}
+          {selectedYear === new Date().getFullYear() && (
+            <div
+              style={{
+                position: 'absolute',
+                top: 80,
+                bottom: 0,
+                left: `calc(200px + (100% - 200px) * ${currentDate.getMonth() / 12 + (currentDate.getDate() - 1) / getDaysInMonth(currentDate) / 12})`, // Calculate left position based on the current date
+                width: '3px',
+                backgroundColor: '#C20101',
+                zIndex: 10,
+              }}
+            ></div>
+          )}
+  
           {/* Project names and project bars */}
-          {projects.sort((a, b) => a.name.localeCompare(b.name)).map((project, projIndex) => (
-            <React.Fragment key={project.id}>
-              {/* Project name cell */}
-              <div className="bg-gray-300 text-center font-bold p-2 border-r border-gray-400" style={{ height: 'auto', minHeight: '50px' }}>
-                {project.name}
-              </div>
-              
-              {/* Timeline cells for each project */}
-              {Array.from({ length: 12 }, (_, monthIndex) => {
-                const barPosition = calculateBarPosition(project.phase_start, project.phase_end, monthIndex);
-                const phaseColor = phaseColors[project.phase] || '#dddddd'; // default color if phase is not found
-                return (
-                  <div
-                    key={monthIndex}
-                    className="relative p-2 border-t border-r border-gray-400 bg-white"
-                    style={{ height: '100%' }}
-                  >
-                    {/* Bar for project phase dates */}
-                    {monthIndex >= getMonthOffset(project.phase_start) &&
-                    monthIndex <= getMonthOffset(project.phase_end) && (
-                      <div
-                        style={{
-                          position: 'absolute',
-                          top: '50%',
-                          left: barPosition.left,
-                          width: barPosition.width,
-                          transform: 'translateY(-50%)', // Center the bar vertically
-                          height: '20px', // Fixed height of the bar
-                          backgroundColor: phaseColor,
-                        }}
-                      ></div>
-                    )}
-                  </div>
-                );
-              })}
-            </React.Fragment>
+          {projects
+            .filter(project => isPhaseInYear(project.phase_start, project.phase_end)) // Filter projects to include only those within the selected year
+            .sort((a, b) => a.name.localeCompare(b.name)) // Sort projects alphabetically by name
+            .map((project, projIndex) => (
+              <React.Fragment key={project.id}>
+                {/* Project name cell */}
+                <div className="bg-gray-300 text-left font-bold p-2 border-r border-gray-400" style={{ height: 'auto', minHeight: '50px' }}>
+                  {project.name}
+                </div>
+                
+                {/* Timeline cells for each project */}
+                {Array.from({ length: 12 }, (_, monthIndex) => {
+                  const barPosition = calculateBarPosition(project.phase_start, project.phase_end, monthIndex);
+                  const phaseColor = phaseColors[project.phase] || '#dddddd'; // Default color if phase is not found
+                  return (
+                    <div
+                      key={monthIndex}
+                      className="relative p-2 border-t border-r border-gray-400 bg-white"
+                      style={{ height: '100%' }}
+                    >
+                      {/* Bar for project phase dates */}
+                      {monthIndex >= getMonthOffset(project.phase_start) &&
+                      monthIndex <= getMonthOffset(project.phase_end) && (
+                        <div
+                          style={{
+                            position: 'absolute',
+                            top: '50%',
+                            left: barPosition.left,
+                            width: barPosition.width,
+                            transform: 'translateY(-50%)', // Center the bar vertically
+                            height: '20px', // Fixed height of the bar
+                            backgroundColor: phaseColor,
+                          }}
+                        ></div>
+                      )}
+                    </div>
+                  );
+                })}
+              </React.Fragment>
           ))}
         </div>
       </div>
