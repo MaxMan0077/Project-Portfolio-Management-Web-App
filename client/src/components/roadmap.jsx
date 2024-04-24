@@ -5,10 +5,11 @@ import Navbar from './navbar';
 import { useIntl } from 'react-intl';
 
 const phaseColors = {
-  'Planning': '#FFD700', // Gold
-  'Execution': '#1E90FF', // DodgerBlue
-  'Completed': '#32CD32', // LimeGreen
-  // Add more phases and their corresponding colors as needed
+  'Funnel': '#FCDA0D',
+  'Review & Evaluation': '#F99B21',
+  'Business Case Development': '#FF4B3D',
+  'In Implementation': '#9DB0AC',
+  'Closed': '#000000',
 };
 
 const Roadmap = () => {
@@ -110,7 +111,7 @@ const Roadmap = () => {
           ))}
   
           {/* Project names and project bars */}
-          {projects.map((project, projIndex) => (
+          {projects.sort((a, b) => a.name.localeCompare(b.name)).map((project, projIndex) => (
             <React.Fragment key={project.id}>
               {/* Project name cell */}
               <div className="bg-gray-300 text-center font-bold p-2 border-r border-gray-400" style={{ height: 'auto', minHeight: '50px' }}>
@@ -120,6 +121,7 @@ const Roadmap = () => {
               {/* Timeline cells for each project */}
               {Array.from({ length: 12 }, (_, monthIndex) => {
                 const barPosition = calculateBarPosition(project.phase_start, project.phase_end, monthIndex);
+                const phaseColor = phaseColors[project.phase] || '#dddddd'; // default color if phase is not found
                 return (
                   <div
                     key={monthIndex}
@@ -137,7 +139,7 @@ const Roadmap = () => {
                           width: barPosition.width,
                           transform: 'translateY(-50%)', // Center the bar vertically
                           height: '20px', // Fixed height of the bar
-                          backgroundColor: '#4c51bf',
+                          backgroundColor: phaseColor,
                         }}
                       ></div>
                     )}
