@@ -1,8 +1,15 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { format, parseISO, differenceInCalendarMonths, getDaysInMonth, getDate } from 'date-fns';
+import { format, parseISO, differenceInCalendarMonths, getDaysInMonth} from 'date-fns';
 import Navbar from './navbar';
 import { useIntl } from 'react-intl';
+
+const phaseColors = {
+  'Planning': '#FFD700', // Gold
+  'Execution': '#1E90FF', // DodgerBlue
+  'Completed': '#32CD32', // LimeGreen
+  // Add more phases and their corresponding colors as needed
+};
 
 const Roadmap = () => {
   const [projects, setProjects] = useState([]);
@@ -14,7 +21,8 @@ const Roadmap = () => {
     const fetchProjects = async () => {
       try {
         const response = await axios.get('http://localhost:5001/api/projects/getall');
-        setProjects(response.data);
+        const sortedProjects = response.data.sort((a, b) => a.name.localeCompare(b.name));
+        setProjects(sortedProjects);
       } catch (error) {
         console.error('Error fetching projects:', error);
       }
