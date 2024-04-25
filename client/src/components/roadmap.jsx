@@ -45,12 +45,27 @@ const Roadmap = () => {
       const clonedElement = exportElement.cloneNode(true);
       clonedElement.style.position = 'absolute';
       clonedElement.style.top = '-9999px';
+      clonedElement.style.left = '0';
+      clonedElement.style.width = '100vw';
       document.body.appendChild(clonedElement);
+  
+      // Create a title element
+      const titleElement = document.createElement('div');
+      titleElement.textContent = `Project Roadmap ${selectedYear}`;
+      titleElement.style.textAlign = 'center';
+      titleElement.style.width = '100%';
+      titleElement.style.fontSize = '32px';
+      titleElement.style.fontWeight = 'bold';
+      titleElement.style.marginTop = '20px';
+      titleElement.style.marginBottom = '20px';
       
+      // Insert the title at the top of the cloned element
+      clonedElement.insertBefore(titleElement, clonedElement.firstChild);
+  
       // Remove elements that should not be in the PDF
-      const buttonsToRemove = clonedElement.querySelectorAll('.export-button');
-      buttonsToRemove.forEach(button => button.remove());
-      
+      const elementsToRemove = clonedElement.querySelectorAll('.export-button, .year-selector');
+      elementsToRemove.forEach(el => el.remove());
+  
       await html2canvas(clonedElement, { scale: 2 }).then(canvas => {
         const imgData = canvas.toDataURL('image/png');
         const pdf = new jsPDF({
@@ -61,10 +76,10 @@ const Roadmap = () => {
         pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
         pdf.save(`${selectedYear}-roadmap.pdf`);
       });
-      
+  
       document.body.removeChild(clonedElement); // Clean up the cloned element
     }
-  }; 
+  };  
 
   const getCurrentDatePosition = () => {
     if (selectedYear === currentYear) {
@@ -131,17 +146,27 @@ const Roadmap = () => {
     <>
       <Navbar />
       <div ref={exportRef} className="w-full overflow-x-auto px-2 pt-2">
-        {/* Year selector with arrow buttons */}
-        <div className="flex justify-center items-center my-4">
-          <button onClick={decrementYear} className="text-2xl font-bold mx-4">
-            &#8592; {/* Left arrow symbol */}
-          </button>
-          <div className="text-2xl font-bold">{selectedYear}</div>
-          <button onClick={incrementYear} className="text-2xl font-bold mx-4">
-            &#8594; {/* Right arrow symbol */}
+        {/* Top section with year selector and export button */}
+        <div className="flex items-center justify-between my-4">
+          {/* Left placeholder for balance */}
+          <div className="w-24"></div>
+  
+          {/* Year selector centered with additional right margin */}
+          <div className="flex justify-center items-center ml-10 year-selector"> {/* Here we add the 'year-selector' class */}
+            <button onClick={decrementYear} className="text-2xl font-bold mx-4">
+              &#8592; {/* Left arrow symbol */}
+            </button>
+            <div className="text-2xl font-bold">{selectedYear}</div>
+            <button onClick={incrementYear} className="text-2xl font-bold mx-4">
+              &#8594; {/* Right arrow symbol */}
+            </button>
+          </div>
+  
+          {/* Export button to the right with padding */}
+          <button onClick={exportPDF} className="export-button p-3 bg-blue-500 text-white font-bold rounded mr-4"> {/* Adjust padding as needed */}
+            Export as PDF
           </button>
         </div>
-        <button onClick={exportPDF} className="export-button mb-4 p-2 bg-blue-500 text-white font-bold rounded">Export as PDF</button>
   
         {/* Key for phase colors */}
         <div className="flex justify-around mb-3 mt-6 px-20">
