@@ -82,8 +82,11 @@ const Roadmap = () => {
     const yearEnd = new Date(selectedYear + 1, 0, 0);
     const phaseStart = parseISO(start);
     const phaseEnd = parseISO(end);
-    return (phaseStart >= yearStart && phaseStart <= yearEnd) || (phaseEnd >= yearStart && phaseEnd <= yearEnd);
-  };
+  
+    return (
+      (phaseStart < yearEnd && phaseEnd > yearStart) // Covers projects that start before and end after the selected year
+    );
+  };  
 
   // Function to calculate the start month offset for a project
   const getMonthOffset = (date) => {
@@ -143,8 +146,8 @@ const Roadmap = () => {
         {/* Key for phase colors */}
         <div className="flex justify-around mb-3 mt-6 px-20">
           {Object.entries(phaseColors).map(([phase, color]) => (
-            <div key={phase} className="flex flex-col items-center"> {/* Adjusted margin here */}
-              <div className="text-sm font-bold">{phase}</div>
+            <div key={phase} className="flex flex-col items-center">
+              <div className="mb-2 text-sm font-bold">{phase}</div>
               <div style={{ width: '250px', height: '20px', backgroundColor: color }}></div>
             </div>
           ))}
