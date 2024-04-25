@@ -5,6 +5,7 @@ import { FaChartBar } from "react-icons/fa6";
 import { motion, AnimatePresence } from 'framer-motion';
 import { useIntl } from 'react-intl';
 import { useLanguage } from '../LanguageContext';
+import UserEditModal from './editProfileModal';
 
 const SettingsModal = ({ isOpen, onClose }) => {
   const intl = useIntl();
@@ -12,7 +13,7 @@ const SettingsModal = ({ isOpen, onClose }) => {
 
   const handleLanguageChange = (event) => {
     const newLang = event.target.value === 'English' ? 'en' : 'ua';
-    toggleLanguage(newLang); // Toggle language
+    toggleLanguage(newLang);
     console.log("Language changed to:", newLang);
     onClose();
   };
@@ -47,13 +48,21 @@ const SettingsModal = ({ isOpen, onClose }) => {
 
 const Navbar = () => {
   const [isProfileMenuOpen, setIsProfileMenuOpen] = useState(false);
+  const [isEditProfileModalOpen, setIsEditProfileModalOpen] = useState(false);
   const [isSettingsModalOpen, setIsSettingsModalOpen] = useState(false);
   const navigate = useNavigate();
-  const { formatMessage } = useIntl(); // Use useIntl hook
-  const t = (id) => formatMessage({ id }); // Helper function for translations
+  const { formatMessage } = useIntl();
+  const t = (id) => formatMessage({ id });
   
   // Retrieve the user's photo from localStorage
   const userPhoto = localStorage.getItem('userPhoto');
+
+  const [userDetails, setUserDetails] = useState({
+    username: 'User',
+    firstName: 'John',
+    lastName: 'Doe',
+    email: 'john.doe@example.com'
+  });
 
   const handleProfileClick = () => {
     setIsProfileMenuOpen(prev => !prev);
@@ -65,6 +74,16 @@ const Navbar = () => {
       console.log("User confirmed logout.");
       navigate('/');
     }
+  };
+
+  const handleOpenEditProfile = () => {
+    setIsEditProfileModalOpen(true);
+    setIsProfileMenuOpen(false);
+  };
+
+  const updateUserDetails = (updatedDetails) => {
+    setUserDetails(updatedDetails);
+    console.log('Updated User Details:', updatedDetails);
   };
 
   const handleOpenSettings = () => {
@@ -188,7 +207,7 @@ const Navbar = () => {
                     transition: { duration: 0.1 }
                   }
                 }}>
-                  <Link to="/your-profile" className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('your_profile')}</Link>
+                  <button onClick={handleOpenEditProfile} className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100">{t('your_profile')}</button>
                 </motion.div>
                 <motion.div variants={{
                   hidden: { x: -10, opacity: 0 },
@@ -215,6 +234,12 @@ const Navbar = () => {
           </AnimatePresence>
         </div>
       </div>
+      <UserEditModal
+        isOpen={isEditProfileModalOpen}
+        onClose={() => setIsEditProfileModalOpen(false)}
+        userDetails={userDetails}
+        updateUserDetails={updateUserDetails}
+      />
       <SettingsModal isOpen={isSettingsModalOpen} onClose={() => setIsSettingsModalOpen(false)} />
     </nav>
   );  
