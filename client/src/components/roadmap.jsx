@@ -1,8 +1,10 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef} from 'react';
 import axios from 'axios';
 import { format, parseISO, differenceInCalendarMonths, getDaysInMonth} from 'date-fns';
 import Navbar from './navbar';
 import { useIntl } from 'react-intl';
+import html2canvas from 'html2canvas';
+import jsPDF from 'jspdf';
 
 const phaseColors = {
   'Funnel': '#FCDA0D',
@@ -17,6 +19,7 @@ const Roadmap = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const { formatMessage } = useIntl();
   const t = (id) => formatMessage({ id });
+  const exportRef = useRef();  // Reference to the element you want to export
 
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
@@ -35,6 +38,33 @@ const Roadmap = () => {
     };
     fetchProjects();
   }, []);
+
+  const exportPDF = async () => {
+    const exportElement = exportRef.current;
+    if (exportElement) {
+      const clonedElement = exportElement.cloneNode(true);
+      clonedElement.style.position = 'absolute';
+      clonedElement.style.top = '-9999px';
+      document.body.appendChild(clonedElement);
+      
+      // Remove elements that should not be in the PDF
+      const buttonsToRemove = clonedElement.querySelectorAll('.export-button');
+      buttonsToRemove.forEach(button => button.remove());
+      
+      await html2canvas(clonedElement, { scale: 2 }).then(canvas => {
+        const imgData = canvas.toDataURL('image/png');
+        const pdf = new jsPDF({
+          orientation: 'landscape',
+          unit: 'px',
+          format: [canvas.width, canvas.height]
+        });
+        pdf.addImage(imgData, 'PNG', 0, 0, canvas.width, canvas.height);
+        pdf.save(`${selectedYear}-roadmap.pdf`);
+      });
+      
+      document.body.removeChild(clonedElement); // Clean up the cloned element
+    }
+  }; 
 
   const getCurrentDatePosition = () => {
     if (selectedYear === currentYear) {
@@ -97,7 +127,7 @@ const Roadmap = () => {
   return (
     <>
       <Navbar />
-      <div className="w-full overflow-x-auto px-2 pt-2">
+      <div ref={exportRef} className="w-full overflow-x-auto px-2 pt-2">
         {/* Year selector with arrow buttons */}
         <div className="flex justify-center items-center my-4">
           <button onClick={decrementYear} className="text-2xl font-bold mx-4">
@@ -108,6 +138,7 @@ const Roadmap = () => {
             &#8594; {/* Right arrow symbol */}
           </button>
         </div>
+        <button onClick={exportPDF} className="export-button mb-4 p-2 bg-blue-500 text-white font-bold rounded">Export as PDF</button>
   
         {/* Key for phase colors */}
         <div className="flex justify-around mb-3 mt-6 px-20">
