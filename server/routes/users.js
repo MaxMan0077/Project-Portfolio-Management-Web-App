@@ -80,6 +80,26 @@ router.post('/login', async (req, res) => {
     }
 });
 
+// Logout route
+router.post('/logout', (req, res) => {
+    if (req.session) {
+        // destroy the session
+        req.session.destroy(err => {
+            if (err) {
+                // Failed to destroy session
+                res.status(500).send('Failed to logout');
+            } else {
+                // Session destroyed
+                res.clearCookie('session_cookie_name'); // Match the name of your session cookie
+                res.json({ message: 'Logged out successfully' });
+            }
+        });
+    } else {
+        // No session found
+        res.status(404).send('No session found');
+    }
+});
+
 // GET route to fetch current user session data
 router.get('/session', (req, res) => {
     if (req.session.user) {
@@ -196,7 +216,7 @@ router.put('/updateProfile/:iduser', upload.single('photo'), async (req, res) =>
             message: 'User profile updated successfully', 
             photoUrl: photo ? `http://localhost:5001/uploads/${photo}` : req.body.currentPhoto // send back new photo URL or current
         });
-        
+
     } catch (err) {
         console.error('Error updating user profile:', err);
         res.status(500).send('Error updating user profile');

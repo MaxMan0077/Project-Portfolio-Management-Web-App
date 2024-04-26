@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
+import axios from 'axios';
 import { FaHome, FaUsers, FaTasks, FaTrello,} from 'react-icons/fa';
 import { FaChartBar } from "react-icons/fa6";
 import { motion, AnimatePresence } from 'framer-motion';
@@ -67,11 +68,24 @@ const Navbar = () => {
     setIsProfileMenuOpen(prev => !prev);
   };
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     const isConfirmed = window.confirm("Are you sure you want to log out?");
     if (isConfirmed) {
-      console.log("User confirmed logout.");
-      navigate('/');
+      try {
+        // Make a POST request to the logout route
+        const response = await axios.post('http://localhost:5001/api/users/logout', {}, { withCredentials: true });
+        console.log(response.data.message);
+        
+        // Clear user photo from local storage
+        localStorage.removeItem('userPhoto');
+
+        // Navigate the user to the home page or login page
+        navigate('/');
+
+        // Optionally, reset any user-related context or state
+      } catch (error) {
+        console.error('Logout failed:', error.response?.data || 'No error message available');
+      }
     }
   };
 
