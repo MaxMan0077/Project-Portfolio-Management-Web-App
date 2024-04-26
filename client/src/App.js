@@ -14,6 +14,7 @@ import { IntlProvider } from 'react-intl';
 import { LanguageContext } from './LanguageContext';
 import messagesEN from './locales/en.json';
 import messagesUA from './locales/ua.json';
+import './axiosConfig';
 
 const messages = {
   en: messagesEN,

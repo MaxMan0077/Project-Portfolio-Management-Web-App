@@ -233,12 +233,12 @@ export default function Dashboard() {
                   <div className="text-3xl font-bold">{getActiveProjectsCount()}</div>
                 </div>
                 <div className="flex-1 min-w-0 rounded shadow p-4 m-2 flex flex-col justify-center items-center">
-                  <div className="text-gray-500 text-md font-semibold">{t('total_budget')}</div>
-                  <div className="text-3xl font-bold">{`$${totalBudget.toLocaleString()}`}</div>
+                  <div className="text-gray-500 text-md font-semibold">{t('total_budget')} USD</div>
+                  <div className="text-3xl font-bold">{`${totalBudget.toLocaleString()}`}</div>
                 </div>
                 <div className="flex-1 min-w-0 rounded shadow p-4 m-2 flex flex-col justify-center items-center">
-                  <div className="text-gray-500 text-md font-semibold">{t('total_expenditure')}</div>
-                  <div className="text-3xl font-bold">{`$${totalExpenditure.toLocaleString()}`}</div>
+                  <div className="text-gray-500 text-md font-semibold">{t('total_expenditure')} USD</div>
+                  <div className="text-3xl font-bold">{`${totalExpenditure.toLocaleString()}`}</div>
                 </div>
               </div>
               <div className="flex flex-wrap justify-around">

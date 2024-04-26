@@ -327,7 +327,7 @@ const ProjectDetails = () => {
         <div className="flex justify-between items-start gap-2 mb-3 flex-wrap">
           {[
             { label: t('phase'), value: t(project.phase) },
-            { label: t('budget_approved'), value: `$${project.budget_approved}` },
+            { label: t('budget_approved'), value: `USD ${project.budget_approved}` },
             { label: t('location'), value: project.location },
             { label: t('project_manager'), value: projectManagerName },
             { label: t('business_owner'), value: businessOwnerName },
