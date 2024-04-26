@@ -14,7 +14,6 @@ const SettingsModal = ({ isOpen, onClose }) => {
   const handleLanguageChange = (event) => {
     const newLang = event.target.value === 'English' ? 'en' : 'ua';
     toggleLanguage(newLang);
-    console.log("Language changed to:", newLang);
     onClose();
   };
 
