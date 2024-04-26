@@ -53,20 +53,21 @@ router.post('/login', async (req, res) => {
     try {
         const sql = 'SELECT * FROM user WHERE username = ?';
         const [users] = await db.promise().query(sql, [username]);
-        console.log("Users found: ", users);
 
         if (users.length > 0) {
             const user = users[0];
-            console.log("User found: ", user);
             const passwordMatch = await bcryptjs.compare(password, user.password);
-            console.log("Password match: ", passwordMatch);
 
             if (passwordMatch) {
-                // Assuming `photo` is the column name where the photo filename is stored
-                const photo = user.photo ? `http://localhost:5001/uploads/${user.photo}` : null;
+                // Store user info in session
+                req.session.user = {
+                    id: user.iduser,  // Assuming `iduser` is the identifier in your database
+                    username: user.username,
+                    photo: user.photo ? `http://localhost:5001/uploads/${user.photo}` : null
+                    // You can add more user specific details here if necessary
+                };
 
-                // Including the photo URL in the response
-                res.status(200).json({ message: "Login successful", photo: photo });
+                res.status(200).json({ message: "Login successful", photo: req.session.user.photo });
             } else {
                 res.status(401).json({ message: "Invalid credentials" });
             }
@@ -76,6 +77,18 @@ router.post('/login', async (req, res) => {
     } catch (err) {
         console.error("Error during login: ", err);
         res.status(500).json({ message: "Server error" });
+    }
+});
+
+// GET route to fetch current user session data
+router.get('/session', (req, res) => {
+    if (req.session.user) {
+        res.json({
+            message: 'Current session data',
+            sessionData: req.session.user
+        });
+    } else {
+        res.status(404).json({ message: 'No active session found' });
     }
 });
 
@@ -98,36 +111,95 @@ router.get('/getall', async (req, res) => {
     }
 });
 
-// PUT route to update an existing user
-router.put('/update/:iduser', async (req, res) => {
-    const { iduser } = req.params;
-    const { name_first, name_second, office, department, user_type, photo } = req.body;
+// GET route to fetch specific user details
+router.get('/user/:id', async (req, res) => {
+    const { id } = req.params;
+    try {
+        const sql = 'SELECT iduser, name_first, name_second, username, password, photo FROM user WHERE iduser = ?';
+        const [results] = await db.promise().query(sql, [id]);
 
-    if (!iduser) {
-        return res.status(400).send('User ID is required');
+        if (results.length > 0) {
+            const user = results[0];
+            user.photo = user.photo ? `http://localhost:5001/uploads/${user.photo}` : null;
+            res.json({
+                message: 'User details fetched successfully',
+                userDetails: {
+                    iduser: user.iduser,
+                    nameFirst: user.name_first,
+                    nameSecond: user.name_second,
+                    username: user.username,
+                    password: user.password,
+                    photo: user.photo
+                }
+            });
+        } else {
+            res.status(404).json({ message: "User not found" });
+        }
+    } catch (err) {
+        console.error("Error fetching user details:", err);
+        res.status(500).json({ message: "Error fetching user details" });
     }
+});
+
+// PUT route to update an existing user's profile
+router.put('/updateProfile/:iduser', upload.single('photo'), async (req, res) => {
+    const { iduser } = req.params;
+    const { name_first, name_second, username, password } = req.body;
+    let photo = req.file ? req.file.filename : null;
 
     try {
-        // Decode base64 photo to binary buffer if photo is provided
-        const photoBuffer = photo ? Buffer.from(photo, 'base64') : null;
+        let sql = 'UPDATE user SET ';
+        const changes = [];
+        const params = [];
 
-        const query = `
-            UPDATE user
-            SET
-                name_first = ?,
-                name_second = ?,
-                office = ?,
-                department = ?,
-                user_type = ?,
-                photo = ?
-            WHERE iduser = ?
-        `;
-        // Pass the binary photo buffer to the database
-        await db.promise().query(query, [name_first, name_second, office, department, user_type, photoBuffer, iduser]);
-        res.json({ message: 'User updated successfully' });
+        // Add checks for each parameter to ensure it's provided before adding to the query
+        if (name_first) {
+            changes.push('name_first = ?');
+            params.push(name_first);
+        }
+        if (name_second) {
+            changes.push('name_second = ?');
+            params.push(name_second);
+        }
+        if (username) {
+            changes.push('username = ?');
+            params.push(username);
+        }
+
+        // Update the photo if a new one is uploaded
+        if (photo) {
+            changes.push('photo = ?');
+            params.push(photo);
+        }
+
+        // Only update the password if one is provided
+        if (password && password.trim() !== '') {
+            const salt = await bcryptjs.genSalt(10);
+            const hashedPassword = await bcryptjs.hash(password, salt);
+            changes.push('password = ?');
+            params.push(hashedPassword);
+        }
+
+        // If no fields are provided to update, return an error
+        if (changes.length === 0) {
+            res.status(400).json({ message: 'No updates provided' });
+            return;
+        }
+
+        // Append the user ID to the parameters and finalize the SQL statement
+        sql += changes.join(', ') + ' WHERE iduser = ?';
+        params.push(iduser);
+
+        // Execute the update query
+        await db.promise().query(sql, params);
+        res.json({ 
+            message: 'User profile updated successfully', 
+            photoUrl: photo ? `http://localhost:5001/uploads/${photo}` : req.body.currentPhoto // send back new photo URL or current
+        });
+        
     } catch (err) {
-        console.error('Error updating user:', err);
-        res.status(500).send('Error updating user');
+        console.error('Error updating user profile:', err);
+        res.status(500).send('Error updating user profile');
     }
 });
 

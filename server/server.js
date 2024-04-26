@@ -7,11 +7,11 @@ const path = require('path');
 
 // Configure MySQL session store
 const sessionStoreOptions = {
-    host: 'your_mysql_host', // Replace with your MySQL server host
+    host: 'localhost', // Replace with your MySQL server host
     port: 3306, // Default MySQL port
-    user: 'your_mysql_user', // Your MySQL username
-    password: 'your_mysql_password', // Your MySQL password
-    database: 'your_mysql_database' // Your MySQL database where sessions will be stored
+    user: 'root', // Your MySQL username
+    password: 'Uptix1478', // Your MySQL password
+    database: 'ppm_database' // Your MySQL database where sessions will be stored
 };
 
 const sessionStore = new MySQLStore(sessionStoreOptions);
@@ -28,7 +28,7 @@ app.use(session({
     }
 }));
 
-// Configure CORS to allow credentials and specify the client origin
+// CORS configuration to allow credentials and specify the client origin
 app.use(cors({
     origin: 'http://localhost:3000', // Specify the client origin explicitly
     credentials: true // Critical for cookies, authorization headers with HTTPS

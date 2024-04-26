@@ -65,13 +65,15 @@ export default function Login() {
     const handleLogin = async (e) => {
         e.preventDefault();
         try {
-            const response = await axios.post('http://localhost:5001/api/users/login', credentials);
+            const response = await axios.post('http://localhost:5001/api/users/login', credentials, {
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                withCredentials: true
+            });
             if (response.status === 200) {
                 console.log("Login successful");
-                
-                // Assuming the response includes the user's photo info
                 localStorage.setItem('userPhoto', response.data.photo);
-    
                 fadeToDashboard();
             } else {
                 console.log("Login failed: ", response.data.message);
