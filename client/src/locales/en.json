@@ -3,6 +3,7 @@
   "total_budget": "Total Budget",
   "total_expenditure": "Total Expenditure",
   "active_projects": "Active Projects",
+  "active_projects_in": "Active Projects - In Implementation",
   "project_name": "Project Name",
   "program": "Program",
   "status": "Status",
@@ -204,5 +205,10 @@
   "are_sure2": "Are you sure you want to delete this status report?",
   "confirm_delete": "Confirm Deletion",
   "clear_filters": "Clear Filters",
-  "budget": "Budget"
+  "budget": "Budget",
+  "account_info": "Account Info",
+  "new_password": "New Password",
+  "upload_new_photo": "Upload New Photo",
+  "username_taken": "Username is taken",
+  "password_requirements": "Password must be minimum 8 characters, must contain at least one uppercase letter, one lowercase letter, and one number"
 }

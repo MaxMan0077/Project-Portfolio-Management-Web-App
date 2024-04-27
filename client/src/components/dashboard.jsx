@@ -250,7 +250,7 @@ export default function Dashboard() {
             <div className="mt-1 px-5">
               {/* Header "Active Projects" */}
               <div className="text-left mb-5">
-                <h2 className="text-3xl font-bold">{t('active_projects')}</h2>
+                <h2 className="text-3xl font-bold">{t('active_projects_in')}</h2>
               </div>
               <div style={{ maxHeight: 'calc(60px * 8)', overflowY: 'auto' }}>
                 <table className="min-w-full leading-normal w-full">

@@ -161,6 +161,20 @@ router.get('/user/:id', async (req, res) => {
     }
 });
 
+// Route to check if username is unique
+router.get('/check-username', async (req, res) => {
+    const { username } = req.query;
+    try {
+        const sql = 'SELECT COUNT(*) AS count FROM user WHERE username = ?';
+        const [result] = await db.promise().query(sql, [username]);
+        const isUnique = result[0].count === 0;
+        res.json({ isUnique });
+    } catch (error) {
+        console.error('Error checking username:', error);
+        res.status(500).send('Error checking username');
+    }
+});
+
 // PUT route to update an existing user's profile
 router.put('/updateProfile/:iduser', upload.single('photo'), async (req, res) => {
     const { iduser } = req.params;

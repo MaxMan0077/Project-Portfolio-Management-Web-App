@@ -3,6 +3,7 @@
   "total_budget": "Загальний бюджет",
   "total_expenditure": "Загальні витрати",
   "active_projects": "Активні проекти",
+  "active_projects_in": "Активні Проекти - У Виконанні",
   "project_name": "Назва проекту",
   "program": "Програма",
   "status": "Статус",
@@ -179,5 +180,10 @@
   "confirm_delete": "Підтвердіть видалення",
   "clear_filters": "Очистити фільтри",
   "budget": "Бюджет",
-  "project_description": "Опис проєкту"
+  "project_description": "Опис проєкту",
+  "account_info": "Інформація про рахунок",
+  "new_password": "Новий пароль",
+  "upload_new_photo": "Завантажити нове фото",
+  "username_taken": "Ім'я користувача вже зайнято",
+  "password_requirements": "Пароль повинен містити мінімум 8 символів, включати хоча б одну велику літеру, одну маленьку літеру та одну цифру"
 }

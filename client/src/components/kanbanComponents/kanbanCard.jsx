@@ -48,7 +48,7 @@ const KanbanCard = ({ project, index }) => {
     if (Number(budget) === 0) {
       return 'Budget USD: 0';
     }
-    return budget ? `Budget USD: ${Math.round(Number(budget)).toLocaleString()}` : t('not_applicable');
+    return budget ? `${t('budget')} USD ${Math.round(Number(budget)).toLocaleString()}` : t('not_applicable');
   };  
   
   const locationColorMap = {

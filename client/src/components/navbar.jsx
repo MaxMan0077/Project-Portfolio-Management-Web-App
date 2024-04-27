@@ -34,8 +34,8 @@ const SettingsModal = ({ isOpen, onClose }) => {
             onChange={handleLanguageChange}
             className="mt-1 block w-full pl-3 pr-10 py-2 text-base border-gray-300 focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 sm:text-sm rounded-md"
           >
-            <option value="English">{intl.formatMessage({ id: 'english' })}</option>
-            <option value="Ukrainian">{intl.formatMessage({ id: 'ukrainian' })}</option>
+            <option value="English">English</option>
+            <option value="Ukrainian">Українська</option>
           </select>
         </div>
         <button onClick={onClose} className="mt-4 bg-red-500 hover:bg-red-700 text-white font-bold py-2 px-4 rounded">

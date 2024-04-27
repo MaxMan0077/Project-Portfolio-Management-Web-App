@@ -19,7 +19,7 @@ const Roadmap = () => {
   const [selectedYear, setSelectedYear] = useState(new Date().getFullYear());
   const { formatMessage } = useIntl();
   const t = (id) => formatMessage({ id });
-  const exportRef = useRef();  // Reference to the element you want to export
+  const exportRef = useRef();
 
   const currentDate = new Date();
   const currentYear = currentDate.getFullYear();
@@ -164,7 +164,7 @@ const Roadmap = () => {
   
           {/* Export button to the right with padding */}
           <button onClick={exportPDF} className="export-button p-3 bg-blue-500 text-white font-bold rounded mr-4"> {/* Adjust padding as needed */}
-            Export as PDF
+            {t('export_to_pdf')}
           </button>
         </div>
   
@@ -172,7 +172,9 @@ const Roadmap = () => {
         <div className="flex justify-around mb-3 mt-6 px-20">
           {Object.entries(phaseColors).map(([phase, color]) => (
             <div key={phase} className="flex flex-col items-center">
-              <div className="mb-2 text-sm font-bold">{phase}</div>
+              <div className="mb-2 text-sm font-bold">
+                {t(phase)}
+              </div>
               <div style={{ width: '250px', height: '20px', backgroundColor: color }}></div>
             </div>
           ))}
@@ -193,7 +195,7 @@ const Roadmap = () => {
   
           {/* Projects header with dark grey background */}
           <div className="bg-gray-500 text-white text-left font-bold p-2 border-r border-gray-300">
-            Projects
+            {t('projects')}
           </div>
   
           {/* Month headers with grey background */}
