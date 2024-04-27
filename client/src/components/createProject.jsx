@@ -296,9 +296,9 @@ export default function CreateProject() {
                                 onChange={handleInputChange}
                             >
                                 <option value="">{t('select_status')}</option>
-                                <option value="Red">{t('Red')}</option>
-                                <option value="Amber">{t('Amber')}</option>
-                                <option value="Green">{t('Green')}</option>
+                                <option value="Red">{t('red')}</option>
+                                <option value="Amber">{t('amber')}</option>
+                                <option value="Green">{t('green')}</option>
                             </select>
                             {fieldErrors.status && <p className="text-red-500 text-xs italic">{fieldErrors.status}</p>}
                         </div>

@@ -33,7 +33,6 @@ const ResourceModal = ({ resource, onClose, onSave, onDelete }) => {
         }
         if (!resourceData.office) errors.office = "Office is required.";
         if (!resourceData.department) errors.department = "Department is required.";
-        // Add validations for other fields if necessary
         return errors;
     };
 
@@ -86,6 +85,43 @@ const ResourceModal = ({ resource, onClose, onSave, onDelete }) => {
                                         <option value="3">Shanghai</option>
                                         <option value="4">Brisbane</option>
                                         <option value="5">Cape Town</option>
+                                    </select>
+                                ) : field === 'department' ? (
+                                    <select
+                                        className={inputClass(field)}
+                                        name={field}
+                                        onChange={handleChange}
+                                        value={resourceData[field]}
+                                    >
+                                        <option value="">{t('department')}</option>
+                                        <option value="Information Technology">{t('Information Technology')}</option>
+                                        <option value="Development">{t('Development')}</option>
+                                        <option value="Human Resources">{t('Human Resources')}</option>
+                                        <option value="Change Management">{t('Change Management')}</option>
+                                        <option value="Front Office">{t('Front Office')}</option>
+                                        <option value="Back Office">{t('Back Office')}</option>
+                                    </select>
+                                ) : field === 'role' ? (
+                                    <select
+                                        className={inputClass(field)}
+                                        name={field}
+                                        onChange={handleChange}
+                                        value={resourceData[field]}
+                                    >
+                                        <option value="">{t("select_role")}</option>
+                                        <option value="admin">{t("admin")}</option>
+                                        <option value="user">{t("user")}</option>
+                                    </select>
+                                ) : field === 'type' ? (
+                                    <select
+                                        className={inputClass(field)}
+                                        name={field}
+                                        onChange={handleChange}
+                                        value={resourceData[field]}
+                                    >
+                                        <option value="">{t("select_type")}</option>
+                                        <option value="internal">{t("internal")}</option>
+                                        <option value="external">{t("external")}</option>
                                     </select>
                                 ) : (
                                     <input

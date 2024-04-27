@@ -84,6 +84,32 @@ const UserModal = ({ user, onClose, onSave, onDelete }) => {
                                         <option value="4">Brisbane</option>
                                         <option value="5">Cape Town</option>
                                     </select>
+                                ) : field === 'department' ? (
+                                    <select
+                                        className={inputClass(field)}
+                                        name={field}
+                                        onChange={handleChange}
+                                        value={userData[field]}
+                                    >
+                                        <option value="">{t('select_department')}</option>
+                                        <option value="Information Technology">{t('Information Technology')}</option>
+                                        <option value="Development">{t('Development')}</option>
+                                        <option value="Human Resources">{t('Human Resources')}</option>
+                                        <option value="Change Management">{t('Change Management')}</option>
+                                        <option value="Front Office">{t('Front Office')}</option>
+                                        <option value="Back Office">{t('Back Office')}</option>
+                                    </select>
+                                ) : field === 'user_type' ? (
+                                    <select
+                                        className={inputClass(field)}
+                                        name={field}
+                                        onChange={handleChange}
+                                        value={userData[field]}
+                                    >
+                                        <option value="">{t('select_user_type')}</option>
+                                        <option value="user">{t('user')}</option>
+                                        <option value="admin">{t('admin')}</option>
+                                    </select>
                                 ) : (
                                     <input
                                         type="text"
