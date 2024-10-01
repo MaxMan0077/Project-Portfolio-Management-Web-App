@@ -7,22 +7,22 @@ const path = require('path');
 
 // Configure MySQL session store
 const sessionStoreOptions = {
-    host: 'localhost', // Replace with your MySQL server host
-    port: 3306, // Default MySQL port
-    user: 'root', // Your MySQL username
-    password: 'Uptix1478', // Your MySQL password
-    database: 'ppm_database' // Your MySQL database where sessions will be stored
+    host: 'localhost',
+    port: 3306,
+    user: 'root',
+    password: '',
+    database: 'ppm_database'
 };
 
 const sessionStore = new MySQLStore(sessionStoreOptions);
 
 // Session middleware configuration
 app.use(session({
-    key: 'session_cookie_name', // The name of the cookie
-    secret: 'your_secret_key', // Secret key to sign the session ID cookie
-    store: sessionStore, // Use MySQL session store
-    resave: false, // Do not resave sessions that haven't been modified
-    saveUninitialized: false, // Do not save uninitialized sessions
+    key: 'session_cookie_name',
+    secret: 'your_secret_key',
+    store: sessionStore, 
+    resave: false,
+    saveUninitialized: false,
     cookie: {
         maxAge: 86400000 // 24 hours in milliseconds
     }
@@ -30,8 +30,8 @@ app.use(session({
 
 // CORS configuration to allow credentials and specify the client origin
 app.use(cors({
-    origin: 'http://localhost:3000', // Specify the client origin explicitly
-    credentials: true // Critical for cookies, authorization headers with HTTPS
+    origin: 'http://localhost:3000', 
+    credentials: true 
 }));
 
 // Middleware to parse JSON bodies
